@@ -39,16 +39,3 @@ art_illumina -rs 0 -ss HS25 -sam -i DS1.fa -p -l 150 -f 10 -m 200 -s 10 -o DS1
 art_illumina -rs 0 -ss HS25 -sam -i DS2.fa -p -l 150 -f 20 -m 200 -s 10 -o DS2
 art_illumina -rs 0 -ss HS25 -sam -i DS3.fa -p -l 150 -f 30 -m 200 -s 10 -o DS3
 #
-#
-# COPY DATASETS TO TESTING FOLDER:
-mkdir -p datasets;
-cp DS1*.fq datasets/
-cp DS2*.fq datasets/
-cp DS2*.fq datasets/
-#
-mkdir -p references;
-cp SVA_*.fa references/
-cp B19_*.fa references/
-cp HPV_*.fa references/
-cp HV4_*.fa references/
-#

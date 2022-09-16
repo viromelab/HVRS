@@ -3,19 +3,19 @@
 declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("SVA" "B19" "HPV" "HV4");
 #
-D_PATH="../output_data/TRACES_hybrid_R5_consensus";
+D_PATH="reconstructed";
 #
 for dataset in "${DATASETS[@]}"
   do
   printf "$dataset\n";	  
   for virus in "${VIRUSES[@]}"
     do	  
-    if [ -f B-$virus-$dataset.fa ];
+    if [ -f $virus-$dataset.fa ];
       then
       #
       printf "$virus\t";	  
-      cp $D_PATH/$virus-consensus-$dataset.fa G_A.fa;
-      cp B-$virus-$dataset.fa G_B.fa
+      cp $D_PATH/$virus-$dataset.fa G_A.fa;
+      cp $virus-$dataset.fa G_B.fa
       #
       dnadiff G_A.fa G_B.fa ;
       #
