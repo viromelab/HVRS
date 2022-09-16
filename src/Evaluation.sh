@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 declare -a DATASETS=("DS1" "DS2" "DS3");
-declare -a VIRUSES=("SVA" "B19" "HPV" "HV4");
+declare -a VIRUSES=("SVA" "B19" "HPV" "VZV");
 #
 D_PATH="reconstructed";
 #
