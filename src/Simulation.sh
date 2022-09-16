@@ -2,6 +2,7 @@
 #
 zcat MINIDB.fa.gz > VDB.fa
 #
+gto_fasta_extract_read_by_pattern -p "Synthetic DNA generated with gto" < VDB.fa > SVA.fa
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "X04370.1" < VDB.fa > HV3.fa
 gto_fasta_extract_read_by_pattern -p "MG921180.1" < VDB.fa > HPV.fa
