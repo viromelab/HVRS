@@ -3,13 +3,14 @@ Human Viral Reconstruction Survey
 
 ### REPLICATION ###
 
-Run the whole experiment:
+Run the whole experiment in a Linux system with:
 <pre>
-cd /src/
-Installation.sh
-Simulation.sh
-Reconstruction.sh
-Evaluation.sh 
+git clone https://github.com/mirakaya/HVRS.git
+cd HVRS/src/
+bash Installation.sh
+bash Simulation.sh
+bash Reconstruction.sh
+bash Evaluation.sh 
 </pre>
 
 ### CITATION ###
