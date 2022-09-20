@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-zcat MINIDB.fa.gz > VDB.fa
+lzma -k -d VDB.mfa.lzma
+mv VDB.mfa VDB.fa
 #
-#gto_fasta_extract_read_by_pattern -p "Synthetic DNA generated with gto" < VDB.fa > SVA.fa
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "X04370.1" < VDB.fa > VZV.fa
 gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
@@ -10,9 +10,6 @@ gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
 #
 # MUTATE SEQUENCES:
 #
-#gto_fasta_mutate -s 0 -e 0.01 < SVA.fa > SVA-1.fa
-#gto_fasta_mutate -s 0 -e 0.03 < SVA.fa > SVA-2.fa
-#gto_fasta_mutate -s 0 -e 0.05 < SVA.fa > SVA-3.fa
 #
 gto_fasta_mutate -s 0 -e 0.01 < B19.fa > B19-1.fa
 gto_fasta_mutate -s 0 -e 0.03 < B19.fa > B19-2.fa
@@ -29,9 +26,6 @@ gto_fasta_mutate -s 0 -e 0.05 < VZV.fa > VZV-3.fa
 #
 # CREATE DATASETS:
 #
-#cat SVA-1.fa B19-1.fa HPV-1.fa VZV-1.fa > DS1.fa
-#cat SVA-2.fa B19-2.fa HPV-2.fa VZV-2.fa > DS2.fa
-#cat SVA-3.fa B19-3.fa HPV-3.fa VZV-3.fa > DS3.fa
 
 cat B19-1.fa HPV-1.fa VZV-1.fa > DS1.fa
 cat B19-2.fa HPV-2.fa VZV-2.fa > DS2.fa
