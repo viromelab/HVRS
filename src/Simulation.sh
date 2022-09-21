@@ -3,8 +3,10 @@
 lzma -k -d VDB.mfa.lzma
 mv VDB.mfa VDB.fa
 #
+rm -f DS*_*.fq
+#
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
-gto_fasta_extract_read_by_pattern -p "X04370.1" < VDB.fa > VZV.fa
+gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
 gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
 #
 #
@@ -34,9 +36,8 @@ cat B19-3.fa HPV-3.fa VZV-3.fa > DS3.fa
 #
 # SIMULATE FASTQ READS:
 #
-art_illumina -rs 0 -ss HS25 -sam -i DS1.fa -p -l 150 -f 10 -m 200 -s 10 -o DS1_
-art_illumina -rs 0 -ss HS25 -sam -i DS2.fa -p -l 150 -f 20 -m 200 -s 10 -o DS2_
-art_illumina -rs 0 -ss HS25 -sam -i DS3.fa -p -l 150 -f 30 -m 200 -s 10 -o DS3_
-#
+art_illumina -rs 0 -ss HS25 -sam -i DS1.fa -p -l 150 -f 20 -m 200 -s 10 -o DS1_
+art_illumina -rs 0 -ss HS25 -sam -i DS2.fa -p -l 150 -f 30 -m 200 -s 10 -o DS2_
+art_illumina -rs 0 -ss HS25 -sam -i DS3.fa -p -l 150 -f 40 -m 200 -s 10 -o DS3_
 rm *.aln #*.sam
 #

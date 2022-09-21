@@ -6,16 +6,16 @@ RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
 RUN_SPADES=0;
-RUN_METAVIRALSPADES=0;
+RUN_METAVIRALSPADES=1;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1;
+RUN_TRACESPIPELITE=0;
 
 declare -a DATASETS=("DS1" "DS2" "DS3");
-declare -a VIRUSES=("SVA" "B19" "HPV" "VZV");
+declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #create bam files from sam files - not working
 if [[ "$CREATE_BAM_FILES" -eq "1" ]] 
@@ -23,7 +23,19 @@ if [[ "$CREATE_BAM_FILES" -eq "1" ]]
   printf "Create bam files\n\n"
   for dataset in "${DATASETS[@]}"
     do	
-    samtools view -S -b ${dataset}_.sam > ${dataset}.bam
+    bwa index ${dataset}.fa
+      bwa aln ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sai
+      bwa samse ${dataset}.fa ${dataset}.sai ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
+      samtools view -bSh ${dataset}.sam > ${dataset}.bam;
+      samtools view -bh -F4 ${dataset}.bam > FIL-${dataset}.bam;
+      samtools sort -o ${dataset}.bam FIL-${dataset}.bam;
+      samtools index -b ${dataset}.bam ${dataset}.bam.bai
+      
+    #bwa index ${dataset}.fa
+    #bwa mem ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
+    #echo "aaaaaaaaaaaa"
+    #samtools view -S -b ${dataset}.sam > ${dataset}.bam
+    #echo "bbbbbbbbbb"
   done
 fi
 
@@ -56,7 +68,9 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
   cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
     do	
-    ./metaviralspades.py -o spades -1 ../../${dataset}_1.fq -2 ../../${dataset}_2.fq
+    cp  ../../${dataset}_1.fq .
+    cp  ../../${dataset}_2.fq .
+    ./metaviralspades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
   done
   cd ../../
 fi
@@ -79,9 +93,13 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   printf "Reconstructing with SAVAGE\n\n"
   mkdir savage
   cd savage
+  cp ../B19.fa .
+  
   for dataset in "${DATASETS[@]}"
     do
-    savage --split 500 -p1 ../${dataset}_1.fq -p2 ../${dataset}_2.fq --ref /home/lx/Desktop/HVRS-main/src/B19-2.fa
+    cp ../${dataset}_1.fq .
+    cp ../${dataset}_2.fq .
+    savage --split 500 -p1 /home/lx/Desktop/HVRS-main/src/savage/${dataset}_1.fq -p2 /home/lx/Desktop/HVRS-main/src/savage/${dataset}_2.fq --ref /home/lx/Desktop/HVRS-main/src/savage/B19-2.fa
   done
   cd ..
 fi
@@ -108,7 +126,7 @@ if [[ "$RUN_QURE" -eq "1" ]]
   cd QuRe_v0.99971/
   for dataset in "${DATASETS[@]}"
     do
-    java -Xmx7G QuRe ../${dataset}.fa ../HPV.fa 1E-25 1E-25 1000
+    java -Xmx7G QuRe ../${dataset}.fa ../B19.fa 1E-25 1E-25 1000
   done
   cd ..
 fi
