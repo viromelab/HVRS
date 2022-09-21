@@ -24,13 +24,12 @@ if [[ "$CREATE_BAM_FILES" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do	
     bwa index ${dataset}.fa
-      bwa aln ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sai
-      bwa samse ${dataset}.fa ${dataset}.sai ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
-      samtools view -bSh ${dataset}.sam > ${dataset}.bam;
-      samtools view -bh -F4 ${dataset}.bam > FIL-${dataset}.bam;
-      samtools sort -o ${dataset}.bam FIL-${dataset}.bam;
-      samtools index -b ${dataset}.bam ${dataset}.bam.bai
-      
+    bwa aln ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sai
+    bwa samse ${dataset}.fa ${dataset}.sai ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
+    samtools view -bSh ${dataset}.sam > ${dataset}.bam;
+    samtools view -bh -F4 ${dataset}.bam > FIL-${dataset}.bam;
+    samtools sort -o ${dataset}.bam FIL-${dataset}.bam;
+    samtools index -b ${dataset}.bam ${dataset}.bam.bai
     #bwa index ${dataset}.fa
     #bwa mem ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
     #echo "aaaaaaaaaaaa"
