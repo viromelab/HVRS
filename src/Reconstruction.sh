@@ -6,13 +6,13 @@ RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
 RUN_SPADES=0;
-RUN_METAVIRALSPADES=1;
+RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0;
+RUN_TRACESPIPELITE=1;
 
 declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("B19" "HPV" "VZV");
@@ -53,12 +53,15 @@ fi
 if [[ "$RUN_SPADES" -eq "1" ]] 
   then
   printf "Reconstructing with SPAdes\n\n"
-  cd SPAdes-3.15.5-Linux/bin/
+  mkdir -p spades/
+  cd spades/
   for dataset in "${DATASETS[@]}"
     do	
-    ./spades.py -o spades -1 ../../${dataset}_1.fq -2 ../../${dataset}_2.fq
+    cp  ../${dataset}_1.fq .
+    cp  ../${dataset}_2.fq .
+    spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
     done
-  cd ../../
+  cd ../
 fi
 
 #metaviralspades
@@ -68,9 +71,9 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
   cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
     do	
-    cp  ../../${dataset}_1.fq .
-    cp  ../../${dataset}_2.fq .
-    ./metaviralspades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
+    cp ../../${dataset}_1.fq .
+    cp ../../${dataset}_2.fq .
+    ./metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
   done
   cd ../../
 fi
@@ -160,7 +163,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     do	
     cp ../../${dataset}_*.fq .
     lzma -d VDB.mfa.lzma
-    ./TRACESPipeLite.sh --threads 8 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis
+    ./TRACESPipeLite.sh --similarity 50 --threads 1 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
     done
   cd ../../
 fi
