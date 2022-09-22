@@ -6,13 +6,13 @@ RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
 RUN_SPADES=0;
-RUN_METAVIRALSPADES=0;
+RUN_METAVIRALSPADES=1;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1;
+RUN_TRACESPIPELITE=0;
 
 declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("B19" "HPV" "VZV");
@@ -48,17 +48,17 @@ if [[ "$RUN_SHORAH" -eq "1" ]]
   done
 fi
 
-#spades
+#spades - runs
 if [[ "$RUN_SPADES" -eq "1" ]] 
   then
   printf "Reconstructing with SPAdes\n\n"
-  mkdir -p spades/
-  cd spades/
+  cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
     do	
-    cp  ../${dataset}_1.fq .
-    cp  ../${dataset}_2.fq .
-    spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
+    cp  ../../${dataset}_1.fq .
+    cp  ../../${dataset}_2.fq .
+    #spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
+    python spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq --meta
     done
   cd ../
 fi
@@ -84,7 +84,7 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
   cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
     do
-    ./coronaspades.py -o spades -1 ../../${dataset}_1.fq -2 ../../${dataset}_2.fq
+    ./coronaspades.py -o coronaspades_${dataset} -1 ../../${dataset}_1.fq -2 ../../${dataset}_2.fq
   done
   cd ../../
 fi
