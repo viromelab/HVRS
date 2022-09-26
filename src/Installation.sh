@@ -8,7 +8,7 @@ RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
-RUN_SPADES=1;
+RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
@@ -16,6 +16,10 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
+RUN_TRACESPIPE=0;
+RUN_ASPIRE=0;
+RUN_QVG=1;
+
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
@@ -132,10 +136,39 @@ fi
 #TracesPipelite
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]] 
   then
-  printf "Installing TracesPipeLite\n\n"
+  printf "Installing TRACESPipeLite\n\n"
   git clone https://github.com/viromelab/TRACESPipeLite.git
   cd TRACESPipeLite/src/
   chmod +x *.sh
   ./TRACESPipeLite.sh --install
   cd ../../  
+fi
+
+#TRACESPipe
+if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
+  then
+  printf "Installing TRACESPipe\n\n"
+  git clone https://github.com/viromelab/tracespipe.git
+  cd tracespipe/src/
+  chmod +x TRACES*.sh
+  ./TRACESPipe.sh --install
+  ./TRACESPipe.sh --get-all-aux
+  cd ../../  
+fi
+
+#ASPIRE
+if [[ "$RUN_ASPIRE" -eq "1" ]] 
+  then
+  printf "Installing ASPIRE\n\n"
+  rm -rf aspire/
+  git clone https://github.com/kevingroup/aspire.git
+fi
+
+
+#QVG
+if [[ "$RUN_QVG" -eq "1" ]] 
+  then
+  printf "Installing QVG\n\n"
+  rm -rf QVG/
+  git clone https://github.com/laczkol/QVG.git
 fi
