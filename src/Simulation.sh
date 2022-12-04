@@ -35,8 +35,8 @@ cat B19-3.fa HPV-3.fa VZV-3.fa > DS3.fa
 #
 # SIMULATE FASTQ READS:
 #
-art_illumina -rs 3  -i DS1.fa -p -l 150 -f 20 -m 200 -s 10 -o DS1_
-art_illumina -rs 7  -i DS2.fa -p -l 150 -f 30 -m 200 -s 10 -o DS2_
-art_illumina -rs 11 -i DS3.fa -p -l 150 -f 40 -m 200 -s 10 -o DS3_
-rm *.aln #*.sam
+art_illumina -rs 3  -i DS1.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS1_
+art_illumina -rs 7  -i DS2.fa -p -sam -l 150 -f 30 -m 200 -s 10 -o DS2_
+art_illumina -rs 11 -i DS3.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS3_
+rm *.aln
 #

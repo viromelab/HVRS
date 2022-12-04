@@ -6,39 +6,49 @@ RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
 RUN_SPADES=0;
-RUN_METAVIRALSPADES=1;
+RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
+RUN_VPIPE=0;
+RUN_STRAINLINE=0;
+RUN_HAPHPIPE=0;
+RUN_ABAYESQR=0;
+RUN_HAPLOCLIQUE=0;
+RUN_VISPA=0;
+RUN_QUASIRECOMB=0;
+RUN_LAZYPIPE=0;
+RUN_VIQUAS=0;
+RUN_MLEHAPLO=0;
+RUN_PEHAPLO=0;
+RUN_REGRESSHAPLO=0;
+RUN_CLIQUESNV=0;
+RUN_IVA=0;
+RUN_PRICE=0;
+RUN_VIRGENA=0;
+RUN_TARVIR=0;
+RUN_VIP=0;
+RUN_DRVM=0;
+RUN_SSAKE=0;
+RUN_VIRALFLYE=1;
 
 declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
-#create bam files from sam files - not working
+#create bam files from sam files - [W::sam_parse1] urecognized reference name; treated as unmapped
 if [[ "$CREATE_BAM_FILES" -eq "1" ]] 
   then  
-  printf "Create bam files\n\n"
+  printf "Create .bam files from .sam files\n\n"
   for dataset in "${DATASETS[@]}"
     do	
-    bwa index ${dataset}.fa
-    bwa aln ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sai
-    bwa samse ${dataset}.fa ${dataset}.sai ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
-    samtools view -bSh ${dataset}.sam > ${dataset}.bam;
-    samtools view -bh -F4 ${dataset}.bam > FIL-${dataset}.bam;
-    samtools sort -o ${dataset}.bam FIL-${dataset}.bam;
-    samtools index -b ${dataset}.bam ${dataset}.bam.bai
-    #bwa index ${dataset}.fa
-    #bwa mem ${dataset}.fa ${dataset}_1.fq ${dataset}_2.fq > ${dataset}.sam
-    #echo "aaaaaaaaaaaa"
-    #samtools view -S -b ${dataset}.sam > ${dataset}.bam
-    #echo "bbbbbbbbbb"
+    samtools view -bS ${dataset}_.sam > ${dataset}.bam
   done
 fi
 
-#shorah - can't test wothout bam files
+#shorah - can't test without bam files
 if [[ "$RUN_SHORAH" -eq "1" ]] 
   then
   printf "Reconstructing with Shorah\n\n"
@@ -167,3 +177,208 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   cd ../../
 fi
 
+#V-pipe - working to some capacity, missing input files
+if [[ "$RUN_VPIPE" -eq "1" ]]
+  then
+  printf "Reconstructing with V-pipe\n\n"
+  cd work./aBayesQR 
+  # edit config.yaml and provide samples/ directory
+  ./vpipe --jobs 4 --printshellcmds --dry-run
+  cd ..
+fi
+
+#Strainline
+if [[ "$RUN_STRAINLINE" -eq "1" ]] 
+  then
+  printf "Reconstructing with Strainline\n\n"
+  
+  
+  
+fi
+
+#HAPHPIPE
+if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
+  then
+  printf "Reconstructing with HAPHPIPE\n\n"
+  
+  
+  
+fi
+
+#aBayesQR - working, missing input
+if [[ "$RUN_ABAYESQR" -eq "1" ]] 
+  then
+  printf "Reconstructing with aBayesQR\n\n"
+  ./aBayesQR config
+    
+fi
+
+#HaploClique
+if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
+  then
+  printf "Reconstructing with HaploClique\n\n"
+
+fi
+
+#ViSpA - error
+#SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Reference file must contain a reference!")?
+#./vispa.bash: line 5: java: command not found
+if [[ "$RUN_VISPA" -eq "1" ]] 
+  then
+  printf "Reconstructing with ViSpA\n\n"
+  
+  cd home
+  rm -rf test
+  mkdir test
+  touch test/log.txt 
+  printf "got here"
+  cd code/vispa_mosaik 
+  
+  for dataset in "${DATASETS[@]}"
+    do	
+
+    cp ../../../${dataset}.fa ../../test
+    cp ../../../HPV.fa ../../test
+    
+    printf "got here"
+    
+    ./main_mosaik.bash ../../test/${dataset}.fa ../../test/HPV.fa 15 6 120 > ../../test/log.txt
+    done
+  
+fi
+
+#QuasiRecomb -> java.lang.UnsupportedOperationException
+if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
+  then
+  printf "Reconstructing with QuasiRecomb\n\n"
+  for dataset in "${DATASETS[@]}"
+    do
+    java -jar QuasiRecomb.jar -i ${dataset}_.sam
+    done
+fi
+
+#Lazypipe
+if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
+  then
+  printf "Reconstructing with Lazypipe\n\n"
+  
+fi
+
+#ViQuaS - missing .bam files
+if [[ "$RUN_VIQUAS" -eq "1" ]] 
+  then
+  printf "Reconstructing with ViQuaS\n\n"
+  cd ViQuaS1.3
+  #Rscript ViQuaS.R HPV-1.fa ${dataset}_.sam <o> <r> <perform richness (1/0)> <diversityRegionLength>
+  
+fi
+
+#MLEHaplo
+if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
+  then
+  printf "Reconstructing with MLEHaplo\n\n"
+  
+fi
+
+#PEHaplo - error activating conda environment, error on python because of version without conda
+if [[ "$RUN_PEHAPLO" -eq "1" ]] 
+  then
+  printf "Reconstructing with PEHaplo\n\n"
+  cd PEHaplo  
+  mkdir assembly  
+  cd assembly  
+  conda activate pehaplo
+  python ../apsp_overlap_clique.py ../processed_test_data/Plus_strand_reads.fa ../processed_test_data/pair_end_connections.txt 180 250 600 210 
+  cd ../../
+  conda activate base
+  
+fi
+
+#RegressHaplo
+if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
+  then
+  printf "Reconstructing with RegressHaplo\n\n"
+  
+fi
+
+#CliqueSNV
+if [[ "$RUN_CLIQUESNV" -eq "1" ]] 
+  then
+  printf "Reconstructing with CliqueSNV\n\n"
+  cd CliqueSNV-2.0.3
+  java -jar clique-snv.jar -m snv-pacbio
+  cd ..
+  
+fi
+
+#IVA
+if [[ "$RUN_IVA" -eq "1" ]] 
+  then
+  printf "Reconstructing with IVA\n\n"
+  
+fi
+
+#PRICE - did nothing, no errors
+if [[ "$RUN_PRICE" -eq "1" ]] 
+  then
+  printf "Reconstructing with PRICE\n\n"
+  cd PriceSource130506
+  for dataset in "${DATASETS[@]}"
+    do
+    ./PriceTI -fp ../${dataset}_1.fq ../${dataset}_2.fq 100 -nc 20 -a 2 -o result_${dataset}.fasta
+    done
+  cd ..
+  
+fi
+
+#VirGenA - missing changes to config.xml file
+if [[ "$RUN_VIRGENA" -eq "1" ]] 
+  then
+  printf "Reconstructing with VirGenA\n\n"
+  cd release_v1.4
+  java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
+  cd ..
+  
+fi
+
+#TAR-VIR
+if [[ "$RUN_TARVIR" -eq "1" ]] 
+  then
+  printf "Reconstructing with TAR-VIR\n\n"
+  
+fi
+
+#VIP
+if [[ "$RUN_VIP" -eq "1" ]] 
+  then
+  printf "Reconstructing with VIP\n\n"
+  #VIP.sh -z -i <NGSfile> -p <454/iontor/illumina> -f <fastq/fasta/bam/sam> -r <reference_path>
+  
+fi
+
+#drVM - ./drVM.py: /usr/bin/python: bad interpreter: No such file or directory
+if [[ "$RUN_DRVM" -eq "1" ]] 
+  then
+  printf "Reconstructing with drVM\n\n"
+  cd Tools 
+  ./drVM.py -1 DS1_1.fq -2 DS1_2.fq -t 1 -keep
+  cd ..
+fi
+
+#SSAKE
+if [[ "$RUN_SSAKE" -eq "1" ]] 
+  then
+  printf "Reconstructing with SSAKE\n\n"
+  
+fi
+
+#viralFlye - conda env error
+if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
+  then
+  printf "Reconstructing with viralFlye\n\n"
+  conda activate viralFlye
+  ./viralFlye.py
+  
+fi
+
+ 
