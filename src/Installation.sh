@@ -8,7 +8,7 @@ INSTALL_MINICONDA=0;
 INSTALL_SAMTOOLS=0;
 RUN_SHORAH=0;
 RUN_QURE=0;
-RUN_SAVAGE=0;
+RUN_SAVAGE=1;
 RUN_QSDPR=0;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
@@ -41,7 +41,7 @@ RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
-RUN_VIRALFLYE=1;
+RUN_VIRALFLYE=0;
 
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
@@ -80,19 +80,23 @@ if [[ "$RUN_SHORAH" -eq "1" ]]
 fi
 
 #spades, metaviralspades and coronaspades
-if [[ "$RUN_SPADES" -eq "1" ]] 
+if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]]
   then
   printf "Installing SPAdes, metaviralSPAdes and coronaSPAdes\n\n"
   wget http://cab.spbu.ru/files/release3.15.5/SPAdes-3.15.5-Linux.tar.gz
   tar -xzf SPAdes-3.15.5-Linux.tar.gz
-  rm SPAdes-3.15.5-Linux.tar.gz
+  rm -rf SPAdes-3.15.5-Linux.tar.gz
 fi
 
 #SAVAGE
 if [[ "$RUN_SAVAGE" -eq "1" ]] 
   then
   printf "Installing SAVAGE\n\n"
+  eval "$(conda shell.bash hook)"
+  conda create -n savage
+  conda activate savage
   conda install savage
+  conda activate base
 fi
 
 #qsdpr
@@ -101,7 +105,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   printf "Installing QSdpr\n\n"
   wget -O qsdpr "https://sourceforge.net/projects/qsdpr/files/QSdpR_v3.2.tar.gz/download"
   tar xfz qsdpr
-  rm qsdpr
+  rm -rf qsdpr
 fi
 
 
@@ -111,7 +115,7 @@ if [[ "$RUN_QURE" -eq "1" ]]
   printf "Installing Qure\n\n"
   wget -O qure "https://sourceforge.net/projects/qure/files/latest/download"
   unzip qure
-  rm qure
+  rm -rf qure
 fi
 
 #virus-vg
@@ -120,7 +124,7 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   printf "Installing Virus-VG\n\n"
   wget -O virus-vg "https://bitbucket.org/jbaaijens/virus-vg/get/69a05f3e74f26e5571830f5366570b1d88ed9650.zip"
   unzip virus-vg
-  rm virus-vg
+  rm -rf virus-vg
   wget "https://github.com/vgteam/vg/releases/download/v1.43.0/vg"
   chmod +x vg
 fi
@@ -131,7 +135,7 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   printf "Installing VG-Flow\n\n"
   wget -O vg-flow "https://bitbucket.org/jbaaijens/vg-flow/get/ac68093bbb235e508d0a8dd56881d4e5aee997e3.zip"
   unzip vg-flow
-  rm vg-flow
+  rm -rf vg-flow
 fi
 
 #viaDBG
@@ -221,13 +225,18 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   ./quick_install.sh -w work
 fi
 
-#Strainline
-if [[ "$RUN_STRAINLINE" -eq "1" ]] #error linking daccord
+#Strainline - error when reconstructing
+if [[ "$RUN_STRAINLINE" -eq "1" ]]
   then
   printf "Installing Strainline\n\n"
-  #conda create -n strainline
-  #conda activate strainline
-  #conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2  
+  eval "$(conda shell.bash hook)"
+  
+  conda create -n strainline
+  conda activate strainline
+  conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2
+  
+  git clone https://github.com/HaploKit/Strainline.git
+  
   
   echo Please input the path to miniconda.
   read miniconda
@@ -235,10 +244,13 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]] #error linking daccord
   
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
-  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $miniconda/envs/strainline/bin/daccord #line not working
+  mkdir -p $miniconda/envs/strainline/bin/daccord
+  ln -fs $(pwd)/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $miniconda/envs/strainline/bin/daccord 
+  
+  conda activate base
 fi
 
-#HAPHPIPE - error
+#HAPHPIPE - error, missing gatk register
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Installing HAPHPIPE\n\n"
@@ -264,7 +276,7 @@ if [[ "$RUN_ABAYESQR" -eq "1" ]]
   cd ..  
 fi
 
-#HaploClique - permission errors, ...
+#HaploClique - missing zlib, samtools
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Installing HaploClique\n\n"
@@ -298,13 +310,26 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
   wget https://github.com/cbg-ethz/QuasiRecomb/releases/download/v1.2/QuasiRecomb.jar
   unzip v1.2.zip 
+  rm -rf v1.2.zip
   
 fi
 
-#Lazypipe 
+#Lazypipe - not complete
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"
+  
+  rm -rf lazypipe  
+  git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
+  cd lazypipe
+  
+  eval "$(conda shell.bash hook)"
+  
+  conda create -n blast -c blast 
+  conda create -n lazypipe -c bioconda -c eclarke bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  conda activate blast
+  conda activate --stack lazypipe
+  
   
 fi
 
@@ -314,14 +339,21 @@ if [[ "$RUN_VIQUAS" -eq "1" ]]
   printf "Installing ViQuaS\n\n"
   wget -O viquas "https://sourceforge.net/projects/viquas/files/latest/download"
   tar -xzf viquas
-  rm viquas
+  rm -rf viquas
   
 fi
 
-#MLEHaplo
+#MLEHaplo - not able to connect to gatb
 if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
   then
   printf "Installing MLEHaplo\n\n"
+  wget -O dsk http://gatb-tools.gforge.inria.fr/versions/bin/dsk-2.1.0-Linux.tar.gz
+  tar -xzf dsk
+  rm -rf dsk
+  
+  #cpanm Bio::Perl
+  #cpanm Getopt::Long, Graph.
+  
   
   
 fi
@@ -332,12 +364,12 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
   printf "Installing PEHaplo\n\n"
   wget -O networkx "https://github.com/networkx/networkx/archive/refs/tags/networkx-1.11.zip"
   unzip networkx
-  rm networkx
+  rm -rf networkx
   cd networkx-1.11/  
   sudo python setup.py install
   wget -O apsp "https://github.com/chjiao/Apsp/archive/refs/tags/V0.zip"
   unzip apsp
-  rm apsp
+  rm -rf apsp
   cd Apsp-0  
   make
   git clone https://github.com/chjiao/PEHaplo.git
@@ -359,7 +391,7 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   printf "Installing CliqueSNV\n\n"
   wget -O cliquesnv "https://github.com/vtsyvina/CliqueSNV/archive/refs/tags/2.0.3.zip"
   unzip cliquesnv
-  rm cliquesnv
+  rm -rf cliquesnv
   
 fi
 
@@ -367,6 +399,22 @@ fi
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Installing IVA\n\n"
+  
+  wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
+  rm -rf kmc
+  mkdir kmc
+  tar -xzf KMC3.2.1.linux.tar.gz -C kmc
+  #missing add to path
+  
+  wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
+  tar zxvf smalt
+  cd smalt-0.7.6
+  ./configure
+  make
+  make install
+  #missing add to path
+  
+  pip3 install iva
   
 fi
 
@@ -389,11 +437,11 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
   printf "Installing VirGenA\n\n"
   wget -O virgena "https://github.com/gFedonin/VirGenA/releases/download/1.4/VirGenA_v1.4.zip"
   unzip virgena
-  rm virgena
+  rm -rf virgena
   
 fi
 
-#TAR-VIR - untested
+#TAR-VIR
 if [[ "$RUN_TARVIR" -eq "1" ]] 
   then
   printf "Installing TAR-VIR\n\n"
@@ -405,25 +453,25 @@ if [[ "$RUN_TARVIR" -eq "1" ]]
   conda create -n bio2 python=2.7     # You can replace bio2 to any name you like
   conda activate bio2                 # Activate your env
   source activate bio2                # Sometimes you need to use this command to activate the environment. Try conda activate first.
-  pip install networkx=1.11           # currently TAR-VIR only works with this version. Under some systems, use pip install networkx==1.11. Type both and see the hints. 
+  pip install networkx==1.11           # currently TAR-VIR only works with this version. Under some systems, use pip install networkx==1.11. Type both and see the hints. 
   conda install Karect bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools
   git clone --recursive https://github.com/chjiao/TAR-VIR.git
  
 
 fi
 
-#VIP - untested
+#VIP - untested, rerun
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Installing VIP\n\n"
   wget -O vip "https://github.com/keylabivdc/VIP/archive/refs/heads/master.zip"
   unzip vip
-  cd VIP
-  cd installer
+  cd VIP/installer
   chmod +x ./dependency_installer.sh
   chmod +x ./db_installer.sh
-  ./dependency_installer.sh
-  #./db_installer.sh -r [PATH]/[TO]/[DATABASE]
+  sudo sh dependency_installer.sh
+  ./db_installer.sh -r #[PATH]/[TO]/[DATABASE]
+  cd ../../
   
 fi
 
@@ -433,7 +481,7 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   printf "Installing drVM\n\n"
   wget -O drvm "https://sourceforge.net/projects/sb2nhri/files/latest/download"
   unzip drvm
-  #rm -rf drvm
+  rm -rf drvm
   
 fi
 
@@ -443,7 +491,7 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   printf "Installing SSAKE\n\n"
   wget -O ssake "https://github.com/bcgsc/SSAKE/releases/download/v4.0.1/ssake_v4-0.tar.gz"
   tar -xzf ssake
-  #rm -rf ssake
+  rm -rf ssake
   
 fi
 

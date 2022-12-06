@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CREATE_BAM_FILES=0;
 RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
@@ -30,28 +29,28 @@ RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
-RUN_VIP=0;
+RUN_VIP=1;
 RUN_DRVM=0;
 RUN_SSAKE=0;
-RUN_VIRALFLYE=1;
+RUN_VIRALFLYE=0;
 
 declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #create bam files from sam files - [W::sam_parse1] urecognized reference name; treated as unmapped
-if [[ "$CREATE_BAM_FILES" -eq "1" ]] 
-  then  
-  printf "Create .bam files from .sam files\n\n"
+create_bam_files () { 
+  printf "Creating .bam files from .sam files\n\n"
   for dataset in "${DATASETS[@]}"
     do	
     samtools view -bS ${dataset}_.sam > ${dataset}.bam
   done
-fi
+}
 
 #shorah - can't test without bam files
 if [[ "$RUN_SHORAH" -eq "1" ]] 
   then
   printf "Reconstructing with Shorah\n\n"
+  create_bam_files
   for dataset in "${DATASETS[@]}"
     do	
     shorah.py -b ${dataset}.bam -f HPV-1.fa
@@ -187,11 +186,17 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   cd ..
 fi
 
-#Strainline
+#Strainline - LAcheck: reads.las is not present
 if [[ "$RUN_STRAINLINE" -eq "1" ]] 
   then
   printf "Reconstructing with Strainline\n\n"
-  
+  cd Strainline/src/
+  chmod +x ./strainline.sh
+  for dataset in "${DATASETS[@]}"
+    do
+    ./strainline.sh -i ../../${dataset}*.fa -o out -p ont
+    done
+  cd ../../
   
   
 fi
@@ -220,7 +225,7 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
 
 fi
 
-#ViSpA - error
+#ViSpA - error, likely python version, change to 2.7?
 #SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Reference file must contain a reference!")?
 #./vispa.bash: line 5: java: command not found
 if [[ "$RUN_VISPA" -eq "1" ]] 
@@ -280,13 +285,14 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   
 fi
 
-#PEHaplo - error activating conda environment, error on python because of version without conda
+#PEHaplo - try - error activating conda environment, error on python because of version without conda
 if [[ "$RUN_PEHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with PEHaplo\n\n"
   cd PEHaplo  
   mkdir assembly  
   cd assembly  
+  eval "$(conda shell.bash hook)"
   conda activate pehaplo
   python ../apsp_overlap_clique.py ../processed_test_data/Plus_strand_reads.fa ../processed_test_data/pair_end_connections.txt 180 250 600 210 
   cd ../../
@@ -345,15 +351,24 @@ fi
 if [[ "$RUN_TARVIR" -eq "1" ]] 
   then
   printf "Reconstructing with TAR-VIR\n\n"
+  cd TAR-VIR
+  ./build -f ../DS1.fa -o prefix
   
+  cd ..
 fi
 
-#VIP
+#VIP - seqtk missing
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Reconstructing with VIP\n\n"
-  #VIP.sh -z -i <NGSfile> -p <454/iontor/illumina> -f <fastq/fasta/bam/sam> -r <reference_path>
-  
+  cd VIP
+  chmod +x ./VIP.sh
+  cp ../DS1_1.fq .
+  cp ../DS1.fa .
+  cp ../VZV.fa .
+  ./VIP.sh -z -i DS1.fa -p illumina -f fasta -r VZV.fa
+  ./VIP.sh -c DS1.fa.conf -i DS1.fa
+  cd ..
 fi
 
 #drVM - ./drVM.py: /usr/bin/python: bad interpreter: No such file or directory
@@ -365,17 +380,21 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   cd ..
 fi
 
-#SSAKE
+#SSAKE - probably bad parameters, running
 if [[ "$RUN_SSAKE" -eq "1" ]] 
   then
   printf "Reconstructing with SSAKE\n\n"
-  
+  cd ssake/tools/
+  ./runSSAKE.sh ../../DS1_1.fq ../../DS1_2.fq 10 ds1_assembly
+  cd ../../
+
 fi
 
-#viralFlye - conda env error
+#viralFlye - missing test, former conda error
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Reconstructing with viralFlye\n\n"
+  eval "$(conda shell.bash hook)"
   conda activate viralFlye
   ./viralFlye.py
   
