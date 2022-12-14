@@ -4,18 +4,18 @@
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
 INSTALL_TOOLS=0;
-INSTALL_MINICONDA=0;
+INSTALL_OTHERS=0;
 INSTALL_SAMTOOLS=0;
 RUN_SHORAH=0;
 RUN_QURE=0;
-RUN_SAVAGE=1;
+RUN_SAVAGE=0;
 RUN_QSDPR=0;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=0;
+RUN_VGFLOW=1;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
@@ -42,6 +42,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
+RUN_ENSEMBLEASSEMBLER=0;
 
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
@@ -53,18 +54,14 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -c bioconda -y mummer4
 fi
 
-if [[ "$INSTALL_MINICONDA" -eq "1" ]] 
+if [[ "$INSTALL_OTHERS" -eq "1" ]] 
   then
   printf "Installing Miniconda\n\n" #missing get install files
   Miniconda3-py39_4.12.0-Linux-x86_64.sh
-fi
-
-#also requires git
-#sudo apt install git
-#sudo apt-get install g++
-
-if [[ "$INSTALL_SAMTOOLS" -eq "1" ]] 
-  then
+  printf "Installing git\n\n"
+  sudo apt install git
+  printf "Installing G++\n\n"
+  sudo apt-get install g++
   printf "Installing Samtools\n\n"
   sudo apt-get install samtools
 fi
@@ -125,17 +122,33 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   wget -O virus-vg "https://bitbucket.org/jbaaijens/virus-vg/get/69a05f3e74f26e5571830f5366570b1d88ed9650.zip"
   unzip virus-vg
   rm -rf virus-vg
+  rm vg
   wget "https://github.com/vgteam/vg/releases/download/v1.43.0/vg"
   chmod +x vg
+  eval "$(conda shell.bash hook)"
+  conda env create --name virus-vg-deps --file jbaaijens-virus-vg-69a05f3e74f2/conda_list_explicit.txt
+  conda activate virus-vg-deps 
+  conda install -c bioconda rust-overlaps 
+  conda install -c conda-forge graph-tool biopython
+  pip install tqdm
+  conda activate base
+  
 fi
 
 #vg-flow
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Installing VG-Flow\n\n"
+  eval "$(conda shell.bash hook)"
+  conda create --name vg-flow-env
+  conda activate vg-flow-env
+  conda install -c bioconda -c conda-forge -c gurobi python=3 graph-tool minimap2 gurobi biopython numpy rust-overlaps 
+  conda install -c conda-forge graph-tool biopython
   wget -O vg-flow "https://bitbucket.org/jbaaijens/vg-flow/get/ac68093bbb235e508d0a8dd56881d4e5aee997e3.zip"
   unzip vg-flow
   rm -rf vg-flow
+  conda activate base
+  sudo apt-get install minimap2
 fi
 
 #viaDBG
@@ -157,6 +170,8 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   cd viadbg
   make
   
+  #cd ../../../
+  
 fi
 
 #PredictHaplo
@@ -174,6 +189,7 @@ if [[ "$RUN_PREDICTHAPLO" -eq "1" ]]
   #make install
   #cd ..
   make
+  cd ..
 fi
 
 #TracesPipelite
@@ -244,6 +260,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
+  rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
   mkdir -p $miniconda/envs/strainline/bin/daccord
   ln -fs $(pwd)/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $miniconda/envs/strainline/bin/daccord 
   
@@ -289,6 +306,7 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   cmake ..
   make
   make install
+  cd ../../
 fi
 
 #ViSpA
@@ -297,10 +315,12 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   printf "Installing ViSpA\n\n"
   wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mosaik-aligner/MOSAIK-2.1.73-binary.tar
   tar -xf MOSAIK-2.1.73-binary.tar
+  rm -rf MOSAIK-2.1.73-binary.tar
   wget https://alan.cs.gsu.edu/NGS/sites/default/files/vispa02.zip
   rm -rf home
   unzip vispa02.zip 
-  
+  rm -rf vispa02.zip
+    
 fi
 
 #QuasiRecomb
@@ -319,18 +339,25 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   then
   printf "Installing Lazypipe\n\n"
   
-  rm -rf lazypipe  
-  git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
-  cd lazypipe
+  #rm -rf lazypipe  
+  #git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
+  #cd lazypipe
   
   eval "$(conda shell.bash hook)"
   
-  conda create -n blast -c blast 
+  conda create -n blast -c bioconda blast 
   conda create -n lazypipe -c bioconda -c eclarke bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
   conda activate blast
   conda activate --stack lazypipe
   
+  printf "Please insert the path to miniconda installation" 
+  read $condapath
   
+  #rm -rf $condapath/envs/lazypipe/opt/krona/taxonomy ln -s $condapath/pkgs/krona-2.8.1-pl5262hdfd78af_0/opt/krona/taxonomy $condapath/envs/lazypipe/opt/krona/taxonomy #idk if this path is right
+  export TM=$condapath/share/trimmomatic 
+   
+  
+  cd .. 
 fi
 
 #ViQuaS
@@ -358,7 +385,7 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   
 fi
 
-#PEHaplo
+#PEHaplo - must have an error in networkx installation
 if [[ "$RUN_PEHAPLO" -eq "1" ]] 
   then
   printf "Installing PEHaplo\n\n"
@@ -372,16 +399,25 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
   rm -rf apsp
   cd Apsp-0  
   make
-  git clone https://github.com/chjiao/PEHaplo.git
-  
-  conda create -n pehaplo python=2.7 
-  
+  git clone https://github.com/chjiao/PEHaplo.git  
+  conda create -n pehaplo python=2.7  
+  cd ../../  
 fi
 
-#RegressHaplo
+#RegressHaplo - error in r instalation
 if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
   then
   printf "Installing RegressHaplo\n\n"
+  #sudo apt-get install r-base
+ 
+  #install_github("hadley/devtools")
+  #library(devtools)
+  #install_github("SLeviyang/RegressHaplo")
+  
+  #source("https://bioconductor.org/biocLite.R")
+  #biocLite("Biostrings")
+  #biocLite("Rsamtools")
+  #biocLite("GenomicAlignments")
   
 fi
 
@@ -391,8 +427,8 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   printf "Installing CliqueSNV\n\n"
   wget -O cliquesnv "https://github.com/vtsyvina/CliqueSNV/archive/refs/tags/2.0.3.zip"
   unzip cliquesnv
+  rm -rf 2.0.3.zip 
   rm -rf cliquesnv
-  
 fi
 
 #IVA
@@ -400,21 +436,78 @@ if [[ "$RUN_IVA" -eq "1" ]]
   then
   printf "Installing IVA\n\n"
   
-  wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
-  rm -rf kmc
-  mkdir kmc
-  tar -xzf KMC3.2.1.linux.tar.gz -C kmc
+  #wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
+  #rm -rf kmc
+  #mkdir kmc
+  #tar -xzf KMC3.2.1.linux.tar.gz -C kmc
+  #rm -rf KMC3.2.1.linux.tar.gz
   #missing add to path
   
-  wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
-  tar zxvf smalt
-  cd smalt-0.7.6
-  ./configure
-  make
-  make install
+  #wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
+  #tar zxvf smalt
+  #rm -rf smalt
+  #cd smalt-0.7.6
+  #./configure
+  #make
+  #make install
   #missing add to path
   
-  pip3 install iva
+  rm -rf IVAdependencies
+  mkdir IVAdependencies   
+  cd IVAdependencies
+  cp -R ../kmc .
+  cp -R ../smalt-0.7.6 .
+  
+  #error, not adding to path and iva can't find kmc and smalt.
+  echo "\n\n Adding $(pwd) to path" 
+  export PATH=$PATH:`pwd`
+  
+  
+  
+  
+  #pip3 install iva
+  cd ..
+  
+  #v2----------
+  #curr_dir = $pwd
+  
+  #sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+  #sudo apt-get update
+  #sudo apt-get install python3-pip zlib1g-dev libncurses5-dev libncursesw5-dev
+  
+  #export PATH=$PATH:$HOME/bin/:$HOME/.local/bin/
+  
+  #cd $HOME/bin
+  #wget http://sun.aei.polsl.pl/kmc/download/kmc
+  #wget http://sun.aei.polsl.pl/kmc/download/kmc_dump
+  #chmod 755 kmc kmc_dump
+  
+  #cd $HOME/bin
+  #wget http://downloads.sourceforge.net/project/mummer/mummer/3.23/MUMmer3.23.tar.gz
+  #tar -zxf MUMmer3.23.tar.gz
+  #cd MUMmer3.23
+  #make
+  #cd ..
+  #for x in `find MUMmer3.23/ -maxdepth 1 -executable -type f`; do cp -s $x . ; done
+  
+  #cd $HOME/bin
+  #wget http://downloads.sourceforge.net/project/samtools/samtools/1.0/samtools-1.0.tar.bz2
+  #tar -xjf samtools-1.0.tar.bz2
+  #cd samtools-1.0/
+  #make
+  #cd ..
+  #cp -s samtools-1.0/samtools .
+  
+  #cd $HOME/bin
+  #wget http://downloads.sourceforge.net/project/smalt/smalt-0.7.6-bin.tar.gz
+  #tar -zxf smalt-0.7.6-bin.tar.gz
+  #cp -s smalt-0.7.6-bin/smalt_x86_64 smalt
+  
+  #pip3 install iva
+  
+  #cd $curr_dir
+  
+  
   
 fi
 
@@ -466,11 +559,12 @@ if [[ "$RUN_VIP" -eq "1" ]]
   printf "Installing VIP\n\n"
   wget -O vip "https://github.com/keylabivdc/VIP/archive/refs/heads/master.zip"
   unzip vip
+  #rm -rf vip
   cd VIP/installer
   chmod +x ./dependency_installer.sh
   chmod +x ./db_installer.sh
   sudo sh dependency_installer.sh
-  ./db_installer.sh -r #[PATH]/[TO]/[DATABASE]
+  ./db_installer.sh -r ../ #-r #[PATH]/[TO]/[DATABASE]
   cd ../../
   
 fi
@@ -500,11 +594,51 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   then
   printf "Installing viralFlye\n\n"
   git clone https://github.com/Dmitry-Antipov/viralFlye
-  cd viralFlye
-  install.sh
-  cd ..
+  #cd viralFlye
+  eval "$(conda shell.bash hook)"
+  conda create -n viralFlye -c bioconda -c conda-forge -c mikeraiko "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 biopython pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
+  #cd ..
+  conda activate viralFlye
+  
   wget http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
+  
+  conda activate base
 fi
 
 
+#EnsembleAssembler 
+if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
+  then
+  printf "Installing EnsembleAssembler \n\n"
+  #wget -O ensembleAssembly "https://sourceforge.net/projects/ensembleassembly/files/latest/download"
+  #tar -zxvf ensembleAssembly
+  
+  #install abyss
+  wget -O abyss "https://github.com/bcgsc/abyss/releases/download/2.3.5/abyss-2.3.5.tar.gz"
+  tar -zxvf abyss  
+  cd abyss-2.3.5  
+  eval "$(conda shell.bash hook)"
+  conda create -n ensembleAssembler
+  conda activate ensembleAssembler
+  conda install -c conda-forge boost openmpi
+  conda install -c bioconda google-sparsehash
+  conda install -c conda-forge compilers
+  ./autogen.sh
+  mkdir build
+  cd build
+  ../configure --prefix=$(pwd)/../../
+  make
+  make install
+  PATH=$(pwd)/../../:$PATH  
+  cd ..  
+  #copy abyss-pe
+  
+  
+  #
+  
+  conda activate base
+  
+  
+  
+fi
 

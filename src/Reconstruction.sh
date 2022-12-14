@@ -9,7 +9,7 @@ RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=0;
+RUN_VGFLOW=1;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_VPIPE=0;
@@ -29,10 +29,11 @@ RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
-RUN_VIP=1;
+RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
+RUN_ENSEMBLEASSEMBLER=0;
 
 declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("B19" "HPV" "VZV");
@@ -69,7 +70,7 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     #spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
     python spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq --meta
     done
-  cd ../
+  cd ../../
 fi
 
 #metaviralspades
@@ -126,6 +127,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
     ../QSdpR_source/QSdpR_master.sh 2 8 QSdpR_source QSdpR_data sample 1 1000 SAMTOOLS
+    cd ..
   done
   cd ../
 fi
@@ -142,24 +144,32 @@ if [[ "$RUN_QURE" -eq "1" ]]
   cd ..
 fi
 
-#virus-vg - not working
+#virus-vg - rust-overlaps not found
 if [[ "$RUN_VIRUSVG" -eq "1" ]] 
   then
   printf "Reconstructing with Virus-VG\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate virus-vg-deps
+  chmod +x jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py
   for dataset in "${DATASETS[@]}"
     do
-    python jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg vg -t 2
+    jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg vg -t 2
   done
+  conda activate base
 fi
 
-#vg-flow - not working
+#vg-flow - running with errors
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Reconstructing with VG-Flow\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate vg-flow-env
+  chmod +x jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py
   for dataset in "${DATASETS[@]}"
     do
-    python jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg pwd -t 2
+    jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg pwd -t 2
   done
+  conda activate base
 fi
 
 #tracespipelite - runs
@@ -180,7 +190,7 @@ fi
 if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
-  cd work./aBayesQR 
+  cd work
   # edit config.yaml and provide samples/ directory
   ./vpipe --jobs 4 --printshellcmds --dry-run
   cd ..
@@ -251,7 +261,6 @@ if [[ "$RUN_VISPA" -eq "1" ]]
     done
   
 fi
-
 #QuasiRecomb -> java.lang.UnsupportedOperationException
 if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
   then
@@ -262,7 +271,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
     done
 fi
 
-#Lazypipe
+#Lazypipe 
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with Lazypipe\n\n"
@@ -312,9 +321,11 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   then
   printf "Reconstructing with CliqueSNV\n\n"
   cd CliqueSNV-2.0.3
-  java -jar clique-snv.jar -m snv-pacbio
-  cd ..
-  
+  for dataset in "${DATASETS[@]}"
+    do
+    java -jar clique-snv.jar -m snv-illumina -in ../${dataset}_.sam
+    done
+  cd ..  
 fi
 
 #IVA
@@ -357,7 +368,7 @@ if [[ "$RUN_TARVIR" -eq "1" ]]
   cd ..
 fi
 
-#VIP - seqtk missing
+#VIP - DS1.fa.preprocessed.fastq missing
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Reconstructing with VIP\n\n"
@@ -396,7 +407,18 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   printf "Reconstructing with viralFlye\n\n"
   eval "$(conda shell.bash hook)"
   conda activate viralFlye
+  cd viralFlye
   ./viralFlye.py
+  cd ..
+  conda activate base
+fi
+
+#EnsembleAssembler 
+if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
+  then
+  printf "Reconstructing with EnsembleAssembler \n\n"
+  
+  
   
 fi
 
