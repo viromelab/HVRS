@@ -9,14 +9,14 @@ RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=1;
+RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
-RUN_HAPLOCLIQUE=0;
+RUN_HAPLOCLIQUE=1;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0;
@@ -35,7 +35,8 @@ RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
 
-declare -a DATASETS=("DS1" "DS2" "DS3");
+declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #create bam files from sam files - [W::sam_parse1] urecognized reference name; treated as unmapped
@@ -158,7 +159,7 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   conda activate base
 fi
 
-#vg-flow - running with errors
+#vg-flow - running with errors, rust-overlaps not found
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Reconstructing with VG-Flow\n\n"
@@ -211,11 +212,14 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   
 fi
 
-#HAPHPIPE
+#HAPHPIPE - haphpipe command not found error
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with HAPHPIPE\n\n"
-  
+  eval "$(conda shell.bash hook)"
+  conda activate haphpipe
+  haphpipe -h
+  conda activate base
   
   
 fi
@@ -228,40 +232,41 @@ if [[ "$RUN_ABAYESQR" -eq "1" ]]
     
 fi
 
-#HaploClique
+#HaploClique - missing bam files and remaining execution
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Reconstructing with HaploClique\n\n"
+  samtools index alignment.bam
+  cd haploclique/scripts/
+  chmod +x haploclique-assembly
+  ./haploclique-assembly -r ../reference.fasta -i ../alignment.bam
+  
+  cd ..
 
 fi
 
-#ViSpA - error, likely python version, change to 2.7?
-#SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Reference file must contain a reference!")?
-#./vispa.bash: line 5: java: command not found
+#ViSpA - did nothing, no errors
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
-  printf "Reconstructing with ViSpA\n\n"
-  
+  printf "Reconstructing with ViSpA\n\n"  
+  eval "$(conda shell.bash hook)"
+  conda activate vispa  
   cd home
   rm -rf test
   mkdir test
   touch test/log.txt 
   printf "got here"
-  cd code/vispa_mosaik 
-  
+  cd code/vispa_mosaik   
   for dataset in "${DATASETS[@]}"
     do	
-
     cp ../../../${dataset}.fa ../../test
-    cp ../../../HPV.fa ../../test
-    
-    printf "got here"
-    
+    cp ../../../HPV.fa ../../test    
     ./main_mosaik.bash ../../test/${dataset}.fa ../../test/HPV.fa 15 6 120 > ../../test/log.txt
-    done
-  
+    done    
+    conda activate base  
 fi
-#QuasiRecomb -> java.lang.UnsupportedOperationException
+
+#QuasiRecomb -> java.lang.UnsupportedOperationException, probably an error with the sam file
 if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
   then
   printf "Reconstructing with QuasiRecomb\n\n"
@@ -282,8 +287,10 @@ fi
 if [[ "$RUN_VIQUAS" -eq "1" ]] 
   then
   printf "Reconstructing with ViQuaS\n\n"
+  create_bam_files
   cd ViQuaS1.3
-  #Rscript ViQuaS.R HPV-1.fa ${dataset}_.sam <o> <r> <perform richness (1/0)> <diversityRegionLength>
+  #Rscript ViQuaS.R ../DS1.fa <read file in BAM format> <o> <r> <perform richness (1/0)> <diversityRegionLength>
+  cd ..
   
 fi
 
@@ -294,17 +301,40 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   
 fi
 
-#PEHaplo - try - error activating conda environment, error on python because of version without conda
+#PEHaplo - likely an error on the input files, _1 _2 .fa required?, working with test example
 if [[ "$RUN_PEHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with PEHaplo\n\n"
-  cd PEHaplo  
-  mkdir assembly  
-  cd assembly  
+  #cd PEHaplo 
+  #rm -rf assembly 
+  #mkdir assembly  
+  #cd assembly  
+  #eval "$(conda shell.bash hook)"
+  #conda activate pehaplo
+  #python ../pehaplo.py -f1 ../../DS1_1.fq -f2 ../../DS1_2.fq -l 20 -r 200 
+  
+  #python ../apsp_overlap_clique.py ../../DS1.fa ../../DS1.fa 180 250 600 210 
+  
+  #python ../apsp_overlap_clique.py ../processed_test_data/Plus_strand_reads.fa ../processed_test_data/pair_end_connections.txt 180 250 600 210 
+  #cd ../../
+  #conda activate base
+  
+  cd TAR-VIR/PEHaplo/
   eval "$(conda shell.bash hook)"
-  conda activate pehaplo
-  python ../apsp_overlap_clique.py ../processed_test_data/Plus_strand_reads.fa ../processed_test_data/pair_end_connections.txt 180 250 600 210 
-  cd ../../
+  conda activate bio2
+  for dataset in "${DATASETS[@]}"
+    do	
+    rm -rf assembly_${dataset}
+    mkdir assembly_${dataset}
+    rm -rf data
+    mkdir data
+    cd data
+    cp ../../../${dataset}_1.fq .
+    cp ../../../${dataset}_2.fq .
+    cd ../assembly_${dataset}
+    #python ../pehaplo.py -f1 ../raw_test_data/virus_1.fa -f2 ../raw_test_data/virus_2.fa -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
+    python ../pehaplo.py -f1 ../data/${dataset}_1.fq -f2 ../data/${dataset}_2.fq -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
+  done
   conda activate base
   
 fi
@@ -358,14 +388,25 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
   
 fi
 
-#TAR-VIR
+#TAR-VIR - .fa file error probably, segmentation fault, working with test example
 if [[ "$RUN_TARVIR" -eq "1" ]] 
   then
   printf "Reconstructing with TAR-VIR\n\n"
-  cd TAR-VIR
-  ./build -f ../DS1.fa -o prefix
+  #cd TAR-VIR
+  #./build -f ../DS1.fa -o prefix
+
   
-  cd ..
+  cd TAR-VIR/
+  rm -rf data
+  mkdir data
+  cd Overlap_extension/
+  
+  cp ../../DS1.fa ../data
+  cp ../../DS1_.sam ../data
+  ./build -f ../data/DS1.fa -o virus
+  ./overlap -S ../data/DS1_.sam -x virus -f ../data/DS1.fa -c 180 -o virus_recruit.fa
+  
+  cd ../../
 fi
 
 #VIP - DS1.fa.preprocessed.fastq missing

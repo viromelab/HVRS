@@ -15,7 +15,7 @@ RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=1;
+RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
@@ -25,7 +25,7 @@ RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
-RUN_HAPLOCLIQUE=0;
+RUN_HAPLOCLIQUE=1;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0;
@@ -267,19 +267,24 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   conda activate base
 fi
 
-#HAPHPIPE - error, missing gatk register
+#HAPHPIPE - haphpipe command not found
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Installing HAPHPIPE\n\n"
-  conda create -n haphpipe haphpipe
+  eval "$(conda shell.bash hook)"
+  conda create -n haphpipe
   conda activate haphpipe
-  wget https://anaconda.org/bioconda/gatk/3.8/download/linux-64/gatk-3.8-py35_0.tar.bz2
+  conda install -c bioconda haphpipe
+  conda install -c "bioconda/label/main" gatk
+  #wget https://anaconda.org/bioconda/gatk/3.8/download/linux-64/gatk-3.8-py35_0.tar.bz2
   #bzip2 -d gatk-3.8-py35_0.tar.bz2
-  mkdir -p gatk
-  tar -jxf gatk-3.8-py35_0.tar.bz2 --directory gatk
-  cd gatk/bin/
-  ./gatk-register GenomeAnalysisTK #i dont know what the file is
-  cd ../../
+  #mkdir -p gatkRUN_HAPLOCLIQUE
+  #tar -jxf gatk-3.8-py35_0.tar.bz2 --directory gatk
+  #cd gatk/bin/
+  #./gatk-register GenomeAnalysisTK #i dont know what the file is
+  
+  #cd ../../
+  conda activate base
 fi
 
 #aBayesQR
@@ -297,7 +302,8 @@ fi
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Installing HaploClique\n\n"
-  apt-get install libncurses5-dev cmake libboost-all-dev git build-essential zlib1g-dev parallel
+  rm -rf haploclique
+  sudo apt-get install libncurses5-dev cmake libboost-all-dev git build-essential zlib1g-dev parallel
   git clone https://github.com/armintoepfer/haploclique
   cd haploclique
   sh install-additional-software.sh
@@ -306,31 +312,31 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   cmake ..
   make
   make install
-  cd ../../
 fi
 
 #ViSpA
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Installing ViSpA\n\n"
-  wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mosaik-aligner/MOSAIK-2.1.73-binary.tar
-  tar -xf MOSAIK-2.1.73-binary.tar
-  rm -rf MOSAIK-2.1.73-binary.tar
   wget https://alan.cs.gsu.edu/NGS/sites/default/files/vispa02.zip
   rm -rf home
   unzip vispa02.zip 
   rm -rf vispa02.zip
-    
+  eval "$(conda shell.bash hook)"
+  conda create --name vispa python=2.7 
+  conda activate vispa
+  conda install -c bioconda -c conda-forge numexpr pysam numpy biopython mosaik
+  conda activate base
 fi
 
 #QuasiRecomb
 if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
   then
   printf "Installing QuasiRecomb\n\n"
-  wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
+  #wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
   wget https://github.com/cbg-ethz/QuasiRecomb/releases/download/v1.2/QuasiRecomb.jar
-  unzip v1.2.zip 
-  rm -rf v1.2.zip
+  #unzip v1.2.zip 
+  #rm -rf v1.2.zip
   
 fi
 
@@ -354,7 +360,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   read $condapath
   
   #rm -rf $condapath/envs/lazypipe/opt/krona/taxonomy ln -s $condapath/pkgs/krona-2.8.1-pl5262hdfd78af_0/opt/krona/taxonomy $condapath/envs/lazypipe/opt/krona/taxonomy #idk if this path is right
-  export TM=$condapath/share/trimmomatic 
+  export TM=$condapath/share/trimmomatic #not exporting, I think
    
   
   cd .. 
@@ -385,30 +391,42 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   
 fi
 
-#PEHaplo - must have an error in networkx installation
-if [[ "$RUN_PEHAPLO" -eq "1" ]] 
-  then
-  printf "Installing PEHaplo\n\n"
-  wget -O networkx "https://github.com/networkx/networkx/archive/refs/tags/networkx-1.11.zip"
-  unzip networkx
-  rm -rf networkx
-  cd networkx-1.11/  
-  sudo python setup.py install
-  wget -O apsp "https://github.com/chjiao/Apsp/archive/refs/tags/V0.zip"
-  unzip apsp
-  rm -rf apsp
-  cd Apsp-0  
-  make
-  git clone https://github.com/chjiao/PEHaplo.git  
-  conda create -n pehaplo python=2.7  
-  cd ../../  
-fi
+#PEHaplo - part of tar-vir installation
+#if [[ "$RUN_PEHAPLO" -eq "1" ]] 
+#  then
+#  printf "Installing PEHaplo\n\n"
+#  git clone https://github.com/chjiao/PEHaplo.git 
+#  conda create -n pehaplo python=2.7 networkx==1.11 apsp 
+#fi
 
 #RegressHaplo - error in r instalation
 if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
   then
   printf "Installing RegressHaplo\n\n"
+  
+  #install R 	
+  sudo apt update
+  sudo apt install r-base
+  
+  # Install devtools from CRAN
+  
+  #sudo R -e 'install.packages("devtools")'
+
+  
+  #wget -O rsource "https://cran.r-project.org/src/base/R-4/R-4.2.2.tar.gz"
+  #tar -zxf rsource
+  #rm -rf rsource
+  #cd R-4.2.2
+  #./configure
+  #make
+  #R --version
+  #R
+  
+  #devtools::install_github("hadley/devtools")
+  
+  
   #sudo apt-get install r-base
+ 
  
   #install_github("hadley/devtools")
   #library(devtools)
@@ -418,6 +436,8 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   #biocLite("Biostrings")
   #biocLite("Rsamtools")
   #biocLite("GenomicAlignments")
+  
+  #cd ..
   
 fi
 
@@ -431,7 +451,7 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   rm -rf cliquesnv
 fi
 
-#IVA
+#IVA - error, not adding to path and iva can't find kmc and smalt.
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Installing IVA\n\n"
@@ -535,21 +555,25 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
 fi
 
 #TAR-VIR
-if [[ "$RUN_TARVIR" -eq "1" ]] 
+if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   then
-  printf "Installing TAR-VIR\n\n"
+  printf "Installing TAR-VIR and PEHaplo\n\n"
   conda config --add channels defaults
   conda config --add channels conda-forge
   conda config --add channels bioconda
   conda config --add channels kennethshang
-  
-  conda create -n bio2 python=2.7     # You can replace bio2 to any name you like
-  conda activate bio2                 # Activate your env
-  source activate bio2                # Sometimes you need to use this command to activate the environment. Try conda activate first.
-  pip install networkx==1.11           # currently TAR-VIR only works with this version. Under some systems, use pip install networkx==1.11. Type both and see the hints. 
-  conda install Karect bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools
+  eval "$(conda shell.bash hook)"  
+  conda create -n bio2 python=2.7    
+  conda activate bio2                 
+  pip install networkx==1.11           
+  conda install bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
+  conda install -c bioconda karect
   git clone --recursive https://github.com/chjiao/TAR-VIR.git
- 
+  cd TAR-VIR/Overlap_extension/
+  make
+  cd ../../ 
+  
+  conda activate base
 
 fi
 
@@ -559,8 +583,8 @@ if [[ "$RUN_VIP" -eq "1" ]]
   printf "Installing VIP\n\n"
   wget -O vip "https://github.com/keylabivdc/VIP/archive/refs/heads/master.zip"
   unzip vip
-  #rm -rf vip
-  cd VIP/installer
+  rm -rf vip
+  cd VIP-master/installer
   chmod +x ./dependency_installer.sh
   chmod +x ./db_installer.sh
   sudo sh dependency_installer.sh
@@ -606,7 +630,7 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
 fi
 
 
-#EnsembleAssembler 
+#EnsembleAssembler - mid installation
 if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
   then
   printf "Installing EnsembleAssembler \n\n"
