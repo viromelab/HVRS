@@ -3,7 +3,7 @@
 RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=0;
+RUN_QSDPR=1;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
@@ -16,7 +16,7 @@ RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
-RUN_HAPLOCLIQUE=1;
+RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0;
@@ -100,47 +100,58 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
   cd ../../
 fi
 
-#savage - Runs but no reads could be aligned to reference error
+#savage - Runs, no reads could be aligned to reference error
 if [[ "$RUN_SAVAGE" -eq "1" ]] 
   then
   printf "Reconstructing with SAVAGE\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate savage
   mkdir savage
   cd savage
   cp ../B19.fa .
   
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}_1.fq .
-    cp ../${dataset}_2.fq .
-    savage --split 500 -p1 /home/lx/Desktop/HVRS-main/src/savage/${dataset}_1.fq -p2 /home/lx/Desktop/HVRS-main/src/savage/${dataset}_2.fq --ref /home/lx/Desktop/HVRS-main/src/savage/B19-2.fa
+    cp ../${dataset}_1.fq ../${dataset}_2.fq .
+    savage --split 500 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq --ref $(pwd)/B19.fa
   done
   cd ..
 fi
 
-#qsdpr - missing vcf file
+#qsdpr - missing vcf file, missing configuration
 if [[ "$RUN_QSDPR" -eq "1" ]] 
   then
   printf "Reconstructing with QSdpr\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate qsdpr  
+  #echo Please input the path to miniconda. Example: /home/miniconda3
+  #read miniconda
+  #echo $miniconda
+  
   cd QSdpR_v3.2/
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data
+    rm -rf QSdpR_data/${dataset}
+    mkdir QSdpR_data/${dataset}
+    cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data/${dataset}
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
-    ../QSdpR_source/QSdpR_master.sh 2 8 QSdpR_source QSdpR_data sample 1 1000 SAMTOOLS
-    cd ..
+    ../QSdpR_source/QSdpR_master.sh 2 8 ../QSdpR_source ${dataset} sample 1 1000 /home/mj/miniconda3/pkgs/samtools-1.3.1-0/bin
+    #cd ..
   done
   cd ../
+  conda activate base
 fi
 
-#qure - Runs with exception at the end of execution
+#qure - Runs with exception at the end of execution - Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 3
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
   printf "Reconstructing with QuRe\n\n"
   cd QuRe_v0.99971/
   for dataset in "${DATASETS[@]}"
     do
-    java -Xmx7G QuRe ../${dataset}.fa ../B19.fa 1E-25 1E-25 1000
+    cp ../${dataset}.fa ../B19.fa .
+    java -Xmx7G QuRe ${dataset}.fa B19.fa 1E-25 1E-25 1000
   done
   cd ..
 fi
@@ -154,7 +165,8 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   chmod +x jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py
   for dataset in "${DATASETS[@]}"
     do
-    jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg vg -t 2
+    cp ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa samples_virusvg
+    jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py -f samples_virusvg/${dataset}_1.fq -r samples_virusvg/${dataset}_2.fq -c samples_virusvg/${dataset}.fa -vg vg -t 2
   done
   conda activate base
 fi
@@ -442,7 +454,7 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
 
 fi
 
-#viralFlye - missing test, former conda error
+#viralFlye - missing scipy
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Reconstructing with viralFlye\n\n"

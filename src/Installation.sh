@@ -9,7 +9,7 @@ INSTALL_SAMTOOLS=0;
 RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=0;
+RUN_QSDPR=1;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
@@ -25,7 +25,7 @@ RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
-RUN_HAPLOCLIQUE=1;
+RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0;
@@ -100,9 +100,14 @@ fi
 if [[ "$RUN_QSDPR" -eq "1" ]] 
   then
   printf "Installing QSdpr\n\n"
+  eval "$(conda shell.bash hook)"
+  conda create --name qsdpr python=2.7 
+  conda activate qsdpr
+  cconda install -c bioconda samtools
   wget -O qsdpr "https://sourceforge.net/projects/qsdpr/files/QSdpR_v3.2.tar.gz/download"
   tar xfz qsdpr
   rm -rf qsdpr
+  conda activate base
 fi
 
 
@@ -613,17 +618,20 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   
 fi
 
-#viralFlye
+#viralFlye - missing scipy
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Installing viralFlye\n\n"
   git clone https://github.com/Dmitry-Antipov/viralFlye
-  #cd viralFlye
+  cd viralFlye
   eval "$(conda shell.bash hook)"
-  conda create -n viralFlye -c bioconda -c conda-forge -c mikeraiko "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 biopython pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
-  #cd ..
+  conda create -n viralFlye
   conda activate viralFlye
-  
+  conda install -c bioconda -c conda-forge -c mikeraiko "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
+  conda install -c conda-forge biopython
+  conda install -c anaconda scipy
+  #cd ..
+  rm -rf Pfam-A.hmm.gz  
   wget http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
   
   conda activate base
