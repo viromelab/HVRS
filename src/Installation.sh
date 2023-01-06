@@ -9,7 +9,7 @@ INSTALL_SAMTOOLS=0;
 RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=1;
+RUN_QSDPR=0;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
@@ -20,7 +20,7 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=0;
+RUN_QVG=1;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -44,6 +44,13 @@ RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
 
+install_samtools () {
+  wget http://sourceforge.net/projects/samtools/files/samtools/0.1.18/samtools-0.1.18.tar.bz2
+  tar xjf samtools-0.1.18.tar.bz2 && cd samtools-0.1.18
+  make CFLAGS=-fPIC
+  export SAMTOOLS=`pwd`
+  cd ..
+}
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
@@ -63,7 +70,8 @@ if [[ "$INSTALL_OTHERS" -eq "1" ]]
   printf "Installing G++\n\n"
   sudo apt-get install g++
   printf "Installing Samtools\n\n"
-  sudo apt-get install samtools
+  #sudo apt-get install samtools
+  install_samtools
 fi
 #
 #
@@ -160,26 +168,28 @@ fi
 if [[ "$RUN_VIADBG" -eq "1" ]] 
   then
   printf "Installing viaDBG\n\n"
-  wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz
-  tar xfz boost_1_60_0.tar.gz
-  rm boost_1_60_0.tar.gz
-  cd boost_1_60_0
-  ./bootstrap.sh --prefix=/usr/local --with-libraries=program_options,regex,filesystem,system
-  export
-  ./b2 install
-  cd /home
-  rm -rf boost_1_60_0
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
-  
+  #wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz
+  #tar xfz boost_1_60_0.tar.gz
+  #rm boost_1_60_0.tar.gz
+  #cd boost_1_60_0
+  #./bootstrap.sh --prefix=/usr/local --with-libraries=program_options,regex,filesystem,system
+  #export
+  #./b2 install
+  #cd /home
+  #rm -rf boost_1_60_0
+  #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+  eval "$(conda shell.bash hook)"  
+  conda create -n viadbg
+  conda activate viadbg
+  conda install -c conda-forge boost    
   git clone https://bitbucket.org/bfreirec1/viadbg.git
   cd viadbg
-  make
-  
-  #cd ../../../
-  
+  make  
+  conda activate base  
+  #cd ../../../  
 fi
 
-#PredictHaplo
+#PredictHaplo - error on make
 if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
   then
   printf "Installing PredictHaplo\n\n"
@@ -201,31 +211,51 @@ fi
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]] 
   then
   printf "Installing TRACESPipeLite\n\n"
+  eval "$(conda shell.bash hook)"  
+  conda create -n tracespipelite
+  conda activate tracespipelite
   git clone https://github.com/viromelab/TRACESPipeLite.git
   cd TRACESPipeLite/src/
   chmod +x *.sh
   ./TRACESPipeLite.sh --install
   cd ../../  
+  conda activate base
 fi
 
-#TRACESPipe
+#TRACESPipe - error on mapDamage
 if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
   then
   printf "Installing TRACESPipe\n\n"
+  eval "$(conda shell.bash hook)"  
+  conda create -n tracespipe
+  conda activate tracespipe
   git clone https://github.com/viromelab/tracespipe.git
   cd tracespipe/src/
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install
   ./TRACESPipe.sh --get-all-aux
   cd ../../  
+  conda activate base
 fi
 
-#ASPIRE
+#ASPIRE - missing R probably + dependencies
 if [[ "$RUN_ASPIRE" -eq "1" ]] 
   then
   printf "Installing ASPIRE\n\n"
   rm -rf aspire/
   git clone https://github.com/kevingroup/aspire.git
+  install_samtools  
+  cpan App::Cmd::Setup
+  cpan Bio::DB::Sam
+  cpan Bio::Seq
+  cpan Bio::SeqIO
+  cpan Cwd
+  cpan File::Path
+  cpan File::Spec
+  cpan IPC::Run
+  cpan List::Util
+  cpan Math::Round
+  cpan Statistics::Descriptive::Full
 fi
 
 
@@ -233,8 +263,18 @@ fi
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Installing QVG\n\n"
+  eval "$(conda shell.bash hook)"  
+  #conda create -n qvg
+  #conda activate qvg  
+  #conda install -c bioconda fastp bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
+  #conda install -c conda-forge parallel
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
+  cd ./QVG/
+  conda create --name qvg-env --file qvg-env.yaml 
+  
+  
+  #conda activate base
 fi
 
 #V-pipe
@@ -250,14 +290,11 @@ fi
 if [[ "$RUN_STRAINLINE" -eq "1" ]]
   then
   printf "Installing Strainline\n\n"
-  eval "$(conda shell.bash hook)"
-  
+  eval "$(conda shell.bash hook)"  
   conda create -n strainline
   conda activate strainline
-  conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2
-  
-  git clone https://github.com/HaploKit/Strainline.git
-  
+  conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2  
+  git clone https://github.com/HaploKit/Strainline.git  
   
   echo Please input the path to miniconda.
   read miniconda

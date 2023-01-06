@@ -3,7 +3,7 @@
 RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=1;
+RUN_QSDPR=0;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
@@ -12,6 +12,9 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
+RUN_TRACESPIPE=0;
+RUN_ASPIRE=0;
+RUN_QVG=1;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -59,45 +62,69 @@ if [[ "$RUN_SHORAH" -eq "1" ]]
   done
 fi
 
-#spades - runs
+#spades - working
 if [[ "$RUN_SPADES" -eq "1" ]] 
   then
   printf "Reconstructing with SPAdes\n\n"
   cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
     do	
-    cp  ../../${dataset}_1.fq .
-    cp  ../../${dataset}_2.fq .
+    rm -rf spades_${dataset}
+    mkdir spades_${dataset}
+    cp  ../../${dataset}_1.fq spades_${dataset}
+    cp  ../../${dataset}_2.fq spades_${dataset}
     #spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
-    python spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq --meta
+    python spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq --meta
     done
   cd ../../
 fi
 
-#metaviralspades
+#metaviralspades - runs, results not found
 if [[ "$RUN_METAVIRALSPADES" -eq "1" ]] 
   then
   printf "Reconstructing with metaviralSPAdes\n\n"
   cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
-    do	
-    cp ../../${dataset}_1.fq .
-    cp ../../${dataset}_2.fq .
-    ./metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
+    do
+    rm -rf metaviralspades_${dataset}
+    mkdir metaviralspades_${dataset}	
+    cp ../../${dataset}_1.fq metaviralspades_${dataset}
+    cp ../../${dataset}_2.fq metaviralspades_${dataset}
+    ./metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
   done
   cd ../../
 fi
 
-#coronaspades
+#coronaspades - runs, doesn't output scaffolds
 if [[ "$RUN_CORONASPADES" -eq "1" ]] 
   then
   printf "Reconstructing with coronaSPAdes\n\n"
   cd SPAdes-3.15.5-Linux/bin/
   for dataset in "${DATASETS[@]}"
     do
-    ./coronaspades.py -o coronaspades_${dataset} -1 ../../${dataset}_1.fq -2 ../../${dataset}_2.fq
+    rm -rf coronaspades_${dataset}
+    mkdir coronaspades_${dataset}	
+    cp ../../${dataset}_1.fq coronaspades_${dataset}
+    cp ../../${dataset}_2.fq coronaspades_${dataset}
+    ./coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
   done
   cd ../../
+fi
+
+#viaDBG - missing ./bin/viaDBG file, bin is empty
+if [[ "$RUN_VIADBG" -eq "1" ]] 
+  then
+  printf "Reconstructing with viaDBG\n\n"
+  cd viadbg/
+  for dataset in "${DATASETS[@]}"
+    do
+    rm -rf viadbg_${dataset}
+    mkdir viadbg_${dataset}	
+    cp ../${dataset}_1.fq viadbg_${dataset}
+    cp ../${dataset}_2.fq viadbg_${dataset}
+    mkdir output_${dataset}
+    ./bin/viaDBG -p viadbg_${dataset} -o output_${dataset}
+    done
 fi
 
 #savage - Runs, no reads could be aligned to reference error
@@ -118,7 +145,7 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   cd ..
 fi
 
-#qsdpr - missing vcf file, missing configuration
+#qsdpr - missing vcf file?, error on samtools configuration
 if [[ "$RUN_QSDPR" -eq "1" ]] 
   then
   printf "Reconstructing with QSdpr\n\n"
@@ -165,13 +192,15 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   chmod +x jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py
   for dataset in "${DATASETS[@]}"
     do
-    cp ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa samples_virusvg
+    rm -rf samples_virusvg
+    mkdir samples_virusvg
+    cp ${dataset}_1.fq ${dataset}_2.fq ${dataset}.fa samples_virusvg
     jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py -f samples_virusvg/${dataset}_1.fq -r samples_virusvg/${dataset}_2.fq -c samples_virusvg/${dataset}.fa -vg vg -t 2
   done
   conda activate base
 fi
 
-#vg-flow - running with errors, rust-overlaps not found
+#vg-flow - running with errors, rust-overlaps not found - json.decoder.JSONDecodeError
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Reconstructing with VG-Flow\n\n"
@@ -180,15 +209,26 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   chmod +x jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py
   for dataset in "${DATASETS[@]}"
     do
-    jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg pwd -t 2
+    rm -rf samples_vgflow
+    mkdir samples_vgflow
+    cp ${dataset}_1.fq ${dataset}_2.fq ${dataset}.fa samples_vgflow
+    jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py -f samples_vgflow/${dataset}_1.fq -r ${dataset}_2.fq -c samples_vgflow/${dataset}.fa -vg pwd -t 2
   done
   conda activate base
 fi
 
-#tracespipelite - runs
+#PredictHaplo - error on installation
+if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
+  then
+  printf "Reconstruction with PredictHaplo is not available\n\n"
+fi
+
+#tracespipelite - working
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]] 
   then
-  printf "Reconstructing with TracePipeLite\n\n"
+  printf "Reconstructing with TRACESPipeLite\n\n"
+  eval "$(conda shell.bash hook)"  
+  conda activate tracespipelite
   cd TRACESPipeLite/src/  
   for dataset in "${DATASETS[@]}"
     do	
@@ -197,6 +237,70 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     ./TRACESPipeLite.sh --similarity 50 --threads 1 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
     done
   cd ../../
+  conda activate base
+fi
+
+#tracespipe - input files are not gzipped error
+if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
+  then
+  printf "Reconstructing with TRACESPipe\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate tracespipe
+  cd tracespipe/
+  for dataset in "${DATASETS[@]}"
+    do	
+    cd meta_data/
+    rm -rf meat_info.txt
+    echo 'blood:${dataset}_1.fq.gz:${dataset}_2.fq.gz'  >> meta_info.txt
+    cd ../input_data/
+    cp ../../${dataset}_*.fq .
+    rm -rf ${dataset}_*.fq.gz
+    gzip ${dataset}_1.fq
+    gzip ${dataset}_2.fq
+    cd ../src/  
+    ./TRACESPipe.sh --run-hybrid
+    cd ..
+    done
+  cd ..   
+  conda activate base  
+fi
+
+#ASPIRE - Can't locate App/Cmd/Setup.pm
+if [[ "$RUN_ASPIRE" -eq "1" ]] 
+  then
+  printf "Reconstructing with ASPIRE\n\n"
+  cd aspire
+  ./aspire
+  cd ..
+fi
+
+#QVG - working
+if [[ "$RUN_QVG" -eq "1" ]] 
+  then
+  printf "Reconstructing with QVG\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate qvg-env
+  cd QVG
+  rm -rf reconstruction_files
+  mkdir reconstruction_files
+  for dataset in "${DATASETS[@]}"
+    do	   
+    rm -rf ${dataset}_files
+    mkdir ${dataset}_files
+    echo "${dataset}" >> ${dataset}_files/samples
+    cd ${dataset}_files
+    mkdir output
+    cp ../../${dataset}_*.fq .
+    gzip -cvf ${dataset}_1.fq > ${dataset}_R1.fastq.gz
+    gzip -cvf ${dataset}_2.fq > ${dataset}_R2.fastq.gz
+    #gzip ${dataset}_1.fq
+    #gzip ${dataset}_2.fq
+    cd ..
+    cp ../B19.fa reconstruction_files
+    ./QVG.sh -r ./reconstruction_files/B19.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes
+    done
+  cd ..
+  conda activate base 
 fi
 
 #V-pipe - working to some capacity, missing input files
