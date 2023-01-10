@@ -14,9 +14,9 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=1;
+RUN_QVG=0;
 RUN_VPIPE=0;
-RUN_STRAINLINE=0;
+RUN_STRAINLINE=1;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
@@ -309,8 +309,11 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   printf "Reconstructing with V-pipe\n\n"
   cd work
   # edit config.yaml and provide samples/ directory
-  ./vpipe --jobs 4 --printshellcmds --dry-run
+  eval "$(conda shell.bash hook)"
+  conda activate vpipe  
+  ./vpipe 
   cd ..
+  conda activate base
 fi
 
 #Strainline - LAcheck: reads.las is not present
@@ -321,7 +324,9 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   chmod +x ./strainline.sh
   for dataset in "${DATASETS[@]}"
     do
-    ./strainline.sh -i ../../${dataset}*.fa -o out -p ont
+    cp ../../DS1.fa .
+    #./strainline.sh -i ../../${dataset}*.fa -o out -p ont
+    ./strainline.sh -i DS1.fa -o out -p pb -k 20 -t 32
     done
   cd ../../
   
@@ -340,15 +345,35 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   
 fi
 
-#aBayesQR - working, missing input
+#aBayesQR - input is probably wrong, segmentation fault
 if [[ "$RUN_ABAYESQR" -eq "1" ]] 
   then
   printf "Reconstructing with aBayesQR\n\n"
-  ./aBayesQR config
+  cd aBayesQR 
+  for dataset in "${DATASETS[@]}"
+    do
+    #cp ${dataset}_*.fq .
+    cp ../B19.fa ../DS1_.sam .
+    rm -rf config_${dataset}
+    echo "filename of reference sequence (FASTA) : B19.fa
+filname of the aligned reads (sam format) : DS1_.sam
+paired-end (1 = true, 0 = false) : 1
+SNV_thres : 0.01
+reconstruction_start : 1
+reconstruction_stop: 1300
+min_mapping_qual : 60
+min_read_length : 150
+max_insert_length : 250
+characteristic zone name : test
+seq_err (assumed sequencing error rate(%)) : 0.1
+MEC improvement threshold : 0.0395 " >> config_${dataset}
+    ./aBayesQR config_${dataset}
+    done
+  cd ..
     
 fi
 
-#HaploClique - missing bam files and remaining execution
+#HaploClique - missing bam files and remaining execution, try later
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Reconstructing with HaploClique\n\n"
@@ -361,7 +386,7 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
 
 fi
 
-#ViSpA - did nothing, no errors
+#ViSpA - did nothing, no errors, try later
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Reconstructing with ViSpA\n\n"  
@@ -382,14 +407,20 @@ if [[ "$RUN_VISPA" -eq "1" ]]
     conda activate base  
 fi
 
-#QuasiRecomb -> java.lang.UnsupportedOperationException, probably an error with the sam file
+#QuasiRecomb -> ParsingException in thread "main" java.lang.reflect.InvocationTargetException
 if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
   then
   printf "Reconstructing with QuasiRecomb\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate quasirecomb
+  cd QuasiRecomb-1.2
   for dataset in "${DATASETS[@]}"
     do
-    java -jar QuasiRecomb.jar -i ${dataset}_.sam
+    cp ../${dataset}_.sam .
+    #java -jar QuasiRecomb.jar -i ${dataset}_.sam
+    java -jar QuasiRecomb.jar -i ${dataset}_.sam -coverage
     done
+  conda activate base
 fi
 
 #Lazypipe 

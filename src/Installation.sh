@@ -20,14 +20,14 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=1;
+RUN_QVG=0;
 RUN_VPIPE=0;
-RUN_STRAINLINE=0;
+RUN_STRAINLINE=1;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
-RUN_QUASIRECOMB=0;
+RUN_QUASIRECOMB=0; #here
 RUN_LAZYPIPE=0;
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
@@ -277,39 +277,36 @@ if [[ "$RUN_QVG" -eq "1" ]]
   #conda activate base
 fi
 
-#V-pipe
+#V-pipe - snakemake not found
 if [[ "$RUN_VPIPE" -eq "1" ]] 
   then
   printf "Installing V-pipe\n\n"
-  curl -O 'https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/utils/quick_install.sh'
-  chmod +x ./quick_install.sh
-  ./quick_install.sh -w work
+  #curl -O 'https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/utils/quick_install.sh'
+  #chmod +x ./quick_install.sh
+  #./quick_install.sh -w work
+  eval "$(conda shell.bash hook)"  
+  conda create --yes -n vpipe -c conda-forge -c bioconda mamba 
+  conda activate vpipe
+  conda install -c bioconda snakemake
+  wget "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.tar.gz"
+  tar xvzf v2.99.3.tar.gz
 fi
 
-#Strainline - error when reconstructing
+#Strainline - daccord not found, try later
 if [[ "$RUN_STRAINLINE" -eq "1" ]]
   then
   printf "Installing Strainline\n\n"
   eval "$(conda shell.bash hook)"  
   conda create -n strainline
   conda activate strainline
-  conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2  
-  git clone https://github.com/HaploKit/Strainline.git  
-  
-  echo Please input the path to miniconda.
-  read miniconda
-  echo $miniconda
-  
+  conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2   
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
-  rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
-  mkdir -p $miniconda/envs/strainline/bin/daccord
-  ln -fs $(pwd)/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $miniconda/envs/strainline/bin/daccord 
-  
+  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord /home/mj/miniconda3/envs/strainline/bin/daccord
   conda activate base
 fi
 
-#HAPHPIPE - haphpipe command not found
+#HAPHPIPE - haphpipe command not found, try later
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Installing HAPHPIPE\n\n"
@@ -345,6 +342,10 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   then
   printf "Installing HaploClique\n\n"
   rm -rf haploclique
+  eval "$(conda shell.bash hook)"
+  conda create -n haploclique
+  conda install -c bioconda samtools
+  conda install -c conda-forge zlib
   sudo apt-get install libncurses5-dev cmake libboost-all-dev git build-essential zlib1g-dev parallel
   git clone https://github.com/armintoepfer/haploclique
   cd haploclique
@@ -354,6 +355,7 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   cmake ..
   make
   make install
+  conda activate base
 fi
 
 #ViSpA
@@ -375,14 +377,24 @@ fi
 if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
   then
   printf "Installing QuasiRecomb\n\n"
-  #wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
+  eval "$(conda shell.bash hook)"
+  conda create --name quasirecomb
+  conda activate quasirecomb
+  conda install -c bioconda samtools
+  
+  wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
+  unzip v1.2.zip 
+  rm -rf v1.2.zip
+  
+  rm -rf QuasiRecomb.jar
   wget https://github.com/cbg-ethz/QuasiRecomb/releases/download/v1.2/QuasiRecomb.jar
-  #unzip v1.2.zip 
-  #rm -rf v1.2.zip
+  cp QuasiRecomb.jar QuasiRecomb-1.2
+  
+  conda activate base
   
 fi
 
-#Lazypipe - not complete
+#Lazypipe - not complete, try later
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"
