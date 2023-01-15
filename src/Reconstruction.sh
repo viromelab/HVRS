@@ -16,8 +16,8 @@ RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
-RUN_STRAINLINE=1;
-RUN_HAPHPIPE=0;
+RUN_STRAINLINE=0;
+RUN_HAPHPIPE=1;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
@@ -133,6 +133,7 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   printf "Reconstructing with SAVAGE\n\n"
   eval "$(conda shell.bash hook)"
   conda activate savage
+  rm -rf savage
   mkdir savage
   cd savage
   cp ../B19.fa .
@@ -250,8 +251,8 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do	
     cd meta_data/
-    rm -rf meat_info.txt
-    echo 'blood:${dataset}_1.fq.gz:${dataset}_2.fq.gz'  >> meta_info.txt
+    rm -rf meta_info.txt
+    echo 'unspecified:'${dataset}'_1.fq.gz:'${dataset}'_2.fq.gz'  >> meta_info.txt
     cd ../input_data/
     cp ../../${dataset}_*.fq .
     rm -rf ${dataset}_*.fq.gz
@@ -307,33 +308,54 @@ fi
 if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
-  cd work
-  # edit config.yaml and provide samples/ directory
   eval "$(conda shell.bash hook)"
-  conda activate vpipe  
-  ./vpipe 
-  cd ..
+  conda activate vpipe 
+  cd V-pipe-2.99.3
+  for dataset in "${DATASETS[@]}"
+    do  
+    cd config
+    echo "general:
+  virus_base_config: hiv
+
+input:
+  datadir: samples
+  samples_file: config/samples.tsv
+
+output:
+  datadir: results
+  snv: true
+  local: true
+  global: false
+  visualization: true
+  QA: true" >> config.yaml
+    # edit config.yaml and provide samples/ directory
+    ./vpipe --cores 1
+    cd ..
+  done
   conda activate base
 fi
 
-#Strainline - LAcheck: reads.las is not present
+#Strainline - seg. fault; reads.las not present
 if [[ "$RUN_STRAINLINE" -eq "1" ]] 
   then
   printf "Reconstructing with Strainline\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate strainline
   cd Strainline/src/
   chmod +x ./strainline.sh
   for dataset in "${DATASETS[@]}"
     do
-    cp ../../DS1.fa .
+    cp ../../${dataset}.fa .
     #./strainline.sh -i ../../${dataset}*.fa -o out -p ont
-    ./strainline.sh -i DS1.fa -o out -p pb -k 20 -t 32
+    ./strainline.sh -i ${dataset}.fa -o out -p pb -k 20 -t 32
     done
   cd ../../
+  conda activate base
   
   
 fi
 
-#HAPHPIPE - haphpipe command not found error
+#HAPHPIPE - missing config
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with HAPHPIPE\n\n"
@@ -341,7 +363,6 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   conda activate haphpipe
   haphpipe -h
   conda activate base
-  
   
 fi
 
@@ -353,7 +374,7 @@ if [[ "$RUN_ABAYESQR" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     #cp ${dataset}_*.fq .
-    cp ../B19.fa ../DS1_.sam .
+    cp ../B19.fa ../${dataset}_.sam .
     rm -rf config_${dataset}
     echo "filename of reference sequence (FASTA) : B19.fa
 filname of the aligned reads (sam format) : DS1_.sam
@@ -380,8 +401,13 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   samtools index alignment.bam
   cd haploclique/scripts/
   chmod +x haploclique-assembly
-  ./haploclique-assembly -r ../reference.fasta -i ../alignment.bam
   
+  for dataset in "${DATASETS[@]}"
+    do
+    cp ../../$dataset.fa .
+    #cp ../../B19.bam #missing bam generation
+    ./haploclique-assembly -r ../reference.fasta -i ../alignment.bam
+  done
   cd ..
 
 fi

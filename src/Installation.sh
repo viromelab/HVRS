@@ -22,8 +22,8 @@ RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
-RUN_STRAINLINE=1;
-RUN_HAPHPIPE=0;
+RUN_STRAINLINE=0;
+RUN_HAPHPIPE=1;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
@@ -52,27 +52,37 @@ install_samtools () {
   cd ..
 }
 
+install_conda() {
+  rm -rf Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
+  wget https://repo.anaconda.com/miniconda/Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
+  chmod +x Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
+  bash Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
+}
+
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
   printf "Installing tools\n\n"
-  sudo apt-get install libopenblas-base
+  #sudo apt-get install libopenblas-base
   conda install -c cobilab -y gto
   conda install -c bioconda -y art
-  conda install -c bioconda -y mummer4
+  conda install -c bioconda -y mummer4 
+  
 fi
 
 if [[ "$INSTALL_OTHERS" -eq "1" ]] 
   then
-  printf "Installing Miniconda\n\n" #missing get install files
-  Miniconda3-py39_4.12.0-Linux-x86_64.sh
+  printf "Installing Miniconda\n\n"
+  install_conda
   printf "Installing git\n\n"
   sudo apt install git
   printf "Installing G++\n\n"
   sudo apt-get install g++
-  printf "Installing Samtools\n\n"
-  #sudo apt-get install samtools
-  install_samtools
+  #printf "Installing Samtools\n\n"
+  #install_samtools
+  printf "Installing make"
+  sudo apt install make
 fi
+
 #
 #
 # INSTALL ASSEMBLY TOOLS:
@@ -100,7 +110,7 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n savage
   conda activate savage
-  conda install savage
+  conda install -c bioconda -c conda-forge boost savage
   conda activate base
 fi
 
@@ -238,13 +248,14 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   conda activate base
 fi
 
-#ASPIRE - missing R probably + dependencies
+#ASPIRE - can't install dependencies
 if [[ "$RUN_ASPIRE" -eq "1" ]] 
   then
   printf "Installing ASPIRE\n\n"
   rm -rf aspire/
   git clone https://github.com/kevingroup/aspire.git
   install_samtools  
+  cpan Module::Build
   cpan App::Cmd::Setup
   cpan Bio::DB::Sam
   cpan Bio::Seq
@@ -277,7 +288,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   #conda activate base
 fi
 
-#V-pipe - snakemake not found
+#V-pipe - try again
 if [[ "$RUN_VPIPE" -eq "1" ]] 
   then
   printf "Installing V-pipe\n\n"
@@ -290,9 +301,10 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   conda install -c bioconda snakemake
   wget "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.tar.gz"
   tar xvzf v2.99.3.tar.gz
+  conda activate base
 fi
 
-#Strainline - daccord not found, try later
+#Strainline - seg. fault; reads.las not present
 if [[ "$RUN_STRAINLINE" -eq "1" ]]
   then
   printf "Installing Strainline\n\n"
@@ -302,19 +314,24 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2   
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
-  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord /home/mj/miniconda3/envs/strainline/bin/daccord
+  rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz   
+  printf "Please insert the path to miniconda installation. Example: /home/USER/miniconda3\n" 
+  read condapath    
+  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $condapath/envs/strainline/bin/daccord
+  rm -rf Strainline
+  git clone "https://github.com/HaploKit/Strainline.git"
   conda activate base
 fi
 
-#HAPHPIPE - haphpipe command not found, try later
+#HAPHPIPE -
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Installing HAPHPIPE\n\n"
   eval "$(conda shell.bash hook)"
   conda create -n haphpipe
   conda activate haphpipe
-  conda install -c bioconda haphpipe
-  conda install -c "bioconda/label/main" gatk
+  conda install -c bioconda gatk
+  conda install haphpipe
   #wget https://anaconda.org/bioconda/gatk/3.8/download/linux-64/gatk-3.8-py35_0.tar.bz2
   #bzip2 -d gatk-3.8-py35_0.tar.bz2
   #mkdir -p gatkRUN_HAPLOCLIQUE
