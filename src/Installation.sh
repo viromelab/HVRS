@@ -23,18 +23,18 @@ RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
-RUN_HAPHPIPE=1;
+RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0; #here
-RUN_LAZYPIPE=0;
+RUN_LAZYPIPE=0; #missing
 RUN_VIQUAS=0;
-RUN_MLEHAPLO=0;
+RUN_MLEHAPLO=1;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
-RUN_IVA=0;
+RUN_IVA=0; #err
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
@@ -42,7 +42,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=0;
+RUN_ENSEMBLEASSEMBLER=0; #missing
 
 install_samtools () {
   wget http://sourceforge.net/projects/samtools/files/samtools/0.1.18/samtools-0.1.18.tar.bz2
@@ -81,6 +81,8 @@ if [[ "$INSTALL_OTHERS" -eq "1" ]]
   #install_samtools
   printf "Installing make"
   sudo apt install make
+  printf "Installing Java"
+  sudo apt install default-jre  
 fi
 
 #
@@ -330,11 +332,13 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n haphpipe
   conda activate haphpipe
-  conda install -c bioconda gatk
-  conda install haphpipe
+  conda install -c bioconda gatk 
+  conda install haphpipe 
+  
+  
   #wget https://anaconda.org/bioconda/gatk/3.8/download/linux-64/gatk-3.8-py35_0.tar.bz2
   #bzip2 -d gatk-3.8-py35_0.tar.bz2
-  #mkdir -p gatkRUN_HAPLOCLIQUE
+  #mkdir -p gatk
   #tar -jxf gatk-3.8-py35_0.tar.bz2 --directory gatk
   #cd gatk/bin/
   #./gatk-register GenomeAnalysisTK #i dont know what the file is
@@ -354,7 +358,7 @@ if [[ "$RUN_ABAYESQR" -eq "1" ]]
   cd ..  
 fi
 
-#HaploClique - missing zlib, samtools
+#HaploClique - issues generating sam to bam files using samtools
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Installing HaploClique\n\n"
@@ -411,7 +415,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - not complete, try later
+#Lazypipe - not complete, try later, tmp skipping
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"
@@ -420,8 +424,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   #git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
   #cd lazypipe
   
-  eval "$(conda shell.bash hook)"
-  
+  eval "$(conda shell.bash hook)"  
   conda create -n blast -c bioconda blast 
   conda create -n lazypipe -c bioconda -c eclarke bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
   conda activate blast
@@ -451,14 +454,27 @@ fi
 if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
   then
   printf "Installing MLEHaplo\n\n"
-  wget -O dsk http://gatb-tools.gforge.inria.fr/versions/bin/dsk-2.1.0-Linux.tar.gz
-  tar -xzf dsk
-  rm -rf dsk
+  eval "$(conda shell.bash hook)"
   
-  #cpanm Bio::Perl
-  #cpanm Getopt::Long, Graph.
+  conda create -n mlehaplo
+  conda activate mlehaplo
+  conda install -c bioconda gatb perl-bioperl perl-graph
   
   
+  
+  
+  #wget -O dsk http://gatb-tools.gforge.inria.fr/versions/bin/dsk-2.1.0-Linux.tar.gz
+  #tar -xzf dsk
+  #rm -rf dsk
+  
+  #cpan Bio::Perl
+  #cpan Getopt::Long
+  #cpan Getopt::Graph
+  
+  wget https://github.com/raunaq-m/MLEHaplo/archive/refs/tags/v0.4.1.tar.gz
+  tar -zxf v0.4.1.tar.gz
+  
+  conda activate base
   
 fi
 

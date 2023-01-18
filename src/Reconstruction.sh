@@ -17,14 +17,14 @@ RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
-RUN_HAPHPIPE=1;
+RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0;
+RUN_LAZYPIPE=0; #missing
 RUN_VIQUAS=0;
-RUN_MLEHAPLO=0;
+RUN_MLEHAPLO=1;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
@@ -355,18 +355,31 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   
 fi
 
-#HAPHPIPE - missing config
+#HAPHPIPE - error mid code 
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with HAPHPIPE\n\n"
   eval "$(conda shell.bash hook)"
   conda activate haphpipe
-  haphpipe -h
-  conda activate base
-  
+  rm -rf haphpipe_data
+  mkdir haphpipe_data
+  cd haphpipe_data
+   
+  for dataset in "${DATASETS[@]}"
+    do
+    #haphpipe -h    
+    cp ../${dataset}_*.fq .
+    
+    rm -rf denovo_assembly_${dataset}
+    mkdir denovo_assembly_${dataset}
+    
+    haphpipe assemble_denovo --fq1 ${dataset}_1.fq --fq2 ${dataset}_2.fq --outdir denovo_assembly_${dataset} #--no_error_correction TRUE
+  done
+  cd ..
+  conda activate base 
 fi
 
-#aBayesQR - input is probably wrong, segmentation fault
+#aBayesQR - input is probably wrong?? , segmentation fault
 if [[ "$RUN_ABAYESQR" -eq "1" ]] 
   then
   printf "Reconstructing with aBayesQR\n\n"
@@ -398,21 +411,26 @@ fi
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Reconstructing with HaploClique\n\n"
-  samtools index alignment.bam
-  cd haploclique/scripts/
-  chmod +x haploclique-assembly
+  eval "$(conda shell.bash hook)"
+  conda activate haploclique  
+  create_bam_files
   
-  for dataset in "${DATASETS[@]}"
-    do
-    cp ../../$dataset.fa .
-    #cp ../../B19.bam #missing bam generation
-    ./haploclique-assembly -r ../reference.fasta -i ../alignment.bam
-  done
-  cd ..
+  #samtools index alignment.bam
+  #cd haploclique/scripts/
+  #chmod +x haploclique-assembly
+  
+  #for dataset in "${DATASETS[@]}"
+  #  do
+  #  cp ../../$dataset.fa .
+  #  #cp ../../B19.bam #missing bam generation
+  #  ./haploclique-assembly -r ../reference.fasta -i ../alignment.bam
+  #done
+  #cd ..
+  conda activate base
 
 fi
 
-#ViSpA - did nothing, no errors, try later
+#ViSpA - index file for DS1.bam err; missing DS1_I_6_120_CNTGS_DIST0.txt
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Reconstructing with ViSpA\n\n"  
@@ -421,13 +439,13 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   cd home
   rm -rf test
   mkdir test
-  touch test/log.txt 
-  printf "got here"
+  #touch test/log.txt 
   cd code/vispa_mosaik   
   for dataset in "${DATASETS[@]}"
     do	
     cp ../../../${dataset}.fa ../../test
-    cp ../../../HPV.fa ../../test    
+    cp ../../../HPV.fa ../../test  
+    echo "" >> ../../test/${dataset}.txt
     ./main_mosaik.bash ../../test/${dataset}.fa ../../test/HPV.fa 15 6 120 > ../../test/log.txt
     done    
     conda activate base  
@@ -467,10 +485,40 @@ if [[ "$RUN_VIQUAS" -eq "1" ]]
   
 fi
 
-#MLEHaplo
+#MLEHaplo - no errors 0 vertices and 0 edges on the DBG
 if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with MLEHaplo\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate mlehaplo
+  cd MLEHaplo-0.4.1
+  rm -rf benchmark
+  mkdir benchmark
+  
+  for dataset in "${DATASETS[@]}"
+    do
+    cd benchmark
+    echo ${dataset}"_1.fq
+"${dataset}"_2.fq" > files_${dataset}.txt
+    echo "55
+45
+35
+25" > kmers_${dataset}.txt
+    cp ../../${dataset}_*.fq .
+    cp ../../${dataset}.fa .
+    cd ..
+    
+    ./multi-dsk/multi-dsk benchmark/${dataset}.fa  benchmark/kmers_${dataset}.txt  -m 8192 -d 10000
+    #
+    ./multi-dsk/parse_results benchmark/paired-reads.solid_kmers_binary.60 > paired-reads.60
+    perl construct_graph.pl  benchmark/${dataset}.fa paired-reads.60 0 paired-reads.60.graph "s"
+    perl construct_paired_without_bloom.pl -fasta benchmark/${dataset}.fa -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
+    #incomplete
+    
+  
+  done
+  conda activate base
+  
   
 fi
 
