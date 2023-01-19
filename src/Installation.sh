@@ -27,8 +27,8 @@ RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
-RUN_QUASIRECOMB=0; #here
-RUN_LAZYPIPE=0; #missing
+RUN_QUASIRECOMB=0;
+RUN_LAZYPIPE=0;
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
@@ -38,11 +38,13 @@ RUN_IVA=0; err
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
-RUN_VIP=1;
+RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=0; #missing
+RUN_ENSEMBLEASSEMBLER=1; #missing
+
+
 
 install_samtools () {
   wget http://sourceforge.net/projects/samtools/files/samtools/0.1.18/samtools-0.1.18.tar.bz2
@@ -415,7 +417,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - not complete, try later, tmp skipping
+#Lazypipe - not complete, err ln 450, no ~/bin/runsanspanz.py file
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"
@@ -430,14 +432,22 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   conda activate blast
   conda activate --stack lazypipe
   
-  printf "Please insert the path to miniconda installation" 
-  read $condapath
+  printf "Please insert the path to miniconda installation. Example: /home/USER/miniconda3\n\n" 
+  read CONDA_PREFIX
   
-  #rm -rf $condapath/envs/lazypipe/opt/krona/taxonomy ln -s $condapath/pkgs/krona-2.8.1-pl5262hdfd78af_0/opt/krona/taxonomy $condapath/envs/lazypipe/opt/krona/taxonomy #idk if this path is right
-  export TM=$condapath/share/trimmomatic #not exporting, I think
+  rm -rf $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy 
+  ln -s $data/taxonomy $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy 
+  
+  export TM=$CONDA_PREFIX/share/trimmomatic #not exporting, I think
    
-  
-  cd .. 
+  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz 
+  tar -zxvf SANSPANZ.3.tar.gz 
+  sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py 
+  prev_pwd=$pwd;
+  cd home/lx/bin
+  echo "" >> runsanspanz.py
+  cd $prev_pwd
+  ln -sf $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py 
 fi
 
 #ViQuaS
@@ -751,32 +761,14 @@ fi
 if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
   then
   printf "Installing EnsembleAssembler \n\n"
-  #wget -O ensembleAssembly "https://sourceforge.net/projects/ensembleassembly/files/latest/download"
-  #tar -zxvf ensembleAssembly
-  
-  #install abyss
-  wget -O abyss "https://github.com/bcgsc/abyss/releases/download/2.3.5/abyss-2.3.5.tar.gz"
-  tar -zxvf abyss  
-  cd abyss-2.3.5  
   eval "$(conda shell.bash hook)"
-  conda create -n ensembleAssembler
+  conda create -n ensembleAssembler python=2.7 
   conda activate ensembleAssembler
-  conda install -c conda-forge boost openmpi
-  conda install -c bioconda google-sparsehash
-  conda install -c conda-forge compilers
-  ./autogen.sh
-  mkdir build
-  cd build
-  ../configure --prefix=$(pwd)/../../
-  make
-  make install
-  PATH=$(pwd)/../../:$PATH  
-  cd ..  
-  #copy abyss-pe
-  
-  
-  #
-  
+  wget -O ensembleAssembly "https://sourceforge.net/projects/ensembleassembly/files/latest/download"
+  tar -zxvf ensembleAssembly
+
+  chmod a+x ensembleAssembly_1/* -R
+
   conda activate base
   
   

@@ -32,11 +32,11 @@ RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
-RUN_VIP=1;
+RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=0;
+RUN_ENSEMBLEASSEMBLER=1;
 
 declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS1" "DS2" "DS3");
@@ -712,10 +712,24 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   conda activate base
 fi
 
-#EnsembleAssembler 
+#EnsembleAssembler - err /usr/bin/env: ‘python\r’: No such file or directory
 if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
   then
   printf "Reconstructing with EnsembleAssembler \n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate ensembleAssembler
+  for dataset in "${DATASETS[@]}"
+    do
+    rm -rf ${dataset}_ea
+    mkdir ${dataset}_ea
+    cd ${dataset}_ea
+    ../ensembleAssembly_1/ensembleAssembly ./config.txt
+    #chmod +x ./ensemble.sh
+    #./ensemble.sh
+    
+  done
+  conda activate base
+  
   
   
   
