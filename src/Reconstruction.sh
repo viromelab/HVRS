@@ -24,7 +24,7 @@ RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; #missing
 RUN_VIQUAS=0;
-RUN_MLEHAPLO=1;
+RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
@@ -32,7 +32,7 @@ RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
-RUN_VIP=0;
+RUN_VIP=1;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
@@ -508,12 +508,25 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
     cp ../../${dataset}.fa .
     cd ..
     
-    ./multi-dsk/multi-dsk benchmark/${dataset}.fa  benchmark/kmers_${dataset}.txt  -m 8192 -d 10000
+    #./multi-dsk/multi-dsk benchmark/${dataset}.fa  benchmark/kmers_${dataset}.txt  -m 8192 -d 10000
     #
-    ./multi-dsk/parse_results benchmark/paired-reads.solid_kmers_binary.60 > paired-reads.60
-    perl construct_graph.pl  benchmark/${dataset}.fa paired-reads.60 0 paired-reads.60.graph "s"
-    perl construct_paired_without_bloom.pl -fasta benchmark/${dataset}.fa -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
-    #incomplete
+    #./multi-dsk/parse_results benchmark/paired-reads.solid_kmers_binary.60 > paired-reads.60
+    #perl construct_graph.pl  benchmark/${dataset}.fa paired-reads.60 0 paired-reads.60.graph "s"
+    #perl construct_paired_without_bloom.pl -fasta benchmark/${dataset}.fa -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
+    #incomplete - DBG graph is empty
+    
+    #example given
+    ./multi-dsk/multi-dsk Example/paired-reads.fasta  Example/listofkmers.txt  -m 8192 -d 10000
+    ./multi-dsk/parse_results Example/paired-reads.solid_kmers_binary.60 > paired-reads.60
+    perl construct_graph.pl  Example/paired-reads.fasta paired-reads.60 0 paired-reads.60.graph "s"
+    perl construct_paired_without_bloom.pl -fasta Example/paired-reads.fasta -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
+    perl dg_cover.pl -graph paired-reads.60.graph -kmer paired-reads.60 -paired paired-reads.60.pk.txt -fact 15 -thresh 0 -IS 400 > paired-reads.60.fact15.txt
+    perl process_dg.pl paired-reads.60.fact15.txt > paired-reads.60.fact15.fasta
+    perl get_paths_dgcover.pl -f paired-reads.60.fact15.txt -w paired-reads.60.fact15.paths.txt
+    perl likelihood_singles_wrapper.pl -condgraph paired-reads.60.cond.graph -compset paired-reads.60.comp.txt -pathsfile paired-reads.60.fact15.paths.txt -back -gl 1200 -slow  > paired-reads.60.smxlik.txt
+    perl extract_MLE.pl -f paired-reads.60.fact15.fasta -l paired-reads.60.smxlik.txt > paired-reads.60.MLE.fasta
+    
+    
     
   
   done
@@ -567,14 +580,15 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   
 fi
 
-#CliqueSNV
+#CliqueSNV - working
 if [[ "$RUN_CLIQUESNV" -eq "1" ]] 
   then
   printf "Reconstructing with CliqueSNV\n\n"
   cd CliqueSNV-2.0.3
   for dataset in "${DATASETS[@]}"
     do
-    java -jar clique-snv.jar -m snv-illumina -in ../${dataset}_.sam
+    cp ../${dataset}_.sam .
+    java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam
     done
   cd ..  
 fi
@@ -583,6 +597,7 @@ fi
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Reconstructing with IVA\n\n"
+  iva --test outdir
   
 fi
 
@@ -599,12 +614,17 @@ if [[ "$RUN_PRICE" -eq "1" ]]
   
 fi
 
-#VirGenA - missing changes to config.xml file
+#VirGenA - missing changes to config.xml file; example err . java.io.IOException: Cannot run program "makeblastdb": error=2, No such file or directory
 if [[ "$RUN_VIRGENA" -eq "1" ]] 
   then
   printf "Reconstructing with VirGenA\n\n"
   cd release_v1.4
-  java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
+  chmod +x ./tools/vsearch
+  for dataset in "${DATASETS[@]}"
+    do
+    java -jar VirGenA.jar assemble -c config_test_linux.xml
+    #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
+  done
   cd ..
   
 fi
@@ -634,7 +654,9 @@ fi
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Reconstructing with VIP\n\n"
-  cd VIP
+  eval "$(conda shell.bash hook)"
+  conda activate vip
+  cd VIP-master
   chmod +x ./VIP.sh
   cp ../DS1_1.fq .
   cp ../DS1.fa .
@@ -642,6 +664,7 @@ if [[ "$RUN_VIP" -eq "1" ]]
   ./VIP.sh -z -i DS1.fa -p illumina -f fasta -r VZV.fa
   ./VIP.sh -c DS1.fa.conf -i DS1.fa
   cd ..
+  conda activate base
 fi
 
 #drVM - ./drVM.py: /usr/bin/python: bad interpreter: No such file or directory
@@ -649,7 +672,8 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   then
   printf "Reconstructing with drVM\n\n"
   cd Tools 
-  ./drVM.py -1 DS1_1.fq -2 DS1_2.fq -t 1 -keep
+  ls
+  ./drVM.py #-1 DS1_1.fq -2 DS1_2.fq -t 1 -keep
   cd ..
 fi
 
@@ -658,19 +682,32 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   then
   printf "Reconstructing with SSAKE\n\n"
   cd ssake/tools/
-  ./runSSAKE.sh ../../DS1_1.fq ../../DS1_2.fq 10 ds1_assembly
+  
+  for dataset in "${DATASETS[@]}"
+    do
+    cp ../../${dataset}_*.fq .
+    ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
+  done
   cd ../../
 
 fi
 
-#viralFlye - missing scipy
+#viralFlye - err can't find out dir
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Reconstructing with viralFlye\n\n"
   eval "$(conda shell.bash hook)"
   conda activate viralFlye
   cd viralFlye
-  ./viralFlye.py
+  rm -rf flye_assembly_dir
+  mkdir flye_assembly_dir 
+  cd flye_assembly_dir 
+  cp ../../DS1_*.fq .
+  cd ..
+  rm -rf out
+  mkdir out
+  
+  ./viralFlye.py --dir $(pwd)/out --hmm ../Pfam-A.hmm.gz --reads $(pwd)/flye_assembly_dir #--outdir flye_assembly_dir
   cd ..
   conda activate base
 fi

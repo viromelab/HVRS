@@ -30,15 +30,15 @@ RUN_VISPA=0;
 RUN_QUASIRECOMB=0; #here
 RUN_LAZYPIPE=0; #missing
 RUN_VIQUAS=0;
-RUN_MLEHAPLO=1;
+RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
-RUN_IVA=0; #err
+RUN_IVA=0; err
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
-RUN_VIP=0;
+RUN_VIP=1;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
@@ -486,18 +486,18 @@ fi
 #  conda create -n pehaplo python=2.7 networkx==1.11 apsp 
 #fi
 
-#RegressHaplo - error in r instalation
+#RegressHaplo - error in r instalation, skipping
 if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
   then
   printf "Installing RegressHaplo\n\n"
   
   #install R 	
-  sudo apt update
-  sudo apt install r-base
+  sudo apt-get update
+  sudo apt-get install r-base
+  #sudo apt update
+  #sudo apt install r-base
   
   # Install devtools from CRAN
-  
-  #sudo R -e 'install.packages("devtools")'
 
   
   #wget -O rsource "https://cran.r-project.org/src/base/R-4/R-4.2.2.tar.gz"
@@ -514,15 +514,32 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   
   #sudo apt-get install r-base
  
- 
-  #install_github("hadley/devtools")
-  #library(devtools)
-  #install_github("SLeviyang/RegressHaplo")
   
-  #source("https://bioconductor.org/biocLite.R")
-  #biocLite("Biostrings")
-  #biocLite("Rsamtools")
-  #biocLite("GenomicAlignments")
+  echo "if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.14")
+source("https://bioconductor.org/biocLite.R")
+biocLite("Biostrings")
+biocLite("Rsamtools")
+biocLite("GenomicAlignments")
+library(devtools)
+install_github("SLeviyang/RegressHaplo")" >> regress.r
+
+ Rscript regress.r
+  
+  
+  
+  
+  
+  
+  
+  #cpan library(devtools)
+  #cpan install_github("SLeviyang/RegressHaplo")
+  
+  #cpan source("https://bioconductor.org/biocLite.R")
+  #cpan biocLite("Biostrings")
+  #cpan biocLite("Rsamtools")
+  #cpan biocLite("GenomicAlignments")
   
   #cd ..
   
@@ -538,36 +555,39 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   rm -rf cliquesnv
 fi
 
-#IVA - error, not adding to path and iva can't find kmc and smalt.
+#IVA - kmc not found
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Installing IVA\n\n"
   
-  #wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
-  #rm -rf kmc
-  #mkdir kmc
-  #tar -xzf KMC3.2.1.linux.tar.gz -C kmc
-  #rm -rf KMC3.2.1.linux.tar.gz
-  #missing add to path
+  wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
+  rm -rf kmc
+  mkdir kmc
+  tar -xzf KMC3.2.1.linux.tar.gz
+  rm -rf KMC3.2.1.linux.tar.gz
   
-  #wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
-  #tar zxvf smalt
-  #rm -rf smalt
-  #cd smalt-0.7.6
-  #./configure
-  #make
-  #make install
+  
+  wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
+  tar zxvf smalt
+  rm -rf smalt
+  cd smalt-0.7.6
+  ./configure
+  make
+  sudo make install
+  cd ..
   #missing add to path
   
   rm -rf IVAdependencies
   mkdir IVAdependencies   
   cd IVAdependencies
-  cp -R ../kmc .
+  cp ../bin/* .
   cp -R ../smalt-0.7.6 .
   
   #error, not adding to path and iva can't find kmc and smalt.
   echo "\n\n Adding $(pwd) to path" 
-  export PATH=$PATH:`pwd`
+  export PATH=$PATH:$(pwd)
+  
+  pip3 install iva
   
   
   
@@ -668,6 +688,12 @@ fi
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Installing VIP\n\n"
+  eval "$(conda shell.bash hook)"
+  
+  conda create -n vip
+  conda activate vip
+  conda install -c bioconda perl-dbi
+  
   wget -O vip "https://github.com/keylabivdc/VIP/archive/refs/heads/master.zip"
   unzip vip
   rm -rf vip
@@ -675,8 +701,9 @@ if [[ "$RUN_VIP" -eq "1" ]]
   chmod +x ./dependency_installer.sh
   chmod +x ./db_installer.sh
   sudo sh dependency_installer.sh
-  ./db_installer.sh -r ../ #-r #[PATH]/[TO]/[DATABASE]
+  #./db_installer.sh -r ../ #-r #[PATH]/[TO]/[DATABASE]
   cd ../../
+  conda activate base
   
 fi
 
@@ -696,11 +723,11 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   printf "Installing SSAKE\n\n"
   wget -O ssake "https://github.com/bcgsc/SSAKE/releases/download/v4.0.1/ssake_v4-0.tar.gz"
   tar -xzf ssake
-  rm -rf ssake
+  #rm -rf ssake
   
 fi
 
-#viralFlye - missing scipy
+#viralFlye
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Installing viralFlye\n\n"
@@ -712,7 +739,7 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   conda install -c bioconda -c conda-forge -c mikeraiko "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
   conda install -c conda-forge biopython
   conda install -c anaconda scipy
-  #cd ..
+  cd ..
   rm -rf Pfam-A.hmm.gz  
   wget http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
   
