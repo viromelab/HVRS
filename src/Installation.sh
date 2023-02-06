@@ -34,7 +34,7 @@ RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
-RUN_IVA=0; err
+RUN_IVA=0; 
 RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
@@ -42,7 +42,11 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=1; #missing
+RUN_ENSEMBLEASSEMBLER=0;
+RUN_HAPLOFLOW=0;
+RUN_TENSQR=0;
+RUN_ARAPANS=0;
+RUN_VIQUF=1;
 
 
 
@@ -694,7 +698,7 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
 
 fi
 
-#VIP - untested, rerun
+#VIP - untested, rerun, missing database?
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Installing VIP\n\n"
@@ -774,4 +778,61 @@ if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]]
   
   
 fi
+
+
+#Haploflow -works
+if [[ "$RUN_HAPLOFLOW" -eq "1" ]] 
+  then
+  printf "Installing Haploflow \n\n"
+  eval "$(conda shell.bash hook)"
+  conda create -n haploflow 
+  conda activate haploflow  
+  conda install -c bioconda haploflow
+  conda activate base  
+fi
+
+#TenSQR-err on reconstruction
+if [[ "$RUN_TENSQR" -eq "1" ]] 
+  then
+  printf "Installing TenSQR\n\n"
+  rm -rf TenSQR
+  git clone https://github.com/SoYeonA/TenSQR.git
+  cd TenSQR
+  make
+  cd ..  
+fi
+
+#Arapan-S - error on dependencies
+if [[ "$RUN_ARAPANS" -eq "1" ]] 
+  then
+  printf "Installing Arapan-S\n\n"
+  wget -O Arapan-S https://downloads.sourceforge.net/project/dnascissor/Arapan-S%20Assembler/Arapan-S%202.1.0%20%28Linux%20_22Ubuntu_22%29.zip
+  rm -rf Arapan 2.1.0  
+  unzip Arapan-S
+  mv "Arapan 2.1.0" "Arapan"
+  rm -rf Arapan-S
+  chmod +x Arapan  
+  wget -O qt.run https://download.qt.io/archive/qt/5.0/5.0.0/qt-linux-opensource-5.0.0-x86_64-offline.run
+  chmod +x qt.run
+  ./qt.run  
+fi
+
+#ViQUF- fatal error: sdsl/suffix_arrays.hpp: No such file or directory
+if [[ "$RUN_VIQUF" -eq "1" ]] 
+  then
+  printf "Installing ViQUF\n\n"
+  eval "$(conda shell.bash hook)"
+  conda create -n viquf-env python=3.6 
+  conda activate viquf
+  conda install biopython altair gurobi matplotlib scipy numpy
+  git clone https://github.com/borjaf696/ViQUF.git
+  cd ViQUF
+  make
+  cd ..
+  
+    
+  conda activate base
+    
+fi
+
 

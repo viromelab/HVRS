@@ -22,7 +22,7 @@ RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; #missing
+RUN_LAZYPIPE=0;
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
@@ -36,7 +36,11 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=1;
+RUN_ENSEMBLEASSEMBLER=0;
+RUN_HAPLOFLOW=0;
+RUN_TENSQR=1;
+RUN_ARAPANS=0; #Not available
+RUN_VIQUF=0;
 
 declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS1" "DS2" "DS3");
@@ -728,11 +732,74 @@ if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]]
     #./ensemble.sh
     
   done
-  conda activate base
-  
-  
-  
+  conda activate base 
   
 fi
+
+#Haploflow -working
+if [[ "$RUN_HAPLOFLOW" -eq "1" ]] 
+  then
+  printf "Reconstructing with Haploflow\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate haploflow
+  rm -rf haploflow_data
+  mkdir haploflow_data
+  cd haploflow_data
+  for dataset in "${DATASETS[@]}"
+    do
+    cp ../${dataset}_1.fq .
+    haploflow --read-file ${dataset}_1.fq --out test --log test/log    
+  done
+  cd ..  
+  conda activate base 
+fi
+
+#TenSQR - FileNotFoundError: sample_SNV_matrix.txt not found.
+if [[ "$RUN_TENSQR" -eq "1" ]] 
+  then
+  printf "Reconstructing with TenSQR\n\n"
+  cd TenSQR
+  rm -rf reconstruction_data
+  for dataset in "${DATASETS[@]}"
+    do
+    cp ../${dataset}_.sam .
+    cp ../B19.fa .
+    echo "filename of reference sequence (FASTA) : B19.fa
+filname of the aligned reads (sam format) : "${dataset}_.sam"
+SNV_thres : 0.01
+reconstruction_start : 500
+reconstruction_stop: 1200
+min_mapping_qual : 40
+min_read_length : 100
+max_insert_length : 500
+characteristic zone name : sample
+seq_err (assumed sequencing error rate(%)) : 0.2
+MEC improvement threshold : 0.0312
+initial population size : 5" >> config_${dataset}
+    ExtractMatrix config_${dataset}
+    python3 TenSQR.py config_${dataset}  
+    
+  done  
+  cd ..
+  
+fi
+
+#ViQUF - err on installation
+if [[ "$RUN_VIQUF" -eq "1" ]] 
+  then
+  printf "Reconstructing with ViQUF\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate viquf
+  cd ViQUF
+  
+  for dataset in "${DATASETS[@]}"
+    do
+    
+  done
+  
+  cd ..
+  conda activate base  
+fi
+
 
  
