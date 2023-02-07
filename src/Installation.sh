@@ -18,7 +18,7 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=0;
+RUN_TRACESPIPE=1;
 RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
@@ -46,7 +46,7 @@ RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 RUN_TENSQR=0;
 RUN_ARAPANS=0;
-RUN_VIQUF=1;
+RUN_VIQUF=0;
 
 
 
@@ -96,19 +96,24 @@ fi
 # INSTALL ASSEMBLY TOOLS:
 
 #shorah
-if [[ "$RUN_SHORAH" -eq "1" ]] 
-  then
-  printf "Installing Shorah\n\n"  
-  conda install shorah
-fi
+#if [[ "$RUN_SHORAH" -eq "1" ]] 
+#  then
+#  printf "Installing Shorah\n\n"  
+#  conda install shorah
+#fi
 
 #spades, metaviralspades and coronaspades
 if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]]
   then
   printf "Installing SPAdes, metaviralSPAdes and coronaSPAdes\n\n"
-  wget http://cab.spbu.ru/files/release3.15.5/SPAdes-3.15.5-Linux.tar.gz
-  tar -xzf SPAdes-3.15.5-Linux.tar.gz
-  rm -rf SPAdes-3.15.5-Linux.tar.gz
+  #wget http://cab.spbu.ru/files/release3.15.5/SPAdes-3.15.5-Linux.tar.gz
+  #tar -xzf SPAdes-3.15.5-Linux.tar.gz
+  #rm -rf SPAdes-3.15.5-Linux.tar.gz
+  eval "$(conda shell.bash hook)"
+  conda create -n spades
+  conda activate spades
+  conda install -c bioconda -y spades
+  conda activate base
 fi
 
 #SAVAGE
@@ -240,20 +245,21 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   conda activate base
 fi
 
-#TRACESPipe - error on mapDamage
+#TRACESPipe
 if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
   then
   printf "Installing TRACESPipe\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -n tracespipe
-  conda activate tracespipe
+  #conda create -n tracespipe
+  #conda activate tracespipe
+  rm -rf tracespipe
   git clone https://github.com/viromelab/tracespipe.git
   cd tracespipe/src/
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install
   ./TRACESPipe.sh --get-all-aux
   cd ../../  
-  conda activate base
+  #conda activate base
 fi
 
 #ASPIRE - can't install dependencies

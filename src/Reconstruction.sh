@@ -12,7 +12,7 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=0;
+RUN_TRACESPIPE=1;
 RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
@@ -38,7 +38,7 @@ RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
-RUN_TENSQR=1;
+RUN_TENSQR=0;
 RUN_ARAPANS=0; #Not available
 RUN_VIQUF=0;
 
@@ -70,49 +70,56 @@ fi
 if [[ "$RUN_SPADES" -eq "1" ]] 
   then
   printf "Reconstructing with SPAdes\n\n"
-  cd SPAdes-3.15.5-Linux/bin/
+  eval "$(conda shell.bash hook)"
+  conda activate spades
   for dataset in "${DATASETS[@]}"
-    do	
+    do
     rm -rf spades_${dataset}
-    mkdir spades_${dataset}
-    cp  ../../${dataset}_1.fq spades_${dataset}
-    cp  ../../${dataset}_2.fq spades_${dataset}
-    #spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq
-    python spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq --meta
-    done
-  cd ../../
+    mkdir spades_${dataset}	
+    cp ${dataset}_1.fq spades_${dataset}
+    cp ${dataset}_2.fq spades_${dataset}
+    spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq
+    mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fasta
+    cp spades_${dataset}/spades-${dataset}.fasta reconstructed
+  done
+  conda activate base
 fi
 
-#metaviralspades - runs, results not found
+#metaviralspades - runs, No complete extrachromosomal contigs assembled!!
 if [[ "$RUN_METAVIRALSPADES" -eq "1" ]] 
   then
   printf "Reconstructing with metaviralSPAdes\n\n"
-  cd SPAdes-3.15.5-Linux/bin/
+  #cd SPAdes-3.15.5-Linux/bin/
+  eval "$(conda shell.bash hook)"
+  conda activate spades
   for dataset in "${DATASETS[@]}"
     do
     rm -rf metaviralspades_${dataset}
     mkdir metaviralspades_${dataset}	
-    cp ../../${dataset}_1.fq metaviralspades_${dataset}
-    cp ../../${dataset}_2.fq metaviralspades_${dataset}
-    ./metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
+    cp ${dataset}_1.fq metaviralspades_${dataset}
+    cp ${dataset}_2.fq metaviralspades_${dataset}
+    metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
   done
-  cd ../../
+  conda activate base
 fi
 
-#coronaspades - runs, doesn't output scaffolds
+#coronaspades - working
 if [[ "$RUN_CORONASPADES" -eq "1" ]] 
   then
   printf "Reconstructing with coronaSPAdes\n\n"
-  cd SPAdes-3.15.5-Linux/bin/
+  eval "$(conda shell.bash hook)"
+  conda activate spades
   for dataset in "${DATASETS[@]}"
     do
     rm -rf coronaspades_${dataset}
     mkdir coronaspades_${dataset}	
-    cp ../../${dataset}_1.fq coronaspades_${dataset}
-    cp ../../${dataset}_2.fq coronaspades_${dataset}
-    ./coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
+    cp ${dataset}_1.fq coronaspades_${dataset}
+    cp ${dataset}_2.fq coronaspades_${dataset}
+    coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
+    mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fasta
+    cp coronaspades_${dataset}/coronaspades-${dataset}.fasta reconstructed
   done
-  cd ../../
+  conda activate base
 fi
 
 #viaDBG - missing ./bin/viaDBG file, bin is empty
@@ -245,25 +252,22 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   conda activate base
 fi
 
-#tracespipe - input files are not gzipped error
+#tracespipe - cp: cannot stat 'mtDNA.fa.fai': No such file or directory
 if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with TRACESPipe\n\n"
   eval "$(conda shell.bash hook)"
-  conda activate tracespipe
+  #conda activate tracespipe
   cd tracespipe/
   for dataset in "${DATASETS[@]}"
     do	
-    cd meta_data/
-    rm -rf meta_info.txt
-    echo 'unspecified:'${dataset}'_1.fq.gz:'${dataset}'_2.fq.gz'  >> meta_info.txt
-    cd ../input_data/
+    cd input_data/
     cp ../../${dataset}_*.fq .
-    rm -rf ${dataset}_*.fq.gz
-    gzip ${dataset}_1.fq
-    gzip ${dataset}_2.fq
-    cd ../src/  
-    ./TRACESPipe.sh --run-hybrid
+    gzip *.fq
+    cd ../meta_data/
+    echo "x:DS1_1.fq.gz:DS1_2.fq.gz" > meta_info.txt
+    cd ../src/
+    ./TRACESPipe.sh --flush-output --flush-logs --run-mito
     cd ..
     done
   cd ..   
@@ -792,10 +796,10 @@ if [[ "$RUN_VIQUF" -eq "1" ]]
   conda activate viquf
   cd ViQUF
   
-  for dataset in "${DATASETS[@]}"
-    do
+  #for dataset in "${DATASETS[@]}"
+  #  do
     
-  done
+  #done
   
   cd ..
   conda activate base  
