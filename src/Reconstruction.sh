@@ -12,7 +12,7 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=1;
+RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
@@ -33,7 +33,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0;
+RUN_DRVM=1;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
@@ -80,7 +80,7 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     cp ${dataset}_2.fq spades_${dataset}
     spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq
     mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fasta
-    cp spades_${dataset}/spades-${dataset}.fasta reconstructed
+    cp spades_${dataset}/spades-${dataset}.fasta reconstructed/$dataset
   done
   conda activate base
 fi
@@ -117,12 +117,12 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
     cp ${dataset}_2.fq coronaspades_${dataset}
     coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
     mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fasta
-    cp coronaspades_${dataset}/coronaspades-${dataset}.fasta reconstructed
+    cp coronaspades_${dataset}/coronaspades-${dataset}.fasta reconstructed/$dataset
   done
   conda activate base
 fi
 
-#viaDBG - missing ./bin/viaDBG file, bin is empty
+#viaDBG - err - ./bin/viaDBG: error while loading shared libraries: libboost_system.so.1.60.0: cannot open shared object file: No such file or directory
 if [[ "$RUN_VIADBG" -eq "1" ]] 
   then
   printf "Reconstructing with viaDBG\n\n"
@@ -135,7 +135,7 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
     cp ../${dataset}_2.fq viadbg_${dataset}
     mkdir output_${dataset}
     ./bin/viaDBG -p viadbg_${dataset} -o output_${dataset}
-    done
+  done
 fi
 
 #savage - Runs, no reads could be aligned to reference error
@@ -163,8 +163,8 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   printf "Reconstructing with QSdpr\n\n"
   eval "$(conda shell.bash hook)"
   conda activate qsdpr  
-  #echo Please input the path to miniconda. Example: /home/miniconda3
-  #read miniconda
+  echo Please input the path to miniconda. Example: /home/user/miniconda3
+  read miniconda
   #echo $miniconda
   
   cd QSdpR_v3.2/
@@ -175,7 +175,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data/${dataset}
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
-    ../QSdpR_source/QSdpR_master.sh 2 8 ../QSdpR_source ${dataset} sample 1 1000 /home/mj/miniconda3/pkgs/samtools-1.3.1-0/bin
+    ../QSdpR_source/QSdpR_master.sh 2 8 ../QSdpR_source ${dataset} sample 1 1000 $miniconda/pkgs/samtools-1.16.1-h6899075_1/bin
     #cd ..
   done
   cd ../
@@ -229,10 +229,25 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   conda activate base
 fi
 
-#PredictHaplo - error on installation
+#PredictHaplo - segmentation fault, likely an error on sam files + lacking proper ref file
 if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
   then
-  printf "Reconstruction with PredictHaplo is not available\n\n"
+  printf "Reconstructing with PredictHaplo\n\n"
+  eval "$(conda shell.bash hook)"  
+  conda activate predicthaplo
+  rm -rf predicthaplo_data
+  mkdir predicthaplo_data
+  cd predicthaplo_data
+  for dataset in "${DATASETS[@]}"
+    do
+    cp ../${dataset}_.sam .
+    cp ../DS2_.sam .
+    predicthaplo --sam ${dataset}_.sam --reference DS2_.sam
+  
+  done
+  cd ..
+  conda activate base
+  
 fi
 
 #tracespipelite - working
@@ -601,12 +616,19 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   cd ..  
 fi
 
-#IVA
+#IVA - err - Failed to make first seed. Cannot continue
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Reconstructing with IVA\n\n"
-  iva --test outdir
-  
+  #iva --test outdir
+  rm -rf iva_data
+  mkdir iva_data
+  for dataset in "${DATASETS[@]}"
+    do    
+    cp ${dataset}_*.fq iva_data
+    rm -rf ${dataset}_Output_directory 
+    sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory    
+  done
 fi
 
 #PRICE - did nothing, no errors
@@ -679,9 +701,19 @@ fi
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Reconstructing with drVM\n\n"
+  printf "If this script is not working and giving you the error /usr/bin/python: bad interpreter: No such file or directory, please, go to each .py file at $(pwd)/tools/ and change the first line of each file to #!/usr/bin/python2\n\n"
   cd Tools 
-  ls
-  ./drVM.py #-1 DS1_1.fq -2 DS1_2.fq -t 1 -keep
+  #./CreateDB.py -s ../B19.fa
+  for dataset in "${DATASETS[@]}"
+    do
+    #./drVM.py -1 ../DS1_1.fq -2 ../DS1_2.fq
+    sudo docker run - 990210oliver/drvm /bin/bash
+    
+    
+    
+    
+    sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory  
+  done
   cd ..
 fi
 

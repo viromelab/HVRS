@@ -18,7 +18,7 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=1;
+RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
@@ -48,13 +48,19 @@ RUN_TENSQR=0;
 RUN_ARAPANS=0;
 RUN_VIQUF=0;
 
-
-
 install_samtools () {
-  wget http://sourceforge.net/projects/samtools/files/samtools/0.1.18/samtools-0.1.18.tar.bz2
-  tar xjf samtools-0.1.18.tar.bz2 && cd samtools-0.1.18
-  make CFLAGS=-fPIC
-  export SAMTOOLS=`pwd`
+  #wget http://sourceforge.net/projects/samtools/files/samtools/0.1.18/samtools-0.1.18.tar.bz2
+  #tar xjf samtools-0.1.18.tar.bz2 && cd samtools-0.1.18
+  #make CFLAGS=-fPIC
+  #export SAMTOOLS=`pwd`
+  #cd ..
+  
+  wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
+  tar xjf samtools-1.16.1.tar.bz2
+  cd samtools-1.16.1
+  ./configure
+  sudo make
+  sudo make install
   cd ..
 }
 
@@ -64,6 +70,12 @@ install_conda() {
   chmod +x Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
   bash Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
 }
+
+install_docker() {
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
+}
+
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
@@ -83,8 +95,8 @@ if [[ "$INSTALL_OTHERS" -eq "1" ]]
   sudo apt install git
   printf "Installing G++\n\n"
   sudo apt-get install g++
-  #printf "Installing Samtools\n\n"
-  #install_samtools
+  printf "Installing Samtools\n\n"
+  install_samtools
   printf "Installing make"
   sudo apt install make
   printf "Installing Java"
@@ -123,7 +135,7 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n savage
   conda activate savage
-  conda install -c bioconda -c conda-forge boost savage
+  conda install -c bioconda -c conda-forge -y boost savage
   conda activate base
 fi
 
@@ -134,7 +146,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create --name qsdpr python=2.7 
   conda activate qsdpr
-  cconda install -c bioconda samtools
+  cconda install -c bioconda -y samtools
   wget -O qsdpr "https://sourceforge.net/projects/qsdpr/files/QSdpR_v3.2.tar.gz/download"
   tar xfz qsdpr
   rm -rf qsdpr
@@ -164,8 +176,8 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda env create --name virus-vg-deps --file jbaaijens-virus-vg-69a05f3e74f2/conda_list_explicit.txt
   conda activate virus-vg-deps 
-  conda install -c bioconda rust-overlaps 
-  conda install -c conda-forge graph-tool biopython
+  conda install -c bioconda -y rust-overlaps 
+  conda install -c conda-forge -y graph-tool biopython
   pip install tqdm
   conda activate base
   
@@ -178,8 +190,8 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create --name vg-flow-env
   conda activate vg-flow-env
-  conda install -c bioconda -c conda-forge -c gurobi python=3 graph-tool minimap2 gurobi biopython numpy rust-overlaps 
-  conda install -c conda-forge graph-tool biopython
+  conda install -c bioconda -c conda-forge -c gurobi -y python=3 graph-tool minimap2 gurobi biopython numpy rust-overlaps 
+  conda install -c conda-forge -y graph-tool biopython
   wget -O vg-flow "https://bitbucket.org/jbaaijens/vg-flow/get/ac68093bbb235e508d0a8dd56881d4e5aee997e3.zip"
   unzip vg-flow
   rm -rf vg-flow
@@ -204,7 +216,18 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -n viadbg
   conda activate viadbg
-  conda install -c conda-forge boost    
+  #conda install -c conda-forge -y boost 
+  #wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz
+  #tar xfz boost_1_60_0.tar.gz
+  #cd boost_1_60_0
+  #./bootstrap.sh --prefix=/usr/local --with-libraries=program_options,regex,filesystem,system
+  #export
+  #./b2 install 
+  #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+  #ls /usr/local/bin/
+  conda install -c "conda-forge/label/gcc7" -y boost
+  conda install -c bioconda -y sga
+  rm -rf viadbg   
   git clone https://bitbucket.org/bfreirec1/viadbg.git
   cd viadbg
   make  
@@ -212,22 +235,15 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   #cd ../../../  
 fi
 
-#PredictHaplo - error on make
+#PredictHaplo
 if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
   then
   printf "Installing PredictHaplo\n\n"
-  rm -rf PredictHaplo
-  git clone https://github.com/bmda-unibas/PredictHaplo.git
-  cd PredictHaplo
-  #tar xfvz PredictHaplo-1.0.tgz
-  #cd PredictHaplo-1.0.tgz      
-  #tar xfvz scythestat-1.0.3.tar.gz
-  #cd scythestat-1.0.3
-  #./configure --prefix=PredictHaplo-1.0/NEWSCYTHE
-  #make install
-  #cd ..
-  make
-  cd ..
+  eval "$(conda shell.bash hook)"  
+  conda create -n predicthaplo
+  conda activate predicthaplo
+  conda install -c bioconda -y predicthaplo
+  conda activate base 
 fi
 
 #TracesPipelite
@@ -310,9 +326,9 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   #chmod +x ./quick_install.sh
   #./quick_install.sh -w work
   eval "$(conda shell.bash hook)"  
-  conda create --yes -n vpipe -c conda-forge -c bioconda mamba 
+  conda create --yes -n vpipe -c conda-forge -c bioconda -y mamba 
   conda activate vpipe
-  conda install -c bioconda snakemake
+  conda install -c bioconda -y snakemake
   wget "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.tar.gz"
   tar xvzf v2.99.3.tar.gz
   conda activate base
@@ -325,7 +341,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -n strainline
   conda activate strainline
-  conda install -c bioconda minimap2 spoa samtools dazz_db daligner metabat2   
+  conda install -c bioconda -y minimap2 spoa samtools dazz_db daligner metabat2   
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
   rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz   
@@ -344,8 +360,8 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n haphpipe
   conda activate haphpipe
-  conda install -c bioconda gatk 
-  conda install haphpipe 
+  conda install -c bioconda -y gatk 
+  conda install -y haphpipe 
   
   
   #wget https://anaconda.org/bioconda/gatk/3.8/download/linux-64/gatk-3.8-py35_0.tar.bz2
@@ -377,8 +393,8 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   rm -rf haploclique
   eval "$(conda shell.bash hook)"
   conda create -n haploclique
-  conda install -c bioconda samtools
-  conda install -c conda-forge zlib
+  conda install -c bioconda -y samtools
+  conda install -c conda-forge -y zlib
   sudo apt-get install libncurses5-dev cmake libboost-all-dev git build-essential zlib1g-dev parallel
   git clone https://github.com/armintoepfer/haploclique
   cd haploclique
@@ -402,7 +418,7 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create --name vispa python=2.7 
   conda activate vispa
-  conda install -c bioconda -c conda-forge numexpr pysam numpy biopython mosaik
+  conda install -c bioconda -c conda-forge -y numexpr pysam numpy biopython mosaik
   conda activate base
 fi
 
@@ -413,7 +429,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create --name quasirecomb
   conda activate quasirecomb
-  conda install -c bioconda samtools
+  conda install -c bioconda -y samtools
   
   wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
   unzip v1.2.zip 
@@ -437,8 +453,8 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   #cd lazypipe
   
   eval "$(conda shell.bash hook)"  
-  conda create -n blast -c bioconda blast 
-  conda create -n lazypipe -c bioconda -c eclarke bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  conda create -n blast -c bioconda -y blast 
+  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
   conda activate blast
   conda activate --stack lazypipe
   
@@ -478,7 +494,7 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   
   conda create -n mlehaplo
   conda activate mlehaplo
-  conda install -c bioconda gatb perl-bioperl perl-graph
+  conda install -c bioconda -y gatb perl-bioperl perl-graph
   
   
   
@@ -506,14 +522,22 @@ fi
 #  conda create -n pehaplo python=2.7 networkx==1.11 apsp 
 #fi
 
-#RegressHaplo - error in r instalation, skipping
+#RegressHaplo - err - The following specifications were found to be incompatible with your system: -feature:linux-64::__glibc==2.35=0  - feature:|@/linux-64::__glibc==2.35=0
 if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
   then
   printf "Installing RegressHaplo\n\n"
+  eval "$(conda shell.bash hook)"
+  
+  conda create -n regresshaplo
+  conda activate regresshaplo
+  conda install -c r -y r r-essentials
+  
+  conda install -c hcc -y r-regresshaplo
+  conda activate base
   
   #install R 	
-  sudo apt-get update
-  sudo apt-get install r-base
+  #sudo apt-get update
+  #sudo apt-get install r-base
   #sudo apt update
   #sudo apt install r-base
   
@@ -535,33 +559,7 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   #sudo apt-get install r-base
  
   
-  echo "if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install(version = "3.14")
-source("https://bioconductor.org/biocLite.R")
-biocLite("Biostrings")
-biocLite("Rsamtools")
-biocLite("GenomicAlignments")
-library(devtools)
-install_github("SLeviyang/RegressHaplo")" >> regress.r
 
- Rscript regress.r
-  
-  
-  
-  
-  
-  
-  
-  #cpan library(devtools)
-  #cpan install_github("SLeviyang/RegressHaplo")
-  
-  #cpan source("https://bioconductor.org/biocLite.R")
-  #cpan biocLite("Biostrings")
-  #cpan biocLite("Rsamtools")
-  #cpan biocLite("GenomicAlignments")
-  
-  #cd ..
   
 fi
 
@@ -580,40 +578,44 @@ if [[ "$RUN_IVA" -eq "1" ]]
   then
   printf "Installing IVA\n\n"
   
-  wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
-  rm -rf kmc
-  mkdir kmc
-  tar -xzf KMC3.2.1.linux.tar.gz
-  rm -rf KMC3.2.1.linux.tar.gz
+  sudo docker pull sangerpathogens/iva
+  
+
+  
+  #wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
+  #rm -rf kmc
+  #mkdir kmc
+  #tar -xzf KMC3.2.1.linux.tar.gz
+  #rm -rf KMC3.2.1.linux.tar.gz
   
   
-  wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
-  tar zxvf smalt
-  rm -rf smalt
-  cd smalt-0.7.6
-  ./configure
-  make
-  sudo make install
-  cd ..
+  #wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
+  #tar zxvf smalt
+  #rm -rf smalt
+  #cd smalt-0.7.6
+  #./configure
+  #make
+  #sudo make install
+  #cd ..
   #missing add to path
   
-  rm -rf IVAdependencies
-  mkdir IVAdependencies   
-  cd IVAdependencies
-  cp ../bin/* .
-  cp -R ../smalt-0.7.6 .
+  #rm -rf IVAdependencies
+  #mkdir IVAdependencies   
+  #cd IVAdependencies
+  #cp ../bin/* .
+  #cp -R ../smalt-0.7.6 .
   
   #error, not adding to path and iva can't find kmc and smalt.
-  echo "\n\n Adding $(pwd) to path" 
-  export PATH=$PATH:$(pwd)
+  #echo "\n\n Adding $(pwd) to path" 
+  #export PATH=$PATH:$(pwd)
   
-  pip3 install iva
+  #pip3 install iva
   
   
   
   
   #pip3 install iva
-  cd ..
+  #cd ..
   
   #v2----------
   #curr_dir = $pwd
@@ -693,8 +695,8 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   conda create -n bio2 python=2.7    
   conda activate bio2                 
   pip install networkx==1.11           
-  conda install bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
-  conda install -c bioconda karect
+  conda install -y bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
+  conda install -c bioconda -y karect
   git clone --recursive https://github.com/chjiao/TAR-VIR.git
   cd TAR-VIR/Overlap_extension/
   make
@@ -712,7 +714,7 @@ if [[ "$RUN_VIP" -eq "1" ]]
   
   conda create -n vip
   conda activate vip
-  conda install -c bioconda perl-dbi
+  conda install -c bioconda -y perl-dbi
   
   wget -O vip "https://github.com/keylabivdc/VIP/archive/refs/heads/master.zip"
   unzip vip
@@ -731,9 +733,15 @@ fi
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Installing drVM\n\n"
+  sudo apt install python2
+  sudo apt-get install build-essential python-dev python-numpy python-scipy libatlas-dev libatlas3gf-base python-matplotlib libatlas-base-dev
   wget -O drvm "https://sourceforge.net/projects/sb2nhri/files/latest/download"
+  rm -rf Tools
   unzip drvm
   rm -rf drvm
+  
+  #sudo docker run -t -i -v /home/manager/Templates:/drVM 990210oliver/drvm /bin/bash
+  #docker run [options] 990210oliver/drvm /bin/bash
   
 fi
 
@@ -756,9 +764,9 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n viralFlye
   conda activate viralFlye
-  conda install -c bioconda -c conda-forge -c mikeraiko "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
-  conda install -c conda-forge biopython
-  conda install -c anaconda scipy
+  conda install -c bioconda -c conda-forge -c mikeraiko -y "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
+  conda install -c conda-forge -y biopython
+  conda install -c anaconda -y scipy
   cd ..
   rm -rf Pfam-A.hmm.gz  
   wget http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
@@ -793,7 +801,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n haploflow 
   conda activate haploflow  
-  conda install -c bioconda haploflow
+  conda install -c bioconda -y haploflow
   conda activate base  
 fi
 
@@ -808,7 +816,7 @@ if [[ "$RUN_TENSQR" -eq "1" ]]
   cd ..  
 fi
 
-#Arapan-S - error on dependencies
+#Arapan-S - error on qt dependency
 if [[ "$RUN_ARAPANS" -eq "1" ]] 
   then
   printf "Installing Arapan-S\n\n"
@@ -830,7 +838,7 @@ if [[ "$RUN_VIQUF" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n viquf-env python=3.6 
   conda activate viquf
-  conda install biopython altair gurobi matplotlib scipy numpy
+  conda install -y biopython altair gurobi matplotlib scipy numpy
   git clone https://github.com/borjaf696/ViQUF.git
   cd ViQUF
   make
