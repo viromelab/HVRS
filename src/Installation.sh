@@ -6,7 +6,7 @@
 INSTALL_TOOLS=0;
 INSTALL_OTHERS=0;
 INSTALL_SAMTOOLS=0;
-RUN_SHORAH=0;
+#RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
@@ -20,7 +20,7 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=0;
+RUN_QVG=1;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -49,14 +49,9 @@ RUN_ARAPANS=0;
 RUN_VIQUF=0;
 
 install_samtools () {
-  #wget http://sourceforge.net/projects/samtools/files/samtools/0.1.18/samtools-0.1.18.tar.bz2
-  #tar xjf samtools-0.1.18.tar.bz2 && cd samtools-0.1.18
-  #make CFLAGS=-fPIC
-  #export SAMTOOLS=`pwd`
-  #cd ..
-  
   wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
   tar xjf samtools-1.16.1.tar.bz2
+  rm -rf samtools-1.16.1.tar.bz2
   cd samtools-1.16.1
   ./configure
   sudo make
@@ -101,6 +96,10 @@ if [[ "$INSTALL_OTHERS" -eq "1" ]]
   sudo apt install make
   printf "Installing Java"
   sudo apt install default-jre  
+  printf "Installing Docker"
+  install_docker
+  printf "Installing Samtools"
+  install_samtools 
 fi
 
 #
@@ -729,16 +728,36 @@ if [[ "$RUN_VIP" -eq "1" ]]
   
 fi
 
-#drVM
+#drVM - untested
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Installing drVM\n\n"
   sudo apt install python2
+  sudo apt install gawk
   sudo apt-get install build-essential python-dev python-numpy python-scipy libatlas-dev libatlas3gf-base python-matplotlib libatlas-base-dev
   wget -O drvm "https://sourceforge.net/projects/sb2nhri/files/latest/download"
   rm -rf Tools
   unzip drvm
   rm -rf drvm
+  cd Tools
+  gawk -i inplace '$0=="#!/usr/bin/python" {$0="#!/usr/bin/python2"} 1' *.py
+  wget https://sourceforge.net/projects/sb2nhri/files/drVM/sequence_20160316.tar.gz
+  tar -zxvf sequence_20160316.tar.gz
+  rm -rf sequence_20160316.tar.gz
+  rm -rf refDB.tar.gz
+  
+  
+  #./CreateDB.py -s sequence.fasta -d 1
+  #printf "exporting path\n\n"
+  #export MyDB="$(pwd)"
+  #printf "path exported  ->  $MyDB \n\n"
+  
+  
+  ./CreateDB.py -s sequence.fasta -d 10 -kn off
+  
+  
+  cd ..
+  
   
   #sudo docker run -t -i -v /home/manager/Templates:/drVM 990210oliver/drvm /bin/bash
   #docker run [options] 990210oliver/drvm /bin/bash

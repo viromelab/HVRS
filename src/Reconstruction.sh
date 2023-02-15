@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RUN_SHORAH=0;
+#RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
@@ -14,7 +14,7 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=0;
+RUN_QVG=1;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -33,7 +33,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0;
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=1;
+RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
@@ -44,29 +44,32 @@ RUN_VIQUF=0;
 
 declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS1" "DS2" "DS3");
+#declare -a VIRUSES=( "HPV" );
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
-#create bam files from sam files - [W::sam_parse1] urecognized reference name; treated as unmapped
+#create bam files from sam files
 create_bam_files () { 
   printf "Creating .bam files from .sam files\n\n"
   for dataset in "${DATASETS[@]}"
-    do	
-    samtools view -bS ${dataset}_.sam > ${dataset}.bam
+  do	
+    cd samtools-1.16.1/
+    ./samtools view -bS ../${dataset}_.sam > ../${dataset}.bam
+    cd ..
   done
 }
 
-#shorah - can't test without bam files
-if [[ "$RUN_SHORAH" -eq "1" ]] 
-  then
-  printf "Reconstructing with Shorah\n\n"
-  create_bam_files
-  for dataset in "${DATASETS[@]}"
-    do	
-    shorah.py -b ${dataset}.bam -f HPV-1.fa
-  done
-fi
+#shorah
+#if [[ "$RUN_SHORAH" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with Shorah\n\n"
+#  create_bam_files
+#  for dataset in "${DATASETS[@]}"
+#    do	
+#    shorah.py -b ${dataset}.bam -f HPV-1.fa
+#  done
+#fi
 
-#spades - working
+#spades - working; stats.
 if [[ "$RUN_SPADES" -eq "1" ]] 
   then
   printf "Reconstructing with SPAdes\n\n"
@@ -78,7 +81,12 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     mkdir spades_${dataset}	
     cp ${dataset}_1.fq spades_${dataset}
     cp ${dataset}_2.fq spades_${dataset}
-    spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq #\
+    #|& grep "TIME" \
+    #|& tr '.' ',' \
+    #|& awk '{ printf $2/60"\t"$4/1024/1024"\n"}' > stats_spades_${dataset}.txt;
+    #cat stats_spades_${dataset}.txt
+ 
     mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fasta
     cp spades_${dataset}/spades-${dataset}.fasta reconstructed/$dataset
   done
@@ -98,7 +106,7 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
     mkdir metaviralspades_${dataset}	
     cp ${dataset}_1.fq metaviralspades_${dataset}
     cp ${dataset}_2.fq metaviralspades_${dataset}
-    metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
   done
   conda activate base
 fi
@@ -115,7 +123,7 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
     mkdir coronaspades_${dataset}	
     cp ${dataset}_1.fq coronaspades_${dataset}
     cp ${dataset}_2.fq coronaspades_${dataset}
-    coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
     mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fasta
     cp coronaspades_${dataset}/coronaspades-${dataset}.fasta reconstructed/$dataset
   done
@@ -307,22 +315,31 @@ if [[ "$RUN_QVG" -eq "1" ]]
   cd QVG
   rm -rf reconstruction_files
   mkdir reconstruction_files
+  rm -rf *.fa*
   for dataset in "${DATASETS[@]}"
-    do	   
-    rm -rf ${dataset}_files
-    mkdir ${dataset}_files
-    echo "${dataset}" >> ${dataset}_files/samples
-    cd ${dataset}_files
-    mkdir output
-    cp ../../${dataset}_*.fq .
-    gzip -cvf ${dataset}_1.fq > ${dataset}_R1.fastq.gz
-    gzip -cvf ${dataset}_2.fq > ${dataset}_R2.fastq.gz
-    #gzip ${dataset}_1.fq
-    #gzip ${dataset}_2.fq
-    cd ..
-    cp ../B19.fa reconstruction_files
-    ./QVG.sh -r ./reconstruction_files/B19.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes
+    do	 
+    for virus in "${VIRUSES[@]}"
+      do
+      #rm -rf ${dataset}_files
+      mkdir ${dataset}_files
+      echo "${dataset}" > ${dataset}_files/samples
+      cd ${dataset}_files
+      rm -rf output
+      mkdir output
+      cp ../../${dataset}_*.fq .
+      gzip -cvf ${dataset}_1.fq > ${dataset}_R1.fastq.gz
+      gzip -cvf ${dataset}_2.fq > ${dataset}_R2.fastq.gz
+      cd ..
+      cp ../${virus}.fa reconstruction_files
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes
+      rm -rf ${dataset}_files/output/samples_multifasta_masked*
+      cat ${dataset}_files/output/samples_multifasta_* > ${dataset}_files/output/qvg-${virus}-${dataset}.fasta      
+      cp ${dataset}_files/output/qvg-${virus}-${dataset}.fasta .
     done
+    cat *.fasta > qvg-${dataset}.fa
+    cp qvg-${dataset}.fa ../reconstructed/$dataset 
+  done
+  
   cd ..
   conda activate base 
 fi
@@ -701,18 +718,11 @@ fi
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Reconstructing with drVM\n\n"
-  printf "If this script is not working and giving you the error /usr/bin/python: bad interpreter: No such file or directory, please, go to each .py file at $(pwd)/tools/ and change the first line of each file to #!/usr/bin/python2\n\n"
+  #printf "If this script is not working and giving you the error /usr/bin/python: bad interpreter: No such file or directory, please, go to each .py file at $(pwd)/tools/ and change the first line of each file to #!/usr/bin/python2\n\n"
   cd Tools 
-  #./CreateDB.py -s ../B19.fa
   for dataset in "${DATASETS[@]}"
     do
-    #./drVM.py -1 ../DS1_1.fq -2 ../DS1_2.fq
-    sudo docker run - 990210oliver/drvm /bin/bash
-    
-    
-    
-    
-    sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory  
+    ./drVM.py -1 ../DS1_1.fq -2 ../DS1_2.fq
   done
   cd ..
 fi
