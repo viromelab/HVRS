@@ -14,7 +14,7 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=1;
+RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -30,7 +30,7 @@ RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
 RUN_IVA=0;
 RUN_PRICE=0;
-RUN_VIRGENA=0;
+RUN_VIRGENA=1;
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
@@ -57,6 +57,7 @@ create_bam_files () {
     cd ..
   done
 }
+
 
 #shorah
 #if [[ "$RUN_SHORAH" -eq "1" ]] 
@@ -146,7 +147,8 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   done
 fi
 
-#savage - Runs, no reads could be aligned to reference error
+#savage - Runs, w/ ref ->no reads could be aligned to reference error
+#no ref - empty results
 if [[ "$RUN_SAVAGE" -eq "1" ]] 
   then
   printf "Reconstructing with SAVAGE\n\n"
@@ -160,21 +162,24 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_1.fq ../${dataset}_2.fq .
-    savage --split 500 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq --ref $(pwd)/B19.fa
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" savage --split 500 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq #--ref $(pwd)/B19.fa
   done
   cd ..
+  conda activate base
 fi
 
-#qsdpr - missing vcf file?, error on samtools configuration
+#qsdpr - err - missing clapack.h
+#possible errors - missing vcf file?, error on samtools configuration
 if [[ "$RUN_QSDPR" -eq "1" ]] 
   then
   printf "Reconstructing with QSdpr\n\n"
   eval "$(conda shell.bash hook)"
   conda activate qsdpr  
-  echo Please input the path to miniconda. Example: /home/user/miniconda3
-  read miniconda
-  #echo $miniconda
-  
+  #echo Please input the path to miniconda. Example: /home/user/miniconda3
+  #read miniconda
+  #miniconda="/home/lx/miniconda3"
+  #printf $miniconda"\n\n"
+  #chmod +x QSdpR_v3.2/QSdpR_source/*.sh
   cd QSdpR_v3.2/
   for dataset in "${DATASETS[@]}"
     do
@@ -183,22 +188,26 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data/${dataset}
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
-    ../QSdpR_source/QSdpR_master.sh 2 8 ../QSdpR_source ${dataset} sample 1 1000 $miniconda/pkgs/samtools-1.16.1-h6899075_1/bin
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../QSdpR_source/QSdpR_master.sh #2 8 ../QSdpR_source ${dataset} sample 1 1000 $miniconda/pkgs/samtools-1.16.1-h6899075_1/bin
+    ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
     #cd ..
   done
   cd ../
   conda activate base
 fi
 
-#qure - Runs with exception at the end of execution - Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 3
+#qure - Runs with exception - Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0 at ReadSet.estimateBaseSet(ReadSet.java:243)
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
   printf "Reconstructing with QuRe\n\n"
   cd QuRe_v0.99971/
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}.fa ../B19.fa .
-    java -Xmx7G QuRe ${dataset}.fa B19.fa 1E-25 1E-25 1000
+    for virus in "${VIRUSES[@]}"
+    do
+    cp ../${dataset}.fa ../$virus.fa .
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java QuRe ${dataset}.fa $virus.fa 1E-25 1E-25 1000
+    done
   done
   cd ..
 fi
@@ -237,7 +246,7 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   conda activate base
 fi
 
-#PredictHaplo - segmentation fault, likely an error on sam files + lacking proper ref file
+#PredictHaplo - runs; can't detect reads on the .sam file
 if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with PredictHaplo\n\n"
@@ -247,11 +256,13 @@ if [[ "$RUN_PREDICTHAPLO" -eq "1" ]]
   mkdir predicthaplo_data
   cd predicthaplo_data
   for dataset in "${DATASETS[@]}"
-    do
-    cp ../${dataset}_.sam .
-    cp ../DS2_.sam .
-    predicthaplo --sam ${dataset}_.sam --reference DS2_.sam
-  
+  do
+    cp ../${dataset}_.sam . 
+    for virus in "${VIRUSES[@]}"
+    do        
+      cp ../$virus.fa .    
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" predicthaplo --sam ${dataset}_.sam --reference $virus.fa       
+    done  
   done
   cd ..
   conda activate base
@@ -266,11 +277,23 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   conda activate tracespipelite
   cd TRACESPipeLite/src/  
   for dataset in "${DATASETS[@]}"
-    do	
+  do	
     cp ../../${dataset}_*.fq .
     lzma -d VDB.mfa.lzma
-    ./TRACESPipeLite.sh --similarity 50 --threads 1 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./TRACESPipeLite.sh --similarity 50 --threads 1 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
+    
+    cd test_viral_analysis_${dataset}
+    for virus in "${VIRUSES[@]}"
+    do
+      printf "copying $virus\n\n"
+      cd $virus*   
+      cp *-consensus.fa ../../
+      cd .. 
     done
+    cd ..
+    cat *-consensus.fa > tracespipelite-$dataset.fa
+    cp tracespipelite-$dataset.fa ../../reconstructed/$dataset
+  done  
   cd ../../
   conda activate base
 fi
@@ -280,7 +303,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   then
   printf "Reconstructing with TRACESPipe\n\n"
   eval "$(conda shell.bash hook)"
-  #conda activate tracespipe
+  conda activate tracespipe
   cd tracespipe/
   for dataset in "${DATASETS[@]}"
     do	
@@ -290,7 +313,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     cd ../meta_data/
     echo "x:DS1_1.fq.gz:DS1_2.fq.gz" > meta_info.txt
     cd ../src/
-    ./TRACESPipe.sh --flush-output --flush-logs --run-mito
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./TRACESPipe.sh --flush-output --flush-logs --run-mito
     cd ..
     done
   cd ..   
@@ -302,7 +325,7 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
   then
   printf "Reconstructing with ASPIRE\n\n"
   cd aspire
-  ./aspire
+  /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./aspire
   cd ..
 fi
 
@@ -369,7 +392,7 @@ output:
   visualization: true
   QA: true" >> config.yaml
     # edit config.yaml and provide samples/ directory
-    ./vpipe --cores 1
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./vpipe --cores 1
     cd ..
   done
   conda activate base
@@ -387,7 +410,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
     do
     cp ../../${dataset}.fa .
     #./strainline.sh -i ../../${dataset}*.fa -o out -p ont
-    ./strainline.sh -i ${dataset}.fa -o out -p pb -k 20 -t 32
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./strainline.sh -i ${dataset}.fa -o out -p pb -k 20 -t 32
     done
   cd ../../
   conda activate base
@@ -413,24 +436,28 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
     rm -rf denovo_assembly_${dataset}
     mkdir denovo_assembly_${dataset}
     
-    haphpipe assemble_denovo --fq1 ${dataset}_1.fq --fq2 ${dataset}_2.fq --outdir denovo_assembly_${dataset} #--no_error_correction TRUE
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haphpipe assemble_denovo --fq1 ${dataset}_1.fq --fq2 ${dataset}_2.fq --outdir denovo_assembly_${dataset} #--no_error_correction TRUE
   done
   cd ..
   conda activate base 
 fi
 
-#aBayesQR - input is probably wrong?? , segmentation fault
+#aBayesQR - running; doesn't output results
 if [[ "$RUN_ABAYESQR" -eq "1" ]] 
   then
   printf "Reconstructing with aBayesQR\n\n"
   cd aBayesQR 
   for dataset in "${DATASETS[@]}"
     do
-    #cp ${dataset}_*.fq .
-    cp ../B19.fa ../${dataset}_.sam .
-    rm -rf config_${dataset}
-    echo "filename of reference sequence (FASTA) : B19.fa
-filname of the aligned reads (sam format) : DS1_.sam
+    
+    for virus in "${VIRUSES[@]}"
+    do
+    
+      #cp ${dataset}_*.fq .
+      cp ../$virus.fa ../${dataset}_.sam .
+      rm -rf config_${dataset}
+      echo "filename of reference sequence (FASTA) : ${virus}.fa
+filname of the aligned reads (sam format) : ${dataset}_.sam
 paired-end (1 = true, 0 = false) : 1
 SNV_thres : 0.01
 reconstruction_start : 1
@@ -441,36 +468,35 @@ max_insert_length : 250
 characteristic zone name : test
 seq_err (assumed sequencing error rate(%)) : 0.1
 MEC improvement threshold : 0.0395 " >> config_${dataset}
-    ./aBayesQR config_${dataset}
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./aBayesQR config_${dataset}
+      done
     done
   cd ..
     
 fi
 
-#HaploClique - missing bam files and remaining execution, try later
+#HaploClique - No reads could be retrieved from the BamFile.
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Reconstructing with HaploClique\n\n"
   eval "$(conda shell.bash hook)"
   conda activate haploclique  
   create_bam_files
-  
-  #samtools index alignment.bam
-  #cd haploclique/scripts/
-  #chmod +x haploclique-assembly
-  
-  #for dataset in "${DATASETS[@]}"
-  #  do
-  #  cp ../../$dataset.fa .
-  #  #cp ../../B19.bam #missing bam generation
-  #  ./haploclique-assembly -r ../reference.fasta -i ../alignment.bam
-  #done
-  #cd ..
+
+  rm -rf haploclique_data
+  mkdir haploclique_data
+  cd haploclique_data
+  for dataset in "${DATASETS[@]}"
+    do
+    cp ../$dataset.bam .
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haploclique $dataset.bam 
+  done
+  cd ..
   conda activate base
 
 fi
 
-#ViSpA - index file for DS1.bam err; missing DS1_I_6_120_CNTGS_DIST0.txt
+#ViSpA - runs; result files *_EM.txt are empty
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Reconstructing with ViSpA\n\n"  
@@ -484,25 +510,34 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do	
     cp ../../../${dataset}.fa ../../test
-    cp ../../../HPV.fa ../../test  
-    echo "" >> ../../test/${dataset}.txt
-    ./main_mosaik.bash ../../test/${dataset}.fa ../../test/HPV.fa 15 6 120 > ../../test/log.txt
+    cp ../../../${dataset}.bam ../../test
+    for virus in "${VIRUSES[@]}"
+    do
+      cp ../../../$virus.fa ../../test 
+     
+      echo "" >> ../../test/${dataset}.txt
+    
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./main_mosaik.bash ../../test/${dataset}.fa ../../test/$virus.fa 2 100 120
+      done
     done    
     conda activate base  
 fi
 
 #QuasiRecomb -> ParsingException in thread "main" java.lang.reflect.InvocationTargetException
+#Caused by: net.sf.samtools.SAMException: No index is available for this BAM file.
 if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
   then
   printf "Reconstructing with QuasiRecomb\n\n"
   eval "$(conda shell.bash hook)"
   conda activate quasirecomb
-  cd QuasiRecomb-1.2
+  #cd QuasiRecomb-1.2
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}_.sam .
+    #cp ../${dataset}_.sam .
     #java -jar QuasiRecomb.jar -i ${dataset}_.sam
-    java -jar QuasiRecomb.jar -i ${dataset}_.sam -coverage
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar QuasiRecomb.jar -i ${dataset}_.sam -coverage
+    java -XX:+UseParallelGC -Xms2g -Xmx8g -XX:+UseNUMA -XX:NewRatio=9 -jar QuasiRecomb.jar -i $dataset.bam
+
     done
   conda activate base
 fi
@@ -511,6 +546,8 @@ fi
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with Lazypipe\n\n"
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
   
 fi
 
@@ -520,6 +557,10 @@ if [[ "$RUN_VIQUAS" -eq "1" ]]
   printf "Reconstructing with ViQuaS\n\n"
   create_bam_files
   cd ViQuaS1.3
+  
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
+  
   #Rscript ViQuaS.R ../DS1.fa <read file in BAM format> <o> <r> <perform richness (1/0)> <diversityRegionLength>
   cd ..
   
@@ -529,6 +570,10 @@ fi
 if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with MLEHaplo\n\n"
+  
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
+  
   eval "$(conda shell.bash hook)"
   conda activate mlehaplo
   cd MLEHaplo-0.4.1
@@ -607,7 +652,7 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
     cp ../../../${dataset}_2.fq .
     cd ../assembly_${dataset}
     #python ../pehaplo.py -f1 ../raw_test_data/virus_1.fa -f2 ../raw_test_data/virus_2.fa -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
-    python ../pehaplo.py -f1 ../data/${dataset}_1.fq -f2 ../data/${dataset}_2.fq -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python ../pehaplo.py -f1 ../data/${dataset}_1.fq -f2 ../data/${dataset}_2.fq -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
   done
   conda activate base
   
@@ -617,6 +662,9 @@ fi
 if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with RegressHaplo\n\n"
+  
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
   
 fi
 
@@ -628,7 +676,9 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_.sam .
-    java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam -outDir $(pwd)
+    cp ${dataset}_.fasta cliquesnv_${dataset}.fa
+    cp cliquesnv_${dataset}.fa ../reconstructed/${dataset}
     done
   cd ..  
 fi
@@ -644,7 +694,7 @@ if [[ "$RUN_IVA" -eq "1" ]]
     do    
     cp ${dataset}_*.fq iva_data
     rm -rf ${dataset}_Output_directory 
-    sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory    
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory    
   done
 fi
 
@@ -655,7 +705,7 @@ if [[ "$RUN_PRICE" -eq "1" ]]
   cd PriceSource130506
   for dataset in "${DATASETS[@]}"
     do
-    ./PriceTI -fp ../${dataset}_1.fq ../${dataset}_2.fq 100 -nc 20 -a 2 -o result_${dataset}.fasta
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fp ../${dataset}_1.fq ../${dataset}_2.fq 100 -nc 20 -a 2 -o result_${dataset}.fasta
     done
   cd ..
   
@@ -669,8 +719,99 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
   chmod +x ./tools/vsearch
   for dataset in "${DATASETS[@]}"
     do
-    java -jar VirGenA.jar assemble -c config_test_linux.xml
+    
+    for virus in "${VIRUSES[@]}"
+    do
+      rm -rf ${dataset}_*.fq
+      rm -rf ${virus}.fa
+      rm -rf *.gz
+      
+      cp ../${dataset}_*.fq .
+      cp ../${virus}.fa .
+    
+      gzip *.fq
+      
+      #rm -rf $dataset-$virus 
+      #mkdir $dataset-$virus
+    
+      echo "<config>
+    <Data>
+        <pathToReads1>${dataset}_1.fq.gz</pathToReads1>
+        <pathToReads2>${dataset}_2.fq.gz</pathToReads2>
+        <InsertionLength>1000</InsertionLength>
+    </Data>
+    <Reference>${virus}.fa</Reference>
+    <OutPath>./res/$dataset-$virus</OutPath>
+    <ThreadNumber>-1</ThreadNumber>
+	<BatchSize>1000</BatchSize>
+    <ReferenceSelector>
+		<Enabled>true</Enabled>
+        <UseMajor>false</UseMajor>
+        <ReferenceMSA>./data/HIV_RefSet_msa.fasta</ReferenceMSA>
+        <PathToVsearch>./tools/vsearch</PathToVsearch>
+        <UclustIdentity>0.95</UclustIdentity>
+        <MinReadLength>50</MinReadLength>
+        <MinContigLength>1000</MinContigLength>
+        <Delta>0.05</Delta>
+		<MaxNongreedyComponentNumber>5</MaxNongreedyComponentNumber>
+        <MapperToMSA>
+			<K>7</K>
+			<IndelToleranceThreshold>1.5</IndelToleranceThreshold>
+			<pValue>0.01</pValue>
+			<RandomModelParameters>
+				<Order>4</Order>
+				<ReadNum>1000</ReadNum>
+				<Step>10</Step>
+			</RandomModelParameters>
+        </MapperToMSA>
+        <Graph>
+            <MinReadNumber>5</MinReadNumber>
+            <VertexWeight>10</VertexWeight>
+			<SimilarityThreshold>0.5</SimilarityThreshold>
+			<Debug>false</Debug>
+        </Graph>
+        <Debug>false</Debug>
+    </ReferenceSelector>
+    <Mapper>
+		<K>5</K>
+		<IndelToleranceThreshold>1.25</IndelToleranceThreshold>
+        <pValue>0.01</pValue>
+		<RandomModelParameters>
+			<Order>4</Order>
+			<ReadNum>1000</ReadNum>
+			<Step>10</Step>
+		</RandomModelParameters>
+        <Aligner>
+            <Match>2</Match>
+            <Mismatch>-3</Mismatch>
+            <GapOpenPenalty>5</GapOpenPenalty>
+            <GapExtensionPenalty>2</GapExtensionPenalty>
+        </Aligner>
+    </Mapper>
+    <ConsensusBuilder>
+        <IdentityThreshold>0.9</IdentityThreshold>
+        <CoverageThreshold>0</CoverageThreshold>
+        <MinIntersectionLength>10</MinIntersectionLength>
+        <MinTerminationReadsNumber>1</MinTerminationReadsNumber>
+        <Reassembler>
+            <IdentityThreshold>0.9</IdentityThreshold>
+            <MinTerminatingSequenceCoverage>0</MinTerminatingSequenceCoverage>
+            <PairReadTerminationThreshold>0.1</PairReadTerminationThreshold>
+            <MinReadLength>50</MinReadLength>
+        </Reassembler>
+        <Debug>false</Debug>
+    </ConsensusBuilder>
+    <Postprocessor>
+        <Enabled>true</Enabled>
+        <MinFragmentLength>500</MinFragmentLength>
+        <MinIdentity>0.99</MinIdentity>
+		<MinFragmentCoverage>0.99</MinFragmentCoverage>
+        <Debug>false</Debug>
+    </Postprocessor>
+</config>" > $dataset-conf.xml
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
+    done
   done
   cd ..
   
@@ -682,7 +823,9 @@ if [[ "$RUN_TARVIR" -eq "1" ]]
   printf "Reconstructing with TAR-VIR\n\n"
   #cd TAR-VIR
   #./build -f ../DS1.fa -o prefix
-
+  
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
   
   cd TAR-VIR/
   rm -rf data
@@ -703,6 +846,10 @@ if [[ "$RUN_VIP" -eq "1" ]]
   printf "Reconstructing with VIP\n\n"
   eval "$(conda shell.bash hook)"
   conda activate vip
+  
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
+  
   cd VIP-master
   chmod +x ./VIP.sh
   cp ../DS1_1.fq .
@@ -722,7 +869,7 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   cd Tools 
   for dataset in "${DATASETS[@]}"
     do
-    ./drVM.py -1 ../DS1_1.fq -2 ../DS1_2.fq
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ../DS1_1.fq -2 ../DS1_2.fq
   done
   cd ..
 fi
@@ -736,7 +883,7 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../../${dataset}_*.fq .
-    ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
   done
   cd ../../
 
@@ -757,7 +904,7 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   rm -rf out
   mkdir out
   
-  ./viralFlye.py --dir $(pwd)/out --hmm ../Pfam-A.hmm.gz --reads $(pwd)/flye_assembly_dir #--outdir flye_assembly_dir
+  /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./viralFlye.py --dir $(pwd)/out --hmm ../Pfam-A.hmm.gz --reads $(pwd)/flye_assembly_dir #--outdir flye_assembly_dir
   cd ..
   conda activate base
 fi
@@ -773,7 +920,7 @@ if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]]
     rm -rf ${dataset}_ea
     mkdir ${dataset}_ea
     cd ${dataset}_ea
-    ../ensembleAssembly_1/ensembleAssembly ./config.txt
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../ensembleAssembly_1/ensembleAssembly ./config.txt
     #chmod +x ./ensemble.sh
     #./ensemble.sh
     
@@ -794,7 +941,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_1.fq .
-    haploflow --read-file ${dataset}_1.fq --out test --log test/log    
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haploflow --read-file ${dataset}_1.fq --out test --log test/log    
   done
   cd ..  
   conda activate base 
@@ -823,7 +970,7 @@ seq_err (assumed sequencing error rate(%)) : 0.2
 MEC improvement threshold : 0.0312
 initial population size : 5" >> config_${dataset}
     ExtractMatrix config_${dataset}
-    python3 TenSQR.py config_${dataset}  
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python3 TenSQR.py config_${dataset}  
     
   done  
   cd ..
@@ -836,6 +983,10 @@ if [[ "$RUN_VIQUF" -eq "1" ]]
   printf "Reconstructing with ViQUF\n\n"
   eval "$(conda shell.bash hook)"
   conda activate viquf
+  
+  #timer
+  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
+  
   cd ViQUF
   
   #for dataset in "${DATASETS[@]}"

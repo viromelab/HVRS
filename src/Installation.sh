@@ -20,7 +20,7 @@ RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=1;
+RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -32,7 +32,7 @@ RUN_LAZYPIPE=0;
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
-RUN_REGRESSHAPLO=0;
+RUN_REGRESSHAPLO=1;
 RUN_CLIQUESNV=0;
 RUN_IVA=0; 
 RUN_PRICE=0;
@@ -143,13 +143,14 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   then
   printf "Installing QSdpr\n\n"
   eval "$(conda shell.bash hook)"
-  conda create --name qsdpr python=2.7 
+  conda create --name qsdpr
   conda activate qsdpr
-  cconda install -c bioconda -y samtools
+  conda install -c anaconda -y python=2.7 pysam numpy clapack scipy #samtools atlas lapack
   wget -O qsdpr "https://sourceforge.net/projects/qsdpr/files/QSdpR_v3.2.tar.gz/download"
   tar xfz qsdpr
   rm -rf qsdpr
   conda activate base
+  install_samtools
 fi
 
 
@@ -385,24 +386,17 @@ if [[ "$RUN_ABAYESQR" -eq "1" ]]
   cd ..  
 fi
 
-#HaploClique - issues generating sam to bam files using samtools
+#HaploClique
 if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
   then
   printf "Installing HaploClique\n\n"
   rm -rf haploclique
   eval "$(conda shell.bash hook)"
   conda create -n haploclique
-  conda install -c bioconda -y samtools
-  conda install -c conda-forge -y zlib
-  sudo apt-get install libncurses5-dev cmake libboost-all-dev git build-essential zlib1g-dev parallel
-  git clone https://github.com/armintoepfer/haploclique
-  cd haploclique
-  sh install-additional-software.sh
-  mkdir build
-  cd build
-  cmake ..
-  make
-  make install
+  conda activate haploclique
+  #conda install -c bioconda -y 
+  #conda install -
+  conda install -c bioconda -y haploclique samtools python=3.6 
   conda activate base
 fi
 
@@ -430,13 +424,13 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   conda activate quasirecomb
   conda install -c bioconda -y samtools
   
-  wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
-  unzip v1.2.zip 
-  rm -rf v1.2.zip
+  #wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
+  #unzip v1.2.zip 
+  #rm -rf v1.2.zip
   
   rm -rf QuasiRecomb.jar
   wget https://github.com/cbg-ethz/QuasiRecomb/releases/download/v1.2/QuasiRecomb.jar
-  cp QuasiRecomb.jar QuasiRecomb-1.2
+  #cp QuasiRecomb.jar QuasiRecomb-1.2
   
   conda activate base
   
@@ -529,8 +523,7 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   
   conda create -n regresshaplo
   conda activate regresshaplo
-  conda install -c r -y r r-essentials
-  
+  #conda install -c r -c hcc -y r r-essentials r-regresshaplo 
   conda install -c hcc -y r-regresshaplo
   conda activate base
   
