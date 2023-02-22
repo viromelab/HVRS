@@ -12,8 +12,8 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=0;
-RUN_ASPIRE=0;
+RUN_TRACESPIPE=1;
+RUN_ASPIRE=1;
 RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
@@ -30,7 +30,7 @@ RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
 RUN_IVA=0;
 RUN_PRICE=0;
-RUN_VIRGENA=1;
+RUN_VIRGENA=0;
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
@@ -44,7 +44,7 @@ RUN_VIQUF=0;
 
 declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS1" "DS2" "DS3");
-#declare -a VIRUSES=( "HPV" );
+#declare -a VIRUSES=( "VZV" );
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #create bam files from sam files
@@ -54,6 +54,17 @@ create_bam_files () {
   do	
     cd samtools-1.16.1/
     ./samtools view -bS ../${dataset}_.sam > ../${dataset}.bam
+    cd ..
+  done
+}
+
+#create fasta files from sam files
+create_fa_from_sam_files () { 
+  printf "Creating fasta files from .sam files\n\n"
+  for dataset in "${DATASETS[@]}"
+  do	
+    cd samtools-1.16.1/
+    ./samtools fasta ../${dataset}_.sam > ../gen_${dataset}.fasta 
     cd ..
   done
 }
@@ -135,16 +146,36 @@ fi
 if [[ "$RUN_VIADBG" -eq "1" ]] 
   then
   printf "Reconstructing with viaDBG\n\n"
-  cd viadbg/
+  #cd viadbg/
   for dataset in "${DATASETS[@]}"
     do
+    
     rm -rf viadbg_${dataset}
-    mkdir viadbg_${dataset}	
-    cp ../${dataset}_1.fq viadbg_${dataset}
-    cp ../${dataset}_2.fq viadbg_${dataset}
-    mkdir output_${dataset}
-    ./bin/viaDBG -p viadbg_${dataset} -o output_${dataset}
+    mkdir viadbg_${dataset}	    
+    cp ${dataset}_*.fq viadbg_${dataset}
+    
+    rm -rf viadbg_output_${dataset} 
+    mkdir viadbg_output_${dataset}
+    
+    cd viadbg/
+    
+    
+    ./bin/viaDBG -p ../viadbg_${dataset} -o ../viadbg_output_${dataset}
+    
+    cd ..
+  
+     
+    
+    #cd viadbg_docker
+    #rm -rf viadbg_${dataset}
+    #mkdir viadbg_${dataset}	
+    #cp ${dataset}_*.fq viadbg_${dataset}
+    #cd ..
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" sudo docker run -d viadbg_docker
+    
   done
+  
+  
 fi
 
 #savage - Runs, w/ ref ->no reads could be aligned to reference error
@@ -212,7 +243,8 @@ if [[ "$RUN_QURE" -eq "1" ]]
   cd ..
 fi
 
-#virus-vg - rust-overlaps not found
+#virus-vg - err; Subcommand 'msga' is deprecated and is no longer being actively maintained. Future releases may eliminate it entirely.
+#error: could not parse i from argument "-a"
 if [[ "$RUN_VIRUSVG" -eq "1" ]] 
   then
   printf "Reconstructing with Virus-VG\n\n"
@@ -223,25 +255,40 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
     do
     rm -rf samples_virusvg
     mkdir samples_virusvg
-    cp ${dataset}_1.fq ${dataset}_2.fq ${dataset}.fa samples_virusvg
-    jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py -f samples_virusvg/${dataset}_1.fq -r samples_virusvg/${dataset}_2.fq -c samples_virusvg/${dataset}.fa -vg vg -t 2
+    cp ${dataset}_*.fq ${dataset}.fa samples_virusvg
+    cd jbaaijens-virus-vg-69a05f3e74f2
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" scripts/build_graph_msga.py -f ../samples_virusvg/${dataset}_1.fq -r ../samples_virusvg/${dataset}_2.fq -c ../samples_virusvg/${dataset}.fa -vg ./vg -t 2
+    
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
+    cd ..
   done
   conda activate base
 fi
 
-#vg-flow - running with errors, rust-overlaps not found - json.decoder.JSONDecodeError
+#vg-flow - err - deprecated msga; vg crashed
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Reconstructing with VG-Flow\n\n"
   eval "$(conda shell.bash hook)"
   conda activate vg-flow-env
   chmod +x jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py
+  cd jbaaijens-vg-flow-ac68093bbb23/
   for dataset in "${DATASETS[@]}"
     do
     rm -rf samples_vgflow
     mkdir samples_vgflow
-    cp ${dataset}_1.fq ${dataset}_2.fq ${dataset}.fa samples_vgflow
-    jbaaijens-vg-flow-ac68093bbb23/scripts/build_graph_msga.py -f samples_vgflow/${dataset}_1.fq -r ${dataset}_2.fq -c samples_vgflow/${dataset}.fa -vg pwd -t 2
+    cp ../${dataset}_1.fq ../${dataset}_2.fq ../${dataset}.fa samples_vgflow
+    cd samples_vgflow
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg .././vg -t 2
+    
+    #example
+    #cd example
+    #python ../scripts/build_graph_msga.py -f forward.fastq -r reverse.fastq -c input.fasta -vg .././vg -t 2
+    python ../scripts/vg-flow.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
+    
+    #cd jbaaijens-vg-flow-ac68093bbb23/
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" scripts/build_graph_msga.py -f ../samples_vgflow/${dataset}_1.fq -r ../samples_vgflow/${dataset}_2.fq -c ../samples_vgflow/${dataset}.fa -vg ./vg -t 2
+    cd ..
   done
   conda activate base
 fi
@@ -298,7 +345,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   conda activate base
 fi
 
-#tracespipe - cp: cannot stat 'mtDNA.fa.fai': No such file or directory
+#tracespipe - efetch error
 if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with TRACESPipe\n\n"
@@ -309,11 +356,12 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     do	
     cd input_data/
     cp ../../${dataset}_*.fq .
+    rm -rf *.fq.gz
     gzip *.fq
     cd ../meta_data/
-    echo "x:DS1_1.fq.gz:DS1_2.fq.gz" > meta_info.txt
+    echo "x:${dataset}_1.fq.gz:${dataset}_2.fq.gz" > meta_info.txt
     cd ../src/
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./TRACESPipe.sh --flush-output --flush-logs --run-mito
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./TRACESPipe.sh --run-meta --run-all-v-alig --remove-dup --min-similarity 3 --best-of-bests
     cd ..
     done
   cd ..   
@@ -360,10 +408,10 @@ if [[ "$RUN_QVG" -eq "1" ]]
       cp ${dataset}_files/output/qvg-${virus}-${dataset}.fasta .
     done
     cat *.fasta > qvg-${dataset}.fa
+    rm -rf *.fasta
     cp qvg-${dataset}.fa ../reconstructed/$dataset 
   done
   
-  cd ..
   conda activate base 
 fi
 
@@ -390,29 +438,47 @@ output:
   local: true
   global: false
   visualization: true
-  QA: true" >> config.yaml
+  QA: true" >> config.yaml 
+    cd ..
     # edit config.yaml and provide samples/ directory
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./vpipe --cores 1
-    cd ..
+   
   done
   conda activate base
 fi
 
-#Strainline - seg. fault; reads.las not present
+#Strainline - missing reads*.las, example fails execution as well
 if [[ "$RUN_STRAINLINE" -eq "1" ]] 
   then
   printf "Reconstructing with Strainline\n\n"
+  create_fa_from_sam_files
   eval "$(conda shell.bash hook)"
   conda activate strainline
   cd Strainline/src/
+  rm -rf out/tmp/
   chmod +x ./strainline.sh
+  cd ..
   for dataset in "${DATASETS[@]}"
     do
-    cp ../../${dataset}.fa .
+    rm -rf ${dataset}
+    mkdir ${dataset} 
+    cd ${dataset}    
+    cp ../../gen_${dataset}.fasta .
+    
+    ../src/strainline.sh -i gen_${dataset}.fasta -o out -p ont -k 20 -t 32
+    
+    
     #./strainline.sh -i ../../${dataset}*.fa -o out -p ont
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./strainline.sh -i ${dataset}.fa -o out -p pb -k 20 -t 32
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../src/strainline.sh -i ${dataset}_test.fa -o ${dataset} -p ont -k 20 -t 32
+    
+    #example
+    #cd ../example/
+    #rm -rf out
+    #../src/strainline.sh -i reads.fa -o out -p pb -k 20 -t 32
+    
+    cd ..
     done
-  cd ../../
+  cd ../
   conda activate base
   
   
@@ -551,108 +617,115 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   
 fi
 
-#ViQuaS - missing .bam files
+#ViQuaS - Error in substr(lines, 1L, 1L) : invalid multibyte string at '<b8>'
 if [[ "$RUN_VIQUAS" -eq "1" ]] 
   then
   printf "Reconstructing with ViQuaS\n\n"
   create_bam_files
-  cd ViQuaS1.3
-  
-  #timer
-  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
-  
-  #Rscript ViQuaS.R ../DS1.fa <read file in BAM format> <o> <r> <perform richness (1/0)> <diversityRegionLength>
-  cd ..
-  
+  eval "$(conda shell.bash hook)"
+  conda activate viquas
+  cd ViQuaS1.3  
+  for dataset in "${DATASETS[@]}"
+    do    
+    cp ../${dataset}.bam .    
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" Rscript ViQuaS.R ${dataset}.bam #<o> <r> <perform richness (1/0)> <diversityRegionLength>
+  done
+  conda activate base  
+  cd ..  
 fi
 
-#MLEHaplo - no errors 0 vertices and 0 edges on the DBG
+#MLEHaplo - constructs graphs with 0 vertices and 0 edges, illegal division by 0
 if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
   then
-  printf "Reconstructing with MLEHaplo\n\n"
-  
+  printf "Reconstructing with MLEHaplo\n\n"  
   #timer
   #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
-  
+  create_fa_from_sam_file
   eval "$(conda shell.bash hook)"
   conda activate mlehaplo
-  cd MLEHaplo-0.4.1
-  rm -rf benchmark
-  mkdir benchmark
-  
+  cd MLEHaplo-0.4.1  
   for dataset in "${DATASETS[@]}"
     do
-    cd benchmark
+    rm -rf ${dataset}
+    mkdir ${dataset}
+    cd ${dataset}
     echo ${dataset}"_1.fq
 "${dataset}"_2.fq" > files_${dataset}.txt
     echo "55
 45
 35
-25" > kmers_${dataset}.txt
-    cp ../../${dataset}_*.fq .
-    cp ../../${dataset}.fa .
-    cd ..
-    
-    #./multi-dsk/multi-dsk benchmark/${dataset}.fa  benchmark/kmers_${dataset}.txt  -m 8192 -d 10000
-    #
-    #./multi-dsk/parse_results benchmark/paired-reads.solid_kmers_binary.60 > paired-reads.60
-    #perl construct_graph.pl  benchmark/${dataset}.fa paired-reads.60 0 paired-reads.60.graph "s"
-    #perl construct_paired_without_bloom.pl -fasta benchmark/${dataset}.fa -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
-    #incomplete - DBG graph is empty
+25" > listofkmers.txt
+    cp ../../gen_${dataset}.fasta .
+    mv gen_${dataset}.fasta paired-reads.fasta
+    cd ..   
     
     #example given
-    ./multi-dsk/multi-dsk Example/paired-reads.fasta  Example/listofkmers.txt  -m 8192 -d 10000
-    ./multi-dsk/parse_results Example/paired-reads.solid_kmers_binary.60 > paired-reads.60
-    perl construct_graph.pl  Example/paired-reads.fasta paired-reads.60 0 paired-reads.60.graph "s"
-    perl construct_paired_without_bloom.pl -fasta Example/paired-reads.fasta -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
+    #./multi-dsk/multi-dsk Example/paired-reads.fasta  Example/listofkmers.txt  -m 8192 -d 10000
+    #./multi-dsk/parse_results Example/paired-reads.solid_kmers_binary.60 > paired-reads.60
+    #perl construct_graph.pl  Example/paired-reads.fasta paired-reads.60 0 paired-reads.60.graph "s"
+    #perl construct_paired_without_bloom.pl -fasta Example/paired-reads.fasta -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
+    #perl dg_cover.pl -graph paired-reads.60.graph -kmer paired-reads.60 -paired paired-reads.60.pk.txt -fact 15 -thresh 0 -IS 400 > paired-reads.60.fact15.txt
+    #perl process_dg.pl paired-reads.60.fact15.txt > paired-reads.60.fact15.fasta
+    #perl get_paths_dgcover.pl -f paired-reads.60.fact15.txt -w paired-reads.60.fact15.paths.txt
+    #perl likelihood_singles_wrapper.pl -condgraph paired-reads.60.cond.graph -compset paired-reads.60.comp.txt -pathsfile paired-reads.60.fact15.paths.txt -back -gl 1200 -slow  > paired-reads.60.smxlik.txt
+    #perl extract_MLE.pl -f paired-reads.60.fact15.fasta -l paired-reads.60.smxlik.txt > paired-reads.60.MLE.fasta
+    
+    #adaptation to the example given
+    ./multi-dsk/multi-dsk ${dataset}/paired-reads.fasta  ${dataset}/listofkmers.txt  -m 8192 -d 10000
+    ./multi-dsk/parse_results ${dataset}/paired-reads.solid_kmers_binary.60 > paired-reads.60
+    perl construct_graph.pl  ${dataset}/paired-reads.fasta paired-reads.60 0 paired-reads.60.graph "s"
+    perl construct_paired_without_bloom.pl -fasta ${dataset}/paired-reads.fasta -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
     perl dg_cover.pl -graph paired-reads.60.graph -kmer paired-reads.60 -paired paired-reads.60.pk.txt -fact 15 -thresh 0 -IS 400 > paired-reads.60.fact15.txt
     perl process_dg.pl paired-reads.60.fact15.txt > paired-reads.60.fact15.fasta
     perl get_paths_dgcover.pl -f paired-reads.60.fact15.txt -w paired-reads.60.fact15.paths.txt
     perl likelihood_singles_wrapper.pl -condgraph paired-reads.60.cond.graph -compset paired-reads.60.comp.txt -pathsfile paired-reads.60.fact15.paths.txt -back -gl 1200 -slow  > paired-reads.60.smxlik.txt
-    perl extract_MLE.pl -f paired-reads.60.fact15.fasta -l paired-reads.60.smxlik.txt > paired-reads.60.MLE.fasta
-    
-    
-    
+    perl extract_MLE.pl -f paired-reads.60.fact15.fasta -l paired-reads.60.smxlik.txt > paired-reads.60.MLE.fasta   
   
   done
-  conda activate base
-  
-  
+  conda activate base 
 fi
 
-#PEHaplo - likely an error on the input files, _1 _2 .fa required?, working with test example
+#PEHaplo - err - subprocess.CalledProcessError: Command 'gt readjoiner overlap -readset samp -memlimit 2GB -l 180' returned non-zero exit status 1 , working with test example
 if [[ "$RUN_PEHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with PEHaplo\n\n"
-  #cd PEHaplo 
-  #rm -rf assembly 
-  #mkdir assembly  
-  #cd assembly  
-  #eval "$(conda shell.bash hook)"
-  #conda activate pehaplo
-  #python ../pehaplo.py -f1 ../../DS1_1.fq -f2 ../../DS1_2.fq -l 20 -r 200 
-  
-  #python ../apsp_overlap_clique.py ../../DS1.fa ../../DS1.fa 180 250 600 210 
-  
-  #python ../apsp_overlap_clique.py ../processed_test_data/Plus_strand_reads.fa ../processed_test_data/pair_end_connections.txt 180 250 600 210 
-  #cd ../../
-  #conda activate base
-  
-  cd TAR-VIR/PEHaplo/
   eval "$(conda shell.bash hook)"
   conda activate bio2
+  cd TAR-VIR/PEHaplo/  
+  
   for dataset in "${DATASETS[@]}"
     do	
-    rm -rf assembly_${dataset}
-    mkdir assembly_${dataset}
-    rm -rf data
-    mkdir data
-    cd data
-    cp ../../../${dataset}_1.fq .
-    cp ../../../${dataset}_2.fq .
-    cd ../assembly_${dataset}
-    #python ../pehaplo.py -f1 ../raw_test_data/virus_1.fa -f2 ../raw_test_data/virus_2.fa -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python ../pehaplo.py -f1 ../data/${dataset}_1.fq -f2 ../data/${dataset}_2.fq -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
+    
+    for virus in "${VIRUSES[@]}"
+    do
+    
+      rm -rf data
+      mkdir data
+      cd data
+    
+      cp ../../../${virus}.fa .
+      cp ../../../gen_${dataset}.fasta .
+    
+      mkdir index
+      bowtie2-build -f ${virus}.fa index/HXB2
+      bowtie2 -x index/HXB2 -f gen_${dataset}.fasta --score-min L,0,-0.05 -t -p 4 -S result.sam
+    
+      cd ..
+      build -f data/gen_${dataset}.fasta -o virus
+      overlap -S data/result.sam -x virus -f data/gen_${dataset}.fasta -c 180 -o data/virus_recruit.fa
+      
+      rm -rf test
+      mkdir test
+      cd test
+      
+      printf "\n $(pwd)\n\n"
+      
+      python ../tools/get_read_pairs.py ../data/virus_recruit.fa
+    
+      python ../pehaplo.py -f1 pair1.fa -f2 pair2.fa -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct yes
+      
+      cd ..
+    done
   done
   conda activate base
   
@@ -677,8 +750,8 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
     do
     cp ../${dataset}_.sam .
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam -outDir $(pwd)
-    cp ${dataset}_.fasta cliquesnv_${dataset}.fa
-    cp cliquesnv_${dataset}.fa ../reconstructed/${dataset}
+    cp ${dataset}_.fasta cliquesnv-${dataset}.fa
+    cp cliquesnv-${dataset}.fa ../reconstructed/${dataset}
     done
   cd ..  
 fi
@@ -693,7 +766,7 @@ if [[ "$RUN_IVA" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do    
     cp ${dataset}_*.fq iva_data
-    rm -rf ${dataset}_Output_directory 
+    sudo rm -rf ${dataset}_Output_directory 
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory    
   done
 fi
@@ -705,13 +778,13 @@ if [[ "$RUN_PRICE" -eq "1" ]]
   cd PriceSource130506
   for dataset in "${DATASETS[@]}"
     do
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fp ../${dataset}_1.fq ../${dataset}_2.fq 100 -nc 20 -a 2 -o result_${dataset}.fasta
+    cp ../${dataset}_*.fq .    
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fp ${dataset}_1.fq ${dataset}_2.fq 150 -nc 1 -o result_${dataset}.fasta
     done
-  cd ..
-  
+  cd ..  
 fi
 
-#VirGenA - missing changes to config.xml file; example err . java.io.IOException: Cannot run program "makeblastdb": error=2, No such file or directory
+#VirGenA 
 if [[ "$RUN_VIRGENA" -eq "1" ]] 
   then
   printf "Reconstructing with VirGenA\n\n"
@@ -812,6 +885,12 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
       /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
     done
+    cd res
+    cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
+    rm -rf *_complete_genome_assembly.fasta
+    cp virgena-$dataset.fa ../../reconstructed/$dataset 
+    cd ..
+    
   done
   cd ..
   
@@ -821,6 +900,8 @@ fi
 if [[ "$RUN_TARVIR" -eq "1" ]] 
   then
   printf "Reconstructing with TAR-VIR\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate bio2
   #cd TAR-VIR
   #./build -f ../DS1.fa -o prefix
   
@@ -837,7 +918,11 @@ if [[ "$RUN_TARVIR" -eq "1" ]]
   ./build -f ../data/DS1.fa -o virus
   ./overlap -S ../data/DS1_.sam -x virus -f ../data/DS1.fa -c 180 -o virus_recruit.fa
   
+  
+  
   cd ../../
+  conda activate base
+  
 fi
 
 #VIP - DS1.fa.preprocessed.fastq missing
@@ -874,7 +959,7 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   cd ..
 fi
 
-#SSAKE - probably bad parameters, running
+#SSAKE - running
 if [[ "$RUN_SSAKE" -eq "1" ]] 
   then
   printf "Reconstructing with SSAKE\n\n"
@@ -884,28 +969,40 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
     do
     cp ../../${dataset}_*.fq .
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
+    mv ${dataset}_assembly_scaffolds.fa ssake-${dataset}.fa
+    cp ssake-${dataset}.fa ../../reconstructed/${dataset}
   done
   cd ../../
 
 fi
 
-#viralFlye - err can't find out dir
+#viralFlye - err can't find out dir, can't create out dir with flye - ERROR: No reads above minimum length threshold (1000)
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Reconstructing with viralFlye\n\n"
   eval "$(conda shell.bash hook)"
   conda activate viralFlye
-  cd viralFlye
-  rm -rf flye_assembly_dir
-  mkdir flye_assembly_dir 
-  cd flye_assembly_dir 
-  cp ../../DS1_*.fq .
-  cd ..
-  rm -rf out
-  mkdir out
   
-  /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./viralFlye.py --dir $(pwd)/out --hmm ../Pfam-A.hmm.gz --reads $(pwd)/flye_assembly_dir #--outdir flye_assembly_dir
-  cd ..
+  for dataset in "${DATASETS[@]}"
+    do
+    cd Flye/bin
+    cp ../../${dataset}_*.fq . 
+    rm -rf ../../viralFlye/out
+    ./flye --nano-raw ${dataset}_1.fq ${dataset}_2.fq -o ../../viralFlye/out
+    cd ../../
+  
+    cd viralFlye
+    rm -rf flye_assembly_dir
+    mkdir flye_assembly_dir 
+    cd flye_assembly_dir 
+    cp ../../${dataset}_*.fq .
+    cd ..
+    rm -rf output_dir
+    mkdir output_dir
+  
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./viralFlye.py --dir out --hmm ../Pfam-A.hmm.gz --reads flye_assembly_dir --outdir output_dir
+    cd ..
+  done
   conda activate base
 fi
 

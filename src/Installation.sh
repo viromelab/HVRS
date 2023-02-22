@@ -19,7 +19,7 @@ RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
-RUN_ASPIRE=0;
+RUN_ASPIRE=1;
 RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
@@ -32,7 +32,7 @@ RUN_LAZYPIPE=0;
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
-RUN_REGRESSHAPLO=1;
+RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0;
 RUN_IVA=0; 
 RUN_PRICE=0;
@@ -167,15 +167,18 @@ fi
 if [[ "$RUN_VIRUSVG" -eq "1" ]] 
   then
   printf "Installing Virus-VG\n\n"
+  rm -rf jbaaijens-virus-vg-69a05f3e74f2
   wget -O virus-vg "https://bitbucket.org/jbaaijens/virus-vg/get/69a05f3e74f26e5571830f5366570b1d88ed9650.zip"
   unzip virus-vg
   rm -rf virus-vg
   rm vg
   wget "https://github.com/vgteam/vg/releases/download/v1.43.0/vg"
   chmod +x vg
+  cp vg jbaaijens-virus-vg-69a05f3e74f2
   eval "$(conda shell.bash hook)"
-  conda env create --name virus-vg-deps --file jbaaijens-virus-vg-69a05f3e74f2/conda_list_explicit.txt
+  conda create -n virus-vg-deps 
   conda activate virus-vg-deps 
+  conda install --file jbaaijens-virus-vg-69a05f3e74f2/conda_list_explicit.txt
   conda install -c bioconda -y rust-overlaps 
   conda install -c conda-forge -y graph-tool biopython
   pip install tqdm
@@ -188,13 +191,18 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   then
   printf "Installing VG-Flow\n\n"
   eval "$(conda shell.bash hook)"
-  conda create --name vg-flow-env
+  conda create -n vg-flow-env
   conda activate vg-flow-env
   conda install -c bioconda -c conda-forge -c gurobi -y python=3 graph-tool minimap2 gurobi biopython numpy rust-overlaps 
   conda install -c conda-forge -y graph-tool biopython
+  rm -rf jbaaijens-vg-flow-ac68093bbb23/
   wget -O vg-flow "https://bitbucket.org/jbaaijens/vg-flow/get/ac68093bbb235e508d0a8dd56881d4e5aee997e3.zip"
   unzip vg-flow
   rm -rf vg-flow
+  rm -rf vg
+  wget "https://github.com/vgteam/vg/releases/download/v1.43.0/vg"
+  chmod +x vg
+  cp vg jbaaijens-vg-flow-ac68093bbb23/
   conda activate base
   sudo apt-get install minimap2
 fi
@@ -213,9 +221,7 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   #cd /home
   #rm -rf boost_1_60_0
   #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
-  eval "$(conda shell.bash hook)"  
-  conda create -n viadbg
-  conda activate viadbg
+   
   #conda install -c conda-forge -y boost 
   #wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz
   #tar xfz boost_1_60_0.tar.gz
@@ -225,14 +231,79 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   #./b2 install 
   #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
   #ls /usr/local/bin/
+  
+  #cd ../../../  
+  
+  eval "$(conda shell.bash hook)"  
+  conda create -n viadbg
+  conda activate viadbg
   conda install -c "conda-forge/label/gcc7" -y boost
   conda install -c bioconda -y sga
-  rm -rf viadbg   
+    
+  
+  #curr_path=$(pwd)
+  
+  #boost
+  
+
+  #sudo -s
+
+  #rm -rf boost_1_60_0
+  #rm -rf boost_1_60_0.tar.gz*
+  #cd /home && 
+  rm -rf tar xfz boost_1_60_0.tar.gz
+  rm -rf boost_1_60_0
+  wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz 
+  tar xfz boost_1_60_0.tar.gz 
+  #cd boost_1_60_0 
+  #./bootstrap.sh
+  #./b2 --prefix=$(pwd)
+  #export LD_LIBRARY_PATH=$(pwd)/bin
+  #echo $LD_LIBRARY_PATH
+  #./bjam install --prefix=$(pwd)
+  
+  cd boost_1_60_0/
+
+  ./bootstrap.sh --with-libraries=atomic,date_time,exception,filesystem,iostreams,locale,program_options,regex,signals,system,test,thread,timer,log
+
+  sudo ./b2 install
+
+  #sudo ls -s /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0 /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.60.0
+  #sudo ls -s /usr/lib/x86_64-linux-gnu/libboost_regex.so.1.74.0 /usr/lib/x86_64-linux-gnu/libboost_regex.so.1.60.0
+  
+  
+  #&& ./bootstrap.sh --prefix=/usr/local --with-libraries=program_options \
+  #&& ./b2 install \
+  #&& export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd) \
+  #ls $(pwd)/bin
+  cd ..
+  
+  #exit
+  
+  #cd $curr_path
+  
+  #rm -rf viadbg   
   git clone https://bitbucket.org/bfreirec1/viadbg.git
   cd viadbg
-  make  
-  conda activate base  
-  #cd ../../../  
+  make clean && make
+  cd ..
+
+
+  #conda activate base 
+  
+  #docker attempt
+  #rm -rf viadbg_docker
+  #git clone https://github.com/borjaf696/viaDBG-DockerFile.git
+  #mv -T viaDBG-DockerFile viadbg_docker 
+  #sudo docker build -t viadbg_docker .
+  
+  #sudo docker pull sangerpathogens/iva
+  
+  ./Reconstruction.sh
+  
+  
+  
+  
 fi
 
 #PredictHaplo
@@ -261,33 +332,37 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   conda activate base
 fi
 
-#TRACESPipe
+#TRACESPipe - efetch error
 if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
   then
   printf "Installing TRACESPipe\n\n"
   eval "$(conda shell.bash hook)"  
-  #conda create -n tracespipe
-  #conda activate tracespipe
+  conda create -n tracespipe
+  conda activate tracespipe
   rm -rf tracespipe
   git clone https://github.com/viromelab/tracespipe.git
   cd tracespipe/src/
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install
-  ./TRACESPipe.sh --get-all-aux
+  #sudo apt-get install -y efetch
+  #got Parser.c: loadable library and perl binaries are mismatched (got handshake key 0xdb00080, needed 0xed00080) while installing, had to reinstall perl and install efetch, still not working
+  ./TRACESPipe.sh --get-all-aux #error is caused by this line
   cd ../../  
-  #conda activate base
+  conda activate base
+  
+  
 fi
 
-#ASPIRE - can't install dependencies
+#ASPIRE - can't in./TRACESPipe.sh --build-viralstall dependencies
 if [[ "$RUN_ASPIRE" -eq "1" ]] 
   then
   printf "Installing ASPIRE\n\n"
   rm -rf aspire/
   git clone https://github.com/kevingroup/aspire.git
   install_samtools  
+  #cpan Bio::DB::Sam
   cpan Module::Build
   cpan App::Cmd::Setup
-  cpan Bio::DB::Sam
   cpan Bio::Seq
   cpan Bio::SeqIO
   cpan Cwd
@@ -341,7 +416,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -n strainline
   conda activate strainline
-  conda install -c bioconda -y minimap2 spoa samtools dazz_db daligner metabat2   
+  conda install -c bioconda -y minimap2 spoa samtools dazz_db daligner metabat2 bbmap python
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
   rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz   
@@ -351,6 +426,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   rm -rf Strainline
   git clone "https://github.com/HaploKit/Strainline.git"
   conda activate base
+  #sudo apt install dazzdb
 fi
 
 #HAPHPIPE -
@@ -473,9 +549,14 @@ fi
 if [[ "$RUN_VIQUAS" -eq "1" ]] 
   then
   printf "Installing ViQuaS\n\n"
+  eval "$(conda shell.bash hook)"  
+  conda create -n viquas
+  conda activate viquas
+  conda install -c bioconda -y bioconductor-biostrings r-seqinr
   wget -O viquas "https://sourceforge.net/projects/viquas/files/latest/download"
   tar -xzf viquas
   rm -rf viquas
+  conda activate base
   
 fi
 
@@ -520,6 +601,10 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   then
   printf "Installing RegressHaplo\n\n"
   eval "$(conda shell.bash hook)"
+  
+  sudo apt-get install r-base
+  sudo apt-get install libcurl4-openssl-dev libssl-dev
+  
   
   conda create -n regresshaplo
   conda activate regresshaplo
@@ -771,18 +856,23 @@ fi
 if [[ "$RUN_VIRALFLYE" -eq "1" ]] 
   then
   printf "Installing viralFlye\n\n"
+  rm -rf viralFlye
   git clone https://github.com/Dmitry-Antipov/viralFlye
-  cd viralFlye
   eval "$(conda shell.bash hook)"
   conda create -n viralFlye
   conda activate viralFlye
   conda install -c bioconda -c conda-forge -c mikeraiko -y "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
   conda install -c conda-forge -y biopython
   conda install -c anaconda -y scipy
-  cd ..
+
   rm -rf Pfam-A.hmm.gz  
   wget http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam34.0/Pfam-A.hmm.gz
   
+  rm -rf Flye
+  git clone https://github.com/fenderglass/Flye
+  cd Flye
+  python setup.py install
+  cd ..
   conda activate base
 fi
 
