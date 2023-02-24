@@ -19,7 +19,7 @@ RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
-RUN_ASPIRE=1;
+RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
@@ -42,7 +42,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=0;
+RUN_ENSEMBLEASSEMBLER=1;
 RUN_HAPLOFLOW=0;
 RUN_TENSQR=0;
 RUN_ARAPANS=0;
@@ -297,7 +297,6 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   #mv -T viaDBG-DockerFile viadbg_docker 
   #sudo docker build -t viadbg_docker .
   
-  #sudo docker pull sangerpathogens/iva
   
   ./Reconstruction.sh
   
@@ -353,25 +352,28 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   
 fi
 
-#ASPIRE - can't in./TRACESPipe.sh --build-viralstall dependencies
+#ASPIRE - Can't locate App/Cmd/Setup.pm, tried installing one of the missing dependencies (Sub::Exporter), was not sucessfull, tried installing one of the missing dependencies for it (Test::LeakTrace) and it failed installation.
 if [[ "$RUN_ASPIRE" -eq "1" ]] 
   then
   printf "Installing ASPIRE\n\n"
+  
+  #install_samtools  
+  
+  cpanm App::Cmd::Setup
+  #cpanm Bio::DB::Sam
+  cpanm Bio::Seq
+  cpanm Bio::SeqIO
+  cpanm Cwd
+  cpanm File::Path
+  cpanm File:Slurp
+  cpanm File::Spec
+  cpanm IPC::Run
+  cpanm List::Util
+  cpanm Math::Round
+  cpanm Statistics::Descriptive::Full  
   rm -rf aspire/
   git clone https://github.com/kevingroup/aspire.git
-  install_samtools  
-  #cpan Bio::DB::Sam
-  cpan Module::Build
-  cpan App::Cmd::Setup
-  cpan Bio::Seq
-  cpan Bio::SeqIO
-  cpan Cwd
-  cpan File::Path
-  cpan File::Spec
-  cpan IPC::Run
-  cpan List::Util
-  cpan Math::Round
-  cpan Statistics::Descriptive::Full
+  
 fi
 
 
@@ -437,7 +439,8 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   conda create -n haphpipe
   conda activate haphpipe
   conda install -c bioconda -y gatk 
-  conda install -y haphpipe 
+  conda install -y haphpipe
+  
   
   
   #wget https://anaconda.org/bioconda/gatk/3.8/download/linux-64/gatk-3.8-py35_0.tar.bz2
@@ -557,6 +560,10 @@ if [[ "$RUN_VIQUAS" -eq "1" ]]
   tar -xzf viquas
   rm -rf viquas
   conda activate base
+  
+  Rscript -e 'install.packages("BiocManager", repos="https://cloud.r-project.org")'
+  Rscript -e 'install.packages("Biostrings", repos="https://cloud.r-project.org")'
+  Rscript -e 'install.packages("seqinr", repos="https://cloud.r-project.org")'
   
 fi
 
@@ -791,8 +798,8 @@ if [[ "$RUN_VIP" -eq "1" ]]
   
   conda create -n vip
   conda activate vip
-  conda install -c bioconda -y perl-dbi
-  
+  conda install -c bioconda -y perl-dbi bowtie2
+  rm -rf VIP-master
   wget -O vip "https://github.com/keylabivdc/VIP/archive/refs/heads/master.zip"
   unzip vip
   rm -rf vip
@@ -806,39 +813,38 @@ if [[ "$RUN_VIP" -eq "1" ]]
   
 fi
 
-#drVM - untested
+#drVM
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Installing drVM\n\n"
   sudo apt install python2
   sudo apt install gawk
   sudo apt-get install build-essential python-dev python-numpy python-scipy libatlas-dev libatlas3gf-base python-matplotlib libatlas-base-dev
+  
   wget -O drvm "https://sourceforge.net/projects/sb2nhri/files/latest/download"
   rm -rf Tools
   unzip drvm
   rm -rf drvm
   cd Tools
+  printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please comment the line below.\n\n"
   gawk -i inplace '$0=="#!/usr/bin/python" {$0="#!/usr/bin/python2"} 1' *.py
+  rm -rf VMDB
+  mkdir VMDB
+  cd VMDB
+  rm -rf sequence_20160316.tar.gz 
   wget https://sourceforge.net/projects/sb2nhri/files/drVM/sequence_20160316.tar.gz
   tar -zxvf sequence_20160316.tar.gz
-  rm -rf sequence_20160316.tar.gz
-  rm -rf refDB.tar.gz
+   
+  ./../CreateDB.py -s sequence.fasta -d 10 -kn off
   
   
-  #./CreateDB.py -s sequence.fasta -d 1
-  #printf "exporting path\n\n"
-  #export MyDB="$(pwd)"
-  #printf "path exported  ->  $MyDB \n\n"
+  cd ../
+  #./CreateSnapDB.py ../DS1.fa snap-0.15.4-linux
+  cd ../
+  export MyDB="$(pwd)/Tools/VMDB"
+  printf "path exported  ->  $MyDB \n\n"
   
   
-  ./CreateDB.py -s sequence.fasta -d 10 -kn off
-  
-  
-  cd ..
-  
-  
-  #sudo docker run -t -i -v /home/manager/Templates:/drVM 990210oliver/drvm /bin/bash
-  #docker run [options] 990210oliver/drvm /bin/bash
   
 fi
 
@@ -877,20 +883,41 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
 fi
 
 
-#EnsembleAssembler - mid installation
+#EnsembleAssembler
 if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
   then
   printf "Installing EnsembleAssembler \n\n"
-  eval "$(conda shell.bash hook)"
-  conda create -n ensembleAssembler python=2.7 
-  conda activate ensembleAssembler
+  sudo apt install python2
+  sudo apt install gawk
+  sudo apt-get install dos2unix
+  
+  rm -rf ensembleAssembly  
+  rm -rf ensembleAssembly_1
   wget -O ensembleAssembly "https://sourceforge.net/projects/ensembleassembly/files/latest/download"
   tar -zxvf ensembleAssembly
-
   chmod a+x ensembleAssembly_1/* -R
-
-  conda activate base
   
+  cd ensembleAssembly_1
+  dos2unix ensembleAssembly
+  printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please comment the line below.\n\n"
+  file_content=$(awk 'NR > 1' ensembleAssembly)
+  py_path="#!/usr/bin/python2"
+  echo "$py_path
+$file_content" > ensembleAssembly
+  
+  cd ..
+
+
+  #for file in `cd ensembleAssembly_1;ls -1 ${file}` #for each fasta file in curr dir
+  #do 
+  #  dos2unix $file
+  #done
+  #cd ensembleAssembly_1
+  #printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please comment the line below.\n\n"
+  #gawk -i inplace '$0=="/usr/bin/env: python" {$0="#!/usr/bin/python2"} 1' *
+  #cd ..
+
+
   
   
 fi
@@ -918,7 +945,8 @@ if [[ "$RUN_TENSQR" -eq "1" ]]
   cd ..  
 fi
 
-#Arapan-S - error on qt dependency
+#Arapan-S - error on qt v4 dependency
+#https://download.qt.io/archive/qt/INSTALL
 if [[ "$RUN_ARAPANS" -eq "1" ]] 
   then
   printf "Installing Arapan-S\n\n"
@@ -928,9 +956,14 @@ if [[ "$RUN_ARAPANS" -eq "1" ]]
   mv "Arapan 2.1.0" "Arapan"
   rm -rf Arapan-S
   chmod +x Arapan  
-  wget -O qt.run https://download.qt.io/archive/qt/5.0/5.0.0/qt-linux-opensource-5.0.0-x86_64-offline.run
-  chmod +x qt.run
-  ./qt.run  
+  
+  wget -O qt.zip https://download.qt.io/archive/qt/4.7/qt-everywhere-opensource-src-4.7.4.zip
+  unzip -a qt.zip
+  cd qt-everywhere-opensource-src-4.7.4/
+  printf "In tests, pressed o and then accepted the terms."
+  make #err
+  su -c "make install" #err
+
 fi
 
 #ViQUF- fatal error: sdsl/suffix_arrays.hpp: No such file or directory
@@ -938,16 +971,70 @@ if [[ "$RUN_VIQUF" -eq "1" ]]
   then
   printf "Installing ViQUF\n\n"
   eval "$(conda shell.bash hook)"
-  conda create -n viquf-env python=3.6 
-  conda activate viquf
-  conda install -y biopython altair gurobi matplotlib scipy numpy
-  git clone https://github.com/borjaf696/ViQUF.git
-  cd ViQUF
-  make
-  cd ..
+  #conda create -n viquf-env python=3.6 
+  #conda activate viquf
+  #conda install -y biopython altair gurobi matplotlib scipy numpy
+  #git clone https://github.com/borjaf696/ViQUF.git
+  #cd ViQUF
+  #sudo docker rm ViQUF
+  #mv ViQUF viquf
+  #sudo docker build -f viquf/Dockerfile .
+  #sudo docker run -d viquf
+  #make clean && make
+  #cd ..
   
     
-  conda activate base
+  #conda activate base
+  
+  start_dir=$(pwd)
+  
+  #dockerfile contents
+  sudo apt update && apt install -y python3 cmake pip software-properties-common wget nano curl build-essential procps file git && apt-get clean
+  sudo pip install install numpy sklearn scipy biopython pandas matplotlib plotly altair gurobipy
+
+# GH
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0 \
+    && apt-add-repository https://cli.github.com/packages \
+    && apt update \
+    && apt install gh
+
+# ENV FOLDER_PROJECT /var/borjafreire1
+# RUN mkdir -p $FOLDER_PROJECT
+# run cd $FOLDER_PROJECT
+# COPY install_gh.sh $FOLDER_PROJECT
+# run ./$FOLDER_PROJECT/install_gh.sh
+
+# Repositories: ViQUF, Gatb
+cd $start_dir
+ git clone https://github.com/borjaf696/ViQUF
+ cd ViQUF \
+    && cd lib/ \
+    && sudo rm -r gatb-core/  
+    git clone https://github.com/GATB/gatb-core \
+    && cd gatb-core/gatb-core \
+    && mkdir build ; cd build ; cmake .. ; make -j8 
+cd $start_dir
+# Lemon
+ cd usr/local/ \
+    && wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz \
+    && tar xvf lemon-1.3.1.tar.gz \
+    && cd lemon-1.3.1 \
+    && cd build \
+    && sudo cmake .. \
+    && make install
+cd $start_dir
+# SDSL
+ git clone https://github.com/simongog/sdsl-lite.git \
+    && cd sdsl-lite \
+    && ./install.sh
+cd $start_dir
+# Make ViqUF
+cd ViQUF\
+    && make clean && make
+cd $start_dir
+pip3 install pandas
+pip install altair
+pip install progressbar
     
 fi
 

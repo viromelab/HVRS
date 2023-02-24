@@ -12,8 +12,8 @@ RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=1;
-RUN_ASPIRE=1;
+RUN_TRACESPIPE=0;
+RUN_ASPIRE=0;
 RUN_QVG=0;
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
@@ -36,7 +36,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=0;
+RUN_ENSEMBLEASSEMBLER=1;
 RUN_HAPLOFLOW=0;
 RUN_TENSQR=0;
 RUN_ARAPANS=0; #Not available
@@ -44,8 +44,8 @@ RUN_VIQUF=0;
 
 declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS1" "DS2" "DS3");
-#declare -a VIRUSES=( "VZV" );
-declare -a VIRUSES=("B19" "HPV" "VZV");
+declare -a VIRUSES=( "VZV" );
+#declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #create bam files from sam files
 create_bam_files () { 
@@ -68,7 +68,6 @@ create_fa_from_sam_files () {
     cd ..
   done
 }
-
 
 #shorah
 #if [[ "$RUN_SHORAH" -eq "1" ]] 
@@ -368,7 +367,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   conda activate base  
 fi
 
-#ASPIRE - Can't locate App/Cmd/Setup.pm
+#ASPIRE - Can't locate App/Cmd/Setup.pm, tried installing one of the missing dependencies (Sub::Exporter), was not sucessfull, tried installing one of the missing dependencies for it (Test::LeakTrace) and it failed installation.
 if [[ "$RUN_ASPIRE" -eq "1" ]] 
   then
   printf "Reconstructing with ASPIRE\n\n"
@@ -484,26 +483,34 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   
 fi
 
-#HAPHPIPE - error mid code 
+#HAPHPIPE - pipeline fails on stage ec_reads
 if [[ "$RUN_HAPHPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with HAPHPIPE\n\n"
   eval "$(conda shell.bash hook)"
   conda activate haphpipe
+  
   rm -rf haphpipe_data
   mkdir haphpipe_data
   cd haphpipe_data
    
   for dataset in "${DATASETS[@]}"
     do
-    #haphpipe -h    
-    cp ../${dataset}_*.fq .
     
-    rm -rf denovo_assembly_${dataset}
-    mkdir denovo_assembly_${dataset}
+    for virus in "${VIRUSES[@]}"
+    do   
+      cp ../${dataset}_*.fq .
+      cp ../$virus.fa .
+      echo "" > empty.gtf
     
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haphpipe assemble_denovo --fq1 ${dataset}_1.fq --fq2 ${dataset}_2.fq --outdir denovo_assembly_${dataset} #--no_error_correction TRUE
-  done
+      rm -rf denovo_assembly_${dataset}_$virus
+      mkdir denovo_assembly_${dataset}_$virus
+    
+      #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haphpipe assemble_denovo --fq1 ${dataset}_1.fq --fq2 ${dataset}_2.fq --outdir denovo_assembly_${dataset} --meta #--no_error_correction TRUE
+      #haphpipe_assemble_01 ${dataset}_1.fq ${dataset}_1.fq $virus.fa empty.gtf $virus.fa denovo_assembly_${dataset}_$virus
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haphpipe_assemble_02 ${dataset}_1.fq ${dataset}_2.fq $virus.fa $virus #denovo_assembly_${dataset}_$virus
+      done
+    done
   cd ..
   conda activate base 
 fi
@@ -527,9 +534,9 @@ filname of the aligned reads (sam format) : ${dataset}_.sam
 paired-end (1 = true, 0 = false) : 1
 SNV_thres : 0.01
 reconstruction_start : 1
-reconstruction_stop: 1300
+reconstruction_stop: 10000
 min_mapping_qual : 60
-min_read_length : 150
+min_read_length : 10
 max_insert_length : 250
 characteristic zone name : test
 seq_err (assumed sequencing error rate(%)) : 0.1
@@ -617,7 +624,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   
 fi
 
-#ViQuaS - Error in substr(lines, 1L, 1L) : invalid multibyte string at '<b8>'
+#ViQuaS - err - [0] smalt.c:1116 ERROR: could not open file cut: alnc.sam: No such file or directory, may be caused by lack of Bio::Seq module, which couldn't be installed
 if [[ "$RUN_VIQUAS" -eq "1" ]] 
   then
   printf "Reconstructing with ViQuaS\n\n"
@@ -626,9 +633,18 @@ if [[ "$RUN_VIQUAS" -eq "1" ]]
   conda activate viquas
   cd ViQuaS1.3  
   for dataset in "${DATASETS[@]}"
-    do    
-    cp ../${dataset}.bam .    
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" Rscript ViQuaS.R ${dataset}.bam #<o> <r> <perform richness (1/0)> <diversityRegionLength>
+    do 
+        
+    for virus in "${VIRUSES[@]}"
+    do       
+      cp ../${dataset}.bam .  
+      cp ../${virus}.fa .
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" Rscript ViQuaS.R ${virus}.fa $dataset.bam 1 1 1 20 
+      
+      #example
+      #Rscript ViQuaS.R reference.fsa sample_reads.bam
+    
+    done
   done
   conda activate base  
   cd ..  
@@ -896,36 +912,41 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
   
 fi
 
-#TAR-VIR - .fa file error probably, segmentation fault, working with test example
+#TAR-VIR - no errors but no seed reads, example runs and detects seed reads
+#likely an error in the sam file format
 if [[ "$RUN_TARVIR" -eq "1" ]] 
   then
   printf "Reconstructing with TAR-VIR\n\n"
   eval "$(conda shell.bash hook)"
   conda activate bio2
-  #cd TAR-VIR
-  #./build -f ../DS1.fa -o prefix
   
   #timer
   #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
   
   cd TAR-VIR/
-  rm -rf data
-  mkdir data
-  cd Overlap_extension/
+  for dataset in "${DATASETS[@]}"
+    do
+    rm -rf data
+    mkdir data
+    cd Overlap_extension/
   
-  cp ../../DS1.fa ../data
-  cp ../../DS1_.sam ../data
-  ./build -f ../data/DS1.fa -o virus
-  ./overlap -S ../data/DS1_.sam -x virus -f ../data/DS1.fa -c 180 -o virus_recruit.fa
-  
-  
+    cp ../../gen_${dataset}.fasta ../data
+    cp ../../${dataset}_.sam ../data
+    
+    #example
+    #./build -f test_data/virus.fa -o virus   
+    #./overlap -S test_data/HIV.sam -x virus -f test_data/virus.fa -c 180 -o virus_recruit.fa 
+    
+    ./build -f ../data/gen_${dataset}.fasta -o virus
+    ./overlap -S data/${dataset}_.sam -x virus -f ../data/gen_${dataset}.fasta -c 180 -o virus_recruit.fa
+  done 
   
   cd ../../
   conda activate base
   
 fi
 
-#VIP - DS1.fa.preprocessed.fastq missing
+#VIP - missing DBI module, can´t install it
 if [[ "$RUN_VIP" -eq "1" ]] 
   then
   printf "Reconstructing with VIP\n\n"
@@ -937,24 +958,39 @@ if [[ "$RUN_VIP" -eq "1" ]]
   
   cd VIP-master
   chmod +x ./VIP.sh
-  cp ../DS1_1.fq .
-  cp ../DS1.fa .
-  cp ../VZV.fa .
-  ./VIP.sh -z -i DS1.fa -p illumina -f fasta -r VZV.fa
-  ./VIP.sh -c DS1.fa.conf -i DS1.fa
+  
+  for dataset in "${DATASETS[@]}"
+    do
+    
+    for virus in "${VIRUSES[@]}"
+    do
+      rm -rf reconstruction
+      mkdir reconstruction
+      cd reconstruction
+      rm -rf ${dataset}.fa.report
+      cp ../../${dataset}_*.fq .
+      cp ../../gen_${dataset}.fasta .
+      cp ../../${virus}.fa .
+      .././VIP.sh -z -i gen_${dataset}.fasta -p illumina -f fasta -r ${virus}.fa
+      .././VIP.sh -c gen_DS1.fasta.conf -i gen_DS1.fasta
+      cd ..
+      
+      done
+    done
   cd ..
   conda activate base
 fi
 
-#drVM - ./drVM.py: /usr/bin/python: bad interpreter: No such file or directory
+#drVM - err - Please check your snap DB location
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Reconstructing with drVM\n\n"
-  #printf "If this script is not working and giving you the error /usr/bin/python: bad interpreter: No such file or directory, please, go to each .py file at $(pwd)/tools/ and change the first line of each file to #!/usr/bin/python2\n\n"
+
   cd Tools 
   for dataset in "${DATASETS[@]}"
     do
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ../DS1_1.fq -2 ../DS1_2.fq
+    cp ../${dataset}_*.fq .
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ${dataset}_1.fq -2 ${dataset}_2.fq
   done
   cd ..
 fi
@@ -1006,23 +1042,40 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   conda activate base
 fi
 
-#EnsembleAssembler - err /usr/bin/env: ‘python\r’: No such file or directory
+#EnsembleAssembler - no errors, doesn't output results
 if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
   then
   printf "Reconstructing with EnsembleAssembler \n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate ensembleAssembler
+  #eval "$(conda shell.bash hook)"
+  #conda activate ensembleAssembler
+  cd ensembleAssembly_1
+
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf ${dataset}_ea
-    mkdir ${dataset}_ea
-    cd ${dataset}_ea
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../ensembleAssembly_1/ensembleAssembly ./config.txt
+    rm -rf reconstruction
+    mkdir reconstruction
+    cd reconstruction    
+    cp ../../${dataset}_*.fq
+    echo "PE=260 30 $(pwd)/${dataset}_1.fq $(pwd)/${dataset}_2.fq
+#SE=$(pwd)/${dataset}_2.fq
+NUM_THREADS= 3
+SOAP_KMER=31
+ABYSS_KMER = 31
+METAVELVET_KMER=31
+CON_LEN_DBG=50
+CON_LEN_OLC=50
+ASSEMBLY_MODE=optimal
+#ASSEMBLY_MODE=quick " > config.txt
+    .././ensembleAssembly config.txt
+    
+    cd ..
+    
     #chmod +x ./ensemble.sh
     #./ensemble.sh
     
   done
-  conda activate base 
+  cd ..
+  #conda activate base 
   
 fi
 
@@ -1044,7 +1097,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   conda activate base 
 fi
 
-#TenSQR - FileNotFoundError: sample_SNV_matrix.txt not found.
+#TenSQR - FileNotFoundError: no data contained in sample_SNV_matrix.txt
 if [[ "$RUN_TENSQR" -eq "1" ]] 
   then
   printf "Reconstructing with TenSQR\n\n"
@@ -1052,47 +1105,58 @@ if [[ "$RUN_TENSQR" -eq "1" ]]
   rm -rf reconstruction_data
   for dataset in "${DATASETS[@]}"
     do
+    
+    for virus in "${VIRUSES[@]}"
+    do
+    
     cp ../${dataset}_.sam .
-    cp ../B19.fa .
-    echo "filename of reference sequence (FASTA) : B19.fa
+    cp ../$virus.fa .
+    echo "filename of reference sequence (FASTA) : "$virus.fa"
 filname of the aligned reads (sam format) : "${dataset}_.sam"
-SNV_thres : 0.01
+SNV_thres : 0.0001
 reconstruction_start : 500
 reconstruction_stop: 1200
 min_mapping_qual : 40
-min_read_length : 100
+min_read_length : 50
 max_insert_length : 500
-characteristic zone name : sample
+characteristic zone name : zone
 seq_err (assumed sequencing error rate(%)) : 0.2
 MEC improvement threshold : 0.0312
 initial population size : 5" >> config_${dataset}
-    ExtractMatrix config_${dataset}
+    ./ExtractMatrix config_${dataset}
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python3 TenSQR.py config_${dataset}  
-    
+    done
   done  
   cd ..
   
 fi
 
-#ViQUF - err on installation
+#ViQUF - UnboundLocalError: local variable 'extension' referenced before assignment
 if [[ "$RUN_VIQUF" -eq "1" ]] 
   then
   printf "Reconstructing with ViQUF\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate viquf
+  #eval "$(conda shell.bash hook)"
+  #conda activate viquf
   
-  #timer
-  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
   
-  cd ViQUF
+  cd viquf
   
-  #for dataset in "${DATASETS[@]}"
-  #  do
+  
+  for dataset in "${DATASETS[@]}"
+    do
+    rm -rf $dataset
+    mkdir $dataset
+    cd $dataset     
+    cp ../../${dataset}_*.fq .    
+    cd ..
     
-  #done
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python scripts/testBcalm.py $dataset 4 10 ngs --no-correct --no-join --no-meta
+    ./bin/output.out tmp 4 tmp/unitigs.graph tmp/unitigs.unitigs.fa tmp/unitigs-viadbg.fa tmp/Ownlatest/append.fasta --virus
+    python scripts/post-process.py 
+  done
   
   cd ..
-  conda activate base  
+  #conda activate base  
 fi
 
 
