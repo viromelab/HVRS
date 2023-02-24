@@ -3,9 +3,9 @@
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
+PYTHON2_PATH="#!/usr/bin/python2";
 INSTALL_TOOLS=0;
 INSTALL_OTHERS=0;
-INSTALL_SAMTOOLS=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
@@ -21,7 +21,7 @@ RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0;
-RUN_VPIPE=0;
+RUN_VPIPE=1;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
@@ -42,7 +42,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=1;
+RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 RUN_TENSQR=0;
 RUN_ARAPANS=0;
@@ -71,6 +71,15 @@ install_docker() {
   sudo sh get-docker.sh
 }
 
+install_mamba() {
+  wget -O mamba.sh https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+  chmod +x mamba.sh
+  ./mamba.sh
+  rm -rf mamba.sh
+  
+  printf "Please restart the terminal. Thank you."
+}
+
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
@@ -92,14 +101,19 @@ if [[ "$INSTALL_OTHERS" -eq "1" ]]
   sudo apt-get install g++
   printf "Installing Samtools\n\n"
   install_samtools
-  printf "Installing make"
+  printf "Installing make\n\n"
   sudo apt install make
-  printf "Installing Java"
+  printf "Installing Java\n\n"
   sudo apt install default-jre  
-  printf "Installing Docker"
+  printf "Installing Docker\n\n"
   install_docker
-  printf "Installing Samtools"
-  install_samtools 
+  printf "Installing mamba\n\n"
+  install_mamba
+  printf "Create evaluation env"
+  conda create -n evaluation  
+  conda activate evaluation
+  conda install -c bioconda -y quast
+  conda activate base
 fi
 
 #
@@ -143,6 +157,8 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   then
   printf "Installing QSdpr\n\n"
   eval "$(conda shell.bash hook)"
+  sudo apt-get update
+  sudo apt-get install libatlas-base-dev
   conda create --name qsdpr
   conda activate qsdpr
   conda install -c anaconda -y python=2.7 pysam numpy clapack scipy #samtools atlas lapack
@@ -151,6 +167,8 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   rm -rf qsdpr
   conda activate base
   install_samtools
+  CXXFLAGS=-I/usr/include/x86_64-linux-gnu
+  CFLAGS=-I/usr/include/x86_64-linux-gnu
 fi
 
 
@@ -395,7 +413,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   #conda activate base
 fi
 
-#V-pipe - try again
+#V-pipe
 if [[ "$RUN_VPIPE" -eq "1" ]] 
   then
   printf "Installing V-pipe\n\n"
@@ -403,12 +421,34 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   #chmod +x ./quick_install.sh
   #./quick_install.sh -w work
   eval "$(conda shell.bash hook)"  
-  conda create --yes -n vpipe -c conda-forge -c bioconda -y mamba 
-  conda activate vpipe
-  conda install -c bioconda -y snakemake
-  wget "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.tar.gz"
-  tar xvzf v2.99.3.tar.gz
+  #conda create --yes -n vpipe -c conda-forge -c bioconda -y mamba 
+  #conda activate vpipe
+  #conda install -c bioconda -y snakemake
+  #wget "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.tar.gz"
+  #tar xvzf v2.99.3.tar.gz
+  #conda activate base
+  
+  #sudo docker pull ghcr.io/cbg-ethz/v-pipe:master
+  
+  
+  
+  
+  #tmp comment
+  #install_mamba
+  
+  
+  conda create --name snakemake
+  conda activate snakemake
+  conda install -c free -y python=3.4
+  conda install -c bioconda -c conda-forge -y snakemake 
+  conda install -c "conda-forge/label/cf202003" -y python
+  conda install -c bioconda -c conda-forge -y snakedeploy
+
+  snakedeploy deploy-workflow https://github.com/cbg-ethz/V-pipe --tag master .
   conda activate base
+  # edit config/config.yaml and provide samples/ directory
+  #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
+  
 fi
 
 #Strainline - seg. fault; reads.las not present

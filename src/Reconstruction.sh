@@ -4,7 +4,7 @@
 RUN_QURE=0;
 RUN_SAVAGE=0;
 RUN_QSDPR=0;
-RUN_SPADES=0;
+RUN_SPADES=1;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0;
@@ -36,7 +36,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=1;
+RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 RUN_TENSQR=0;
 RUN_ARAPANS=0; #Not available
@@ -93,12 +93,10 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     cp ${dataset}_1.fq spades_${dataset}
     cp ${dataset}_2.fq spades_${dataset}
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq #\
-    #|& grep "TIME" \
-    #|& tr '.' ',' \
-    #|& awk '{ printf $2/60"\t"$4/1024/1024"\n"}' > stats_spades_${dataset}.txt;
-    #cat stats_spades_${dataset}.txt
- 
-    mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fasta
+    
+    #echo $time
+    #mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fasta
+    mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fasta
     cp spades_${dataset}/spades-${dataset}.fasta reconstructed/$dataset
   done
   conda activate base
@@ -198,7 +196,7 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   conda activate base
 fi
 
-#qsdpr - err - missing clapack.h
+#qsdpr - runs ..
 #possible errors - missing vcf file?, error on samtools configuration
 if [[ "$RUN_QSDPR" -eq "1" ]] 
   then
@@ -218,9 +216,11 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data/${dataset}
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
-    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../QSdpR_source/QSdpR_master.sh #2 8 ../QSdpR_source ${dataset} sample 1 1000 $miniconda/pkgs/samtools-1.16.1-h6899075_1/bin
-    ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
-    #cd ..
+
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
+    mv sample_10_recon.fasta qsdpr_$dataset.fa
+    cp qsdpr_$dataset.fa ../../reconstructed/$dataset
+    cd ..
   done
   cd ../
   conda activate base
@@ -418,21 +418,21 @@ fi
 if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate vpipe 
-  cd V-pipe-2.99.3
+  #eval "$(conda shell.bash hook)"
+  #conda activate vpipe 
+  #cd V-pipe-2.99.3
+  
+  rm -rf samples
+  mkdir samples
+  cd samples
+    
   for dataset in "${DATASETS[@]}"
     do  
-    cd config
+    
     echo "general:
   virus_base_config: hiv
 
-input:
-  datadir: samples
-  samples_file: config/samples.tsv
-
 output:
-  datadir: results
   snv: true
   local: true
   global: false
@@ -440,10 +440,12 @@ output:
   QA: true" >> config.yaml 
     cd ..
     # edit config.yaml and provide samples/ directory
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./vpipe --cores 1
+    sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./vpipe --cores 1
    
   done
-  conda activate base
+  #conda activate base
+  cd ..
 fi
 
 #Strainline - missing reads*.las, example fails execution as well
