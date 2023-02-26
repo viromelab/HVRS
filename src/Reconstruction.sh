@@ -51,9 +51,9 @@ declare -a VIRUSES=( "VZV" );
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
   then  
-  rm -rf reconstruction
-  mkdir reconstruction
-  cd reconstruction
+  rm -rf reconstructed
+  mkdir reconstructed
+  cd reconstructed
   for dataset in "${DATASETS[@]}"
   do
     mkdir $dataset  
@@ -233,6 +233,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     cd ..
   done
   cd ../
+  python --version
   conda activate base
 fi
 
@@ -843,7 +844,7 @@ if [[ "$RUN_PRICE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_*.fq .    
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fp ${dataset}_1.fq ${dataset}_2.fq 150 -nc 1 -o result_${dataset}.fasta
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -a 8 -fp ${dataset}_1.fq ${dataset}_2.fq 150 -nc 1 -o result_${dataset}.fasta
     done
   cd ..  
 fi

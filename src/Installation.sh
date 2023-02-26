@@ -8,11 +8,11 @@ CONDA_PREFIX=/home/lx/miniconda3;
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
 INSTALL_TOOLS=0;
-INSTALL_MINICONDA=0;
+INSTALL_MINICONDA=1;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=1;
+RUN_QSDPR=0;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
@@ -107,6 +107,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt install default-jre  
   printf "Installing Docker\n\n"
   install_docker
+  
+  sudo apt install curl
   #printf "Installing mamba\n\n"
   #install_mamba   
 fi
@@ -132,7 +134,7 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   eval "$(conda shell.bash hook)"
   conda create -y -n spades
   conda activate spades
-  conda install -c bioconda -y spades
+  conda install -c bioconda -y spades python=3.8
   conda activate base
 fi
 
