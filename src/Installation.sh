@@ -1,15 +1,18 @@
 #!/bin/bash
 #
 #
-# INSTALL SIMULATION AND EVALUATION TOOLS:
 #
 PYTHON2_PATH="#!/usr/bin/python2";
+CONDA_PREFIX=/home/lx/miniconda3;
+#
+# INSTALL SIMULATION AND EVALUATION TOOLS:
+#
 INSTALL_TOOLS=0;
-INSTALL_OTHERS=0;
+INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=0;
+RUN_QSDPR=1;
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
@@ -21,14 +24,14 @@ RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0;
-RUN_VPIPE=1;
+RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0;
+RUN_LAZYPIPE=0; #
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
@@ -71,30 +74,27 @@ install_docker() {
   sudo sh get-docker.sh
 }
 
-install_mamba() {
-  wget -O mamba.sh https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
-  chmod +x mamba.sh
-  ./mamba.sh
-  rm -rf mamba.sh
-  
-  printf "Please restart the terminal. Thank you."
-}
+#install_mamba() {
+#  wget -O mamba.sh https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+#  chmod +x mamba.sh
+#  ./mamba.sh
+#  rm -rf mamba.sh 
+#  printf "Please restart the terminal. Thank you."
+#}
 
+if [[ "$INSTALL_MINICONDA" -eq "1" ]] 
+  then
+  printf "Installing Miniconda\n\n"
+  install_conda
+fi
 
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
   printf "Installing tools\n\n"
-  #sudo apt-get install libopenblas-base
   conda install -c cobilab -y gto
   conda install -c bioconda -y art
   conda install -c bioconda -y mummer4 
-  
-fi
-
-if [[ "$INSTALL_OTHERS" -eq "1" ]] 
-  then
-  printf "Installing Miniconda\n\n"
-  install_conda
+  #conda install -c bioconda -y quast
   printf "Installing git\n\n"
   sudo apt install git
   printf "Installing G++\n\n"
@@ -107,13 +107,8 @@ if [[ "$INSTALL_OTHERS" -eq "1" ]]
   sudo apt install default-jre  
   printf "Installing Docker\n\n"
   install_docker
-  printf "Installing mamba\n\n"
-  install_mamba
-  printf "Create evaluation env"
-  conda create -n evaluation  
-  conda activate evaluation
-  conda install -c bioconda -y quast
-  conda activate base
+  #printf "Installing mamba\n\n"
+  #install_mamba   
 fi
 
 #
@@ -135,7 +130,7 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   #tar -xzf SPAdes-3.15.5-Linux.tar.gz
   #rm -rf SPAdes-3.15.5-Linux.tar.gz
   eval "$(conda shell.bash hook)"
-  conda create -n spades
+  conda create -y -n spades
   conda activate spades
   conda install -c bioconda -y spades
   conda activate base
@@ -146,7 +141,7 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   then
   printf "Installing SAVAGE\n\n"
   eval "$(conda shell.bash hook)"
-  conda create -n savage
+  conda create -y -n savage
   conda activate savage
   conda install -c bioconda -c conda-forge -y boost savage
   conda activate base
@@ -159,7 +154,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   sudo apt-get update
   sudo apt-get install libatlas-base-dev
-  conda create --name qsdpr
+  conda create -y -n qsdpr
   conda activate qsdpr
   conda install -c anaconda -y python=2.7 pysam numpy clapack scipy #samtools atlas lapack
   wget -O qsdpr "https://sourceforge.net/projects/qsdpr/files/QSdpR_v3.2.tar.gz/download"
@@ -194,7 +189,7 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   chmod +x vg
   cp vg jbaaijens-virus-vg-69a05f3e74f2
   eval "$(conda shell.bash hook)"
-  conda create -n virus-vg-deps 
+  conda create -y -n virus-vg-deps 
   conda activate virus-vg-deps 
   conda install --file jbaaijens-virus-vg-69a05f3e74f2/conda_list_explicit.txt
   conda install -c bioconda -y rust-overlaps 
@@ -209,7 +204,7 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   then
   printf "Installing VG-Flow\n\n"
   eval "$(conda shell.bash hook)"
-  conda create -n vg-flow-env
+  conda create -y -n vg-flow-env
   conda activate vg-flow-env
   conda install -c bioconda -c conda-forge -c gurobi -y python=3 graph-tool minimap2 gurobi biopython numpy rust-overlaps 
   conda install -c conda-forge -y graph-tool biopython
@@ -253,7 +248,7 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   #cd ../../../  
   
   eval "$(conda shell.bash hook)"  
-  conda create -n viadbg
+  conda create -y -n viadbg
   conda activate viadbg
   conda install -c "conda-forge/label/gcc7" -y boost
   conda install -c bioconda -y sga
@@ -328,7 +323,7 @@ if [[ "$RUN_PREDICTHAPLO" -eq "1" ]]
   then
   printf "Installing PredictHaplo\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -n predicthaplo
+  conda create -y -n predicthaplo
   conda activate predicthaplo
   conda install -c bioconda -y predicthaplo
   conda activate base 
@@ -339,7 +334,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   then
   printf "Installing TRACESPipeLite\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -n tracespipelite
+  conda create -y -n tracespipelite
   conda activate tracespipelite
   git clone https://github.com/viromelab/TRACESPipeLite.git
   cd TRACESPipeLite/src/
@@ -354,7 +349,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   then
   printf "Installing TRACESPipe\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -n tracespipe
+  conda create -y -n tracespipe
   conda activate tracespipe
   rm -rf tracespipe
   git clone https://github.com/viromelab/tracespipe.git
@@ -407,7 +402,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/
-  conda create --name qvg-env --file qvg-env.yaml 
+  conda create -y --name qvg-env --file qvg-env.yaml 
   
   
   #conda activate base
@@ -437,11 +432,11 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   #install_mamba
   
   
-  conda create --name snakemake
+  conda create -y --name snakemake
   conda activate snakemake
-  conda install -c free -y python=3.4
+  #conda install -c free -y python=3.4
   conda install -c bioconda -c conda-forge -y snakemake 
-  conda install -c "conda-forge/label/cf202003" -y python
+  #conda install -c "conda-forge/label/cf202003" -y python
   conda install -c bioconda -c conda-forge -y snakedeploy
 
   snakedeploy deploy-workflow https://github.com/cbg-ethz/V-pipe --tag master .
@@ -456,7 +451,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   then
   printf "Installing Strainline\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -n strainline
+  conda create -y -n strainline
   conda activate strainline
   conda install -c bioconda -y minimap2 spoa samtools dazz_db daligner metabat2 bbmap python
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
@@ -476,7 +471,7 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   then
   printf "Installing HAPHPIPE\n\n"
   eval "$(conda shell.bash hook)"
-  conda create -n haphpipe
+  conda create -y -n haphpipe
   conda activate haphpipe
   conda install -c bioconda -y gatk 
   conda install -y haphpipe
@@ -511,7 +506,7 @@ if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]]
   printf "Installing HaploClique\n\n"
   rm -rf haploclique
   eval "$(conda shell.bash hook)"
-  conda create -n haploclique
+  conda create -y -n haploclique
   conda activate haploclique
   #conda install -c bioconda -y 
   #conda install -
@@ -528,7 +523,7 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   unzip vispa02.zip 
   rm -rf vispa02.zip
   eval "$(conda shell.bash hook)"
-  conda create --name vispa python=2.7 
+  conda create -y --name vispa python=2.7 
   conda activate vispa
   conda install -c bioconda -c conda-forge -y numexpr pysam numpy biopython mosaik
   conda activate base
@@ -539,7 +534,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   then
   printf "Installing QuasiRecomb\n\n"
   eval "$(conda shell.bash hook)"
-  conda create --name quasirecomb
+  conda create -y --name quasirecomb
   conda activate quasirecomb
   conda install -c bioconda -y samtools
   
@@ -555,37 +550,45 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - not complete, err ln 450, no ~/bin/runsanspanz.py file
+#Lazypipe - issues installing perl dependencies
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
-  printf "Installing Lazypipe\n\n"
-  
-  #rm -rf lazypipe  
-  #git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
-  #cd lazypipe
-  
+  printf "Installing Lazypipe\n\n"  
   eval "$(conda shell.bash hook)"  
-  conda create -n blast -c bioconda -y blast 
-  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  rm -rf lazypipe  
+  git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
+  cd lazypipe
+  
+  #conda create -y -n blast
+  #conda activate blast
+  #conda install -c bioconda -y blast 
+ 
+  #conda create -y -n lazypipe
+  #conda activate lazypipe
+  #conda install -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  
   conda activate blast
-  conda activate --stack lazypipe
+  conda activate --stack lazypipe 
   
-  printf "Please insert the path to miniconda installation. Example: /home/USER/miniconda3\n\n" 
-  read CONDA_PREFIX
+  rm -rf $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy ln -s $data/taxonomy $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
+  export TM=$CONDA_PREFIX/share/trimmomatic 
   
-  rm -rf $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy 
-  ln -s $data/taxonomy $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy 
   
-  export TM=$CONDA_PREFIX/share/trimmomatic #not exporting, I think
-   
-  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz 
-  tar -zxvf SANSPANZ.3.tar.gz 
-  sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py 
-  prev_pwd=$pwd;
-  cd home/lx/bin
-  echo "" >> runsanspanz.py
-  cd $prev_pwd
-  ln -sf $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py 
+  
+  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz tar -zxvf SANSPANZ.3.tar.gz sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py ln -sf $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
+  
+  cpan --local-lib=~/perl5 File::Basename File::Temp Getopt::Long YAML::Tiny
+export PERL5LIB=~/perl5/lib/perl5:$PERL5LIB
+  
+  Rscript -e 'install.packages( c("reshape","openxlsx") , repos="https://cloud.r-project.org")' 
+  
+  cpan YAML::Tiny
+  sudo perl perl/install_db.pl --db taxonomy
+  
+  perl perl/install_db.pl --db blastn_vi
+  
+  cd ..
+  
 fi
 
 #ViQuaS
@@ -593,7 +596,7 @@ if [[ "$RUN_VIQUAS" -eq "1" ]]
   then
   printf "Installing ViQuaS\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -n viquas
+  conda create -y -n viquas
   conda activate viquas
   conda install -c bioconda -y bioconductor-biostrings r-seqinr
   wget -O viquas "https://sourceforge.net/projects/viquas/files/latest/download"
@@ -613,7 +616,7 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   printf "Installing MLEHaplo\n\n"
   eval "$(conda shell.bash hook)"
   
-  conda create -n mlehaplo
+  conda create -y -n mlehaplo
   conda activate mlehaplo
   conda install -c bioconda -y gatb perl-bioperl perl-graph
   
@@ -653,7 +656,7 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
   sudo apt-get install libcurl4-openssl-dev libssl-dev
   
   
-  conda create -n regresshaplo
+  conda create -y -n regresshaplo
   conda activate regresshaplo
   #conda install -c r -c hcc -y r r-essentials r-regresshaplo 
   conda install -c hcc -y r-regresshaplo
@@ -816,7 +819,7 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   conda config --add channels bioconda
   conda config --add channels kennethshang
   eval "$(conda shell.bash hook)"  
-  conda create -n bio2 python=2.7    
+  conda create -y -n bio2 python=2.7    
   conda activate bio2                 
   pip install networkx==1.11           
   conda install -y bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
@@ -836,7 +839,7 @@ if [[ "$RUN_VIP" -eq "1" ]]
   printf "Installing VIP\n\n"
   eval "$(conda shell.bash hook)"
   
-  conda create -n vip
+  conda create -y -n vip
   conda activate vip
   conda install -c bioconda -y perl-dbi bowtie2
   rm -rf VIP-master
@@ -867,7 +870,16 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   rm -rf drvm
   cd Tools
   printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please comment the line below.\n\n"
-  gawk -i inplace '$0=="#!/usr/bin/python" {$0="#!/usr/bin/python2"} 1' *.py
+  for filename in $(ls *.py); #for each fasta file in curr dir
+  do   
+    printf "Processing file $filename \n\n\n"  
+    file_content=$(awk 'NR > 1' $filename)  
+    echo "$PYTHON2_PATH
+$file_content" > $filename      
+  done
+  
+  
+  #gawk -i inplace $0=="#!/usr/bin/python" {$0="${PYTHON2_PATH}"} 1 *.py
   rm -rf VMDB
   mkdir VMDB
   cd VMDB
@@ -905,7 +917,7 @@ if [[ "$RUN_VIRALFLYE" -eq "1" ]]
   rm -rf viralFlye
   git clone https://github.com/Dmitry-Antipov/viralFlye
   eval "$(conda shell.bash hook)"
-  conda create -n viralFlye
+  conda create -y -n viralFlye
   conda activate viralFlye
   conda install -c bioconda -c conda-forge -c mikeraiko -y "python>=3.6" prodigal viralverify vcflib seqtk minced minimap2 pysam tabix samtools freebayes bcftools numpy scipy blast bwa viralcomplete
   conda install -c conda-forge -y biopython
@@ -939,12 +951,10 @@ if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]]
   
   cd ensembleAssembly_1
   dos2unix ensembleAssembly
-  printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please comment the line below.\n\n"
-  file_content=$(awk 'NR > 1' ensembleAssembly)
-  py_path="#!/usr/bin/python2"
-  echo "$py_path
-$file_content" > ensembleAssembly
-  
+  printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please change PYTHON2_PATH at the beginning of this file to the location of python2 on your device.\n\n"
+  file_content=$(awk 'NR > 1' ensembleAssembly)  
+  echo "$PYTHON2_PATH
+$file_content" > ensembleAssembly  
   cd ..
 
 
@@ -968,7 +978,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   then
   printf "Installing Haploflow \n\n"
   eval "$(conda shell.bash hook)"
-  conda create -n haploflow 
+  conda create -y -n haploflow 
   conda activate haploflow  
   conda install -c bioconda -y haploflow
   conda activate base  

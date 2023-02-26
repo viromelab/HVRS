@@ -1,20 +1,21 @@
 #!/bin/bash
-
+#
+CREATE_RECONSTRUCTION_FOLDERS=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=0;
-RUN_SPADES=1;
+RUN_QSDPR=1; #-
+RUN_SPADES=0; #
 RUN_METAVIRALSPADES=0;
-RUN_CORONASPADES=0;
+RUN_CORONASPADES=0; #
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0;
+RUN_TRACESPIPELITE=0; #
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=0;
+RUN_QVG=0; #
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -22,30 +23,42 @@ RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0;
+RUN_LAZYPIPE=0; 
 RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
-RUN_CLIQUESNV=0;
+RUN_CLIQUESNV=0; #
 RUN_IVA=0;
 RUN_PRICE=0;
-RUN_VIRGENA=0;
+RUN_VIRGENA=0; #
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0;
+RUN_SSAKE=0; #
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 RUN_TENSQR=0;
-RUN_ARAPANS=0; #Not available
+RUN_ARAPANS=0;
 RUN_VIQUF=0;
 
-declare -a DATASETS=("DS1");
-#declare -a DATASETS=("DS1" "DS2" "DS3");
+#declare -a DATASETS=("DS1");
+declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a VIRUSES=( "VZV" );
 #declare -a VIRUSES=("B19" "HPV" "VZV");
+
+#Creates a folder for each dataset
+if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
+  then  
+  rm -rf reconstruction
+  mkdir reconstruction
+  cd reconstruction
+  for dataset in "${DATASETS[@]}"
+  do
+    mkdir $dataset  
+  done
+fi
 
 #create bam files from sam files
 create_bam_files () { 
@@ -92,12 +105,12 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     mkdir spades_${dataset}	
     cp ${dataset}_1.fq spades_${dataset}
     cp ${dataset}_2.fq spades_${dataset}
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq #\
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq #\
     
-    #echo $time
-    #mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fasta
-    mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fasta
-    cp spades_${dataset}/spades-${dataset}.fasta reconstructed/$dataset
+    mv spades-${dataset}-time.txt reconstructed/$dataset
+    mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fa
+    #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
+    cp spades_${dataset}/spades-${dataset}.fa reconstructed/$dataset
   done
   conda activate base
 fi
@@ -115,7 +128,7 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
     mkdir metaviralspades_${dataset}	
     cp ${dataset}_1.fq metaviralspades_${dataset}
     cp ${dataset}_2.fq metaviralspades_${dataset}
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
   done
   conda activate base
 fi
@@ -132,9 +145,10 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
     mkdir coronaspades_${dataset}	
     cp ${dataset}_1.fq coronaspades_${dataset}
     cp ${dataset}_2.fq coronaspades_${dataset}
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
-    mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fasta
-    cp coronaspades_${dataset}/coronaspades-${dataset}.fasta reconstructed/$dataset
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o coronaspades-${dataset}-time.txt coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
+    mv coronaspades-${dataset}-time.txt reconstructed/$dataset
+    mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fa
+    cp coronaspades_${dataset}/coronaspades-${dataset}.fa reconstructed/$dataset
   done
   conda activate base
 fi
@@ -196,18 +210,12 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   conda activate base
 fi
 
-#qsdpr - runs ..
-#possible errors - missing vcf file?, error on samtools configuration
+#qsdpr - working
 if [[ "$RUN_QSDPR" -eq "1" ]] 
   then
   printf "Reconstructing with QSdpr\n\n"
   eval "$(conda shell.bash hook)"
-  conda activate qsdpr  
-  #echo Please input the path to miniconda. Example: /home/user/miniconda3
-  #read miniconda
-  #miniconda="/home/lx/miniconda3"
-  #printf $miniconda"\n\n"
-  #chmod +x QSdpR_v3.2/QSdpR_source/*.sh
+  conda activate qsdpr
   cd QSdpR_v3.2/
   for dataset in "${DATASETS[@]}"
     do
@@ -217,7 +225,9 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
 
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
+    
+    mv qsdpr-${dataset}-time.txt ../../reconstructed/$dataset
     mv sample_10_recon.fasta qsdpr_$dataset.fa
     cp qsdpr_$dataset.fa ../../reconstructed/$dataset
     cd ..
@@ -326,7 +336,8 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   do	
     cp ../../${dataset}_*.fq .
     lzma -d VDB.mfa.lzma
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./TRACESPipeLite.sh --similarity 50 --threads 1 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads 1 --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
+    
     
     cd test_viral_analysis_${dataset}
     for virus in "${VIRUSES[@]}"
@@ -338,6 +349,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     done
     cd ..
     cat *-consensus.fa > tracespipelite-$dataset.fa
+    mv tracespipelite-${dataset}-time.txt ../../reconstructed/$dataset
     cp tracespipelite-$dataset.fa ../../reconstructed/$dataset
   done  
   cd ../../
@@ -401,50 +413,83 @@ if [[ "$RUN_QVG" -eq "1" ]]
       gzip -cvf ${dataset}_2.fq > ${dataset}_R2.fastq.gz
       cd ..
       cp ../${virus}.fa reconstruction_files
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes
       rm -rf ${dataset}_files/output/samples_multifasta_masked*
       cat ${dataset}_files/output/samples_multifasta_* > ${dataset}_files/output/qvg-${virus}-${dataset}.fasta      
       cp ${dataset}_files/output/qvg-${virus}-${dataset}.fasta .
     done
     cat *.fasta > qvg-${dataset}.fa
     rm -rf *.fasta
+    mv qvg-${dataset}-time.txt ../reconstructed/$dataset
     cp qvg-${dataset}.fa ../reconstructed/$dataset 
   done
   
   conda activate base 
 fi
 
-#V-pipe - working to some capacity, missing input files
+#V-pipe - Failed to open source file https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/workflow/rules/scripts/functions.sh
 if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
-  #eval "$(conda shell.bash hook)"
-  #conda activate vpipe 
+  eval "$(conda shell.bash hook)"
+  conda activate vpipe 
   #cd V-pipe-2.99.3
   
-  rm -rf samples
-  mkdir samples
-  cd samples
+  
     
   for dataset in "${DATASETS[@]}"
-    do  
+    do 
     
-    echo "general:
-  virus_base_config: hiv
+    for virus in "${VIRUSES[@]}"
+    do  
+    #cd config
+    rm -rf samples
+    mkdir samples
+    cd samples
+    
+    mkdir ${dataset}
+    cd ${dataset}
+    mkdir ${dataset}_2
+    cd ${dataset}_2 
+    mkdir raw_data
+    cd raw_data 
+    cp ../../../../${dataset}_*.fq .    
+    cd ../../../../
+    
+    rm -rf resources
+    mkdir resources
+    cd resources
+    mkdir $virus
+    cd $virus
+    cp ../../$virus.fa .
+    cd ../../
+    
+    
+    echo "input:
+  datadir: samples
+  samples_file: config/samples.tsv
+  reference: resources/$virus/$virus.fa
 
 output:
+  datadir: results
   snv: true
   local: true
   global: false
   visualization: true
-  QA: true" >> config.yaml 
-    cd ..
+  QA: true" > config/config.yaml 
+    
+    
+    
+    
+    snakemake --use-conda --jobs 4 --printshellcmds --dry-run
+    
     # edit config.yaml and provide samples/ directory
-    sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
+    #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
     #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./vpipe --cores 1
-   
+    
+   done
   done
-  #conda activate base
+  conda activate base
   cd ..
 fi
 
@@ -767,8 +812,9 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_.sam .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam -outDir $(pwd)
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o cliquesnv-${dataset}-time.txt java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam -outDir $(pwd)
     cp ${dataset}_.fasta cliquesnv-${dataset}.fa
+    mv cliquesnv-${dataset}-time.txt ../reconstructed/$dataset
     cp cliquesnv-${dataset}.fa ../reconstructed/${dataset}
     done
   cd ..  
@@ -900,12 +946,13 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
         <Debug>false</Debug>
     </Postprocessor>
 </config>" > $dataset-conf.xml
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-${dataset}-time.txt java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
     done
     cd res
     cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
     rm -rf *_complete_genome_assembly.fasta
+    mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
     cp virgena-$dataset.fa ../../reconstructed/$dataset 
     cd ..
     
@@ -1006,9 +1053,11 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../../${dataset}_*.fq .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o ssake-${dataset}-time.txt ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
+    
     mv ${dataset}_assembly_scaffolds.fa ssake-${dataset}.fa
     cp ssake-${dataset}.fa ../../reconstructed/${dataset}
+    mv ssake-${dataset}-time.txt ../../reconstructed/$dataset
   done
   cd ../../
 
