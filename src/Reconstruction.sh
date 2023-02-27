@@ -4,7 +4,7 @@ CREATE_RECONSTRUCTION_FOLDERS=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=1; #-
+RUN_QSDPR=0; #-
 RUN_SPADES=0; #
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0; #
@@ -28,7 +28,7 @@ RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
-RUN_CLIQUESNV=0; #
+RUN_CLIQUESNV=1; #
 RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0; #
@@ -225,7 +225,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
 
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
     
     mv qsdpr-${dataset}-time.txt ../../reconstructed/$dataset
     mv sample_10_recon.fasta qsdpr_$dataset.fa
@@ -343,10 +343,13 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     cd test_viral_analysis_${dataset}
     for virus in "${VIRUSES[@]}"
     do
-      printf "copying $virus\n\n"
-      cd $virus*   
-      cp *-consensus.fa ../../
-      cd .. 
+      if [ -d $virus* ] 
+      then
+        printf "copying $virus\n\n"
+        cd $virus*   
+        cp *-consensus.fa ../../
+        cd ..
+      fi 
     done
     cd ..
     cat *-consensus.fa > tracespipelite-$dataset.fa
