@@ -12,12 +12,12 @@ INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=1;
+RUN_QSDPR=0; #np
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
-RUN_VIADBG=0;
-RUN_VIRUSVG=0;
+RUN_VIADBG=0; #np
+RUN_VIRUSVG=1;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
@@ -93,7 +93,7 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   printf "Installing tools\n\n"
   conda install -c cobilab -y gto
   conda install -c bioconda -y art
-  conda install -c bioconda -y mummer4 
+  conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
   printf "Installing git\n\n"
   sudo apt install git
@@ -112,25 +112,15 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   #printf "Installing mamba\n\n"
   #install_mamba   
 fi
-
 #
 #
 # INSTALL ASSEMBLY TOOLS:
-
-#shorah
-#if [[ "$RUN_SHORAH" -eq "1" ]] 
-#  then
-#  printf "Installing Shorah\n\n"  
-#  conda install shorah
-#fi
-
+#
+#
 #spades, metaviralspades and coronaspades
 if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]]
   then
   printf "Installing SPAdes, metaviralSPAdes and coronaSPAdes\n\n"
-  #wget http://cab.spbu.ru/files/release3.15.5/SPAdes-3.15.5-Linux.tar.gz
-  #tar -xzf SPAdes-3.15.5-Linux.tar.gz
-  #rm -rf SPAdes-3.15.5-Linux.tar.gz
   eval "$(conda shell.bash hook)"
   conda create -y -n spades
   conda activate spades
@@ -194,8 +184,9 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   conda create -y -n virus-vg-deps 
   conda activate virus-vg-deps 
   conda install --file jbaaijens-virus-vg-69a05f3e74f2/conda_list_explicit.txt
-  conda install -c bioconda -y rust-overlaps 
+  conda install -c bioconda -y rust-overlaps minimap2
   conda install -c conda-forge -y graph-tool biopython
+  pip install gurobipy
   pip install tqdm
   conda activate base
   
@@ -219,7 +210,8 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   chmod +x vg
   cp vg jbaaijens-vg-flow-ac68093bbb23/
   conda activate base
-  sudo apt-get install minimap2
+  #tmp comment
+  #sudo apt-get install minimap2
 fi
 
 #viaDBG
@@ -346,7 +338,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   conda activate base
 fi
 
-#TRACESPipe - efetch error
+#TRACESPipe - working
 if [[ "$RUN_TRACESPIPE" -eq "1" ]] 
   then
   printf "Installing TRACESPipe\n\n"
@@ -358,9 +350,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   cd tracespipe/src/
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install
-  #sudo apt-get install -y efetch
-  #got Parser.c: loadable library and perl binaries are mismatched (got handshake key 0xdb00080, needed 0xed00080) while installing, had to reinstall perl and install efetch, still not working
-  ./TRACESPipe.sh --get-all-aux #error is caused by this line
+  ./TRACESPipe.sh --get-all-aux
   cd ../../  
   conda activate base
   
@@ -397,17 +387,20 @@ if [[ "$RUN_QVG" -eq "1" ]]
   then
   printf "Installing QVG\n\n"
   eval "$(conda shell.bash hook)"  
-  #conda create -n qvg
-  #conda activate qvg  
-  #conda install -c bioconda fastp bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
+  conda create -y -n qvg
+  conda activate qvg  
+  conda install -c bioconda -y samtools openssl=1.0 
+  conda install -c bioconda -y fastp bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
+  conda install -c r -y r
   #conda install -c conda-forge parallel
+  conda install -c bioconda -y fastp
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
   
   
-  #conda activate base
+  conda activate base
 fi
 
 #V-pipe

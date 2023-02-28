@@ -1,13 +1,17 @@
 #!/bin/bash
 #
+NR_THREADS=4;
+MAX_RAM=20;
+#
 CREATE_RECONSTRUCTION_FOLDERS=0;
-#RUN_SHORAH=0;
+#
 RUN_QURE=0;
-RUN_SAVAGE=0;
+RUN_SAVAGE_NOREF=1; #
+RUN_SAVAGE_REF=1;
 RUN_QSDPR=0; #-
-RUN_SPADES=0; #
-RUN_METAVIRALSPADES=0;
-RUN_CORONASPADES=0; #
+RUN_SPADES=0; #t
+RUN_METAVIRALSPADES=0; #t
+RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
@@ -28,7 +32,7 @@ RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
-RUN_CLIQUESNV=1; #
+RUN_CLIQUESNV=0; #
 RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0; #
@@ -43,14 +47,15 @@ RUN_TENSQR=0;
 RUN_ARAPANS=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS2");
 declare -a DATASETS=("DS1" "DS2" "DS3");
-declare -a VIRUSES=( "VZV" );
-#declare -a VIRUSES=("B19" "HPV" "VZV");
+#declare -a VIRUSES=( "VZV" );
+declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
   then  
+  printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/"
   rm -rf reconstructed
   mkdir reconstructed
   cd reconstructed
@@ -58,6 +63,7 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
   do
     mkdir $dataset  
   done
+  cd ..
 fi
 
 #create bam files from sam files
@@ -99,37 +105,45 @@ if [[ "$RUN_SPADES" -eq "1" ]]
   printf "Reconstructing with SPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda activate spades
+  rm -rf spades_reconstruction
+  mkdir spades_reconstruction
+  cd spades_reconstruction
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf spades_${dataset}
     mkdir spades_${dataset}	
-    cp ${dataset}_1.fq spades_${dataset}
-    cp ${dataset}_2.fq spades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq #\
+    cp ../${dataset}_*.fq spades_${dataset}
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     
-    mv spades-${dataset}-time.txt reconstructed/$dataset
+    mv spades-${dataset}-time.txt ../reconstructed/$dataset
     mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fa
     #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
-    cp spades_${dataset}/spades-${dataset}.fa reconstructed/$dataset
+    cp spades_${dataset}/spades-${dataset}.fa ../reconstructed/$dataset
+ 
   done
+  cd ..
   conda activate base
 fi
 
-#metaviralspades - runs, No complete extrachromosomal contigs assembled!!
+#metaviralspades - working, only outputs results for DS3
 if [[ "$RUN_METAVIRALSPADES" -eq "1" ]] 
   then
   printf "Reconstructing with metaviralSPAdes\n\n"
-  #cd SPAdes-3.15.5-Linux/bin/
   eval "$(conda shell.bash hook)"
   conda activate spades
+  rm -rf metaviralspades_reconstruction
+  mkdir metaviralspades_reconstruction
+  cd metaviralspades_reconstruction
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf metaviralspades_${dataset}
     mkdir metaviralspades_${dataset}	
-    cp ${dataset}_1.fq metaviralspades_${dataset}
-    cp ${dataset}_2.fq metaviralspades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq
+    cp ../${dataset}_*.fq metaviralspades_${dataset}
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    
+    mv metaviralspades-${dataset}-time.txt ../reconstructed/$dataset
+    mv metaviralspades_${dataset}/scaffolds.fasta metaviralspades_${dataset}/metaviralspades-${dataset}.fa
+    cp metaviralspades_${dataset}/metaviralspades-${dataset}.fa ../reconstructed/$dataset
   done
+  cd ..
   conda activate base
 fi
 
@@ -139,17 +153,19 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
   printf "Reconstructing with coronaSPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda activate spades
+  rm -rf coronaspades_reconstruction
+  mkdir coronaspades_reconstruction
+  cd coronaspades_reconstruction
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf coronaspades_${dataset}
     mkdir coronaspades_${dataset}	
-    cp ${dataset}_1.fq coronaspades_${dataset}
-    cp ${dataset}_2.fq coronaspades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o coronaspades-${dataset}-time.txt coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq
-    mv coronaspades-${dataset}-time.txt reconstructed/$dataset
+    cp ../${dataset}_*.fq coronaspades_${dataset}
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o coronaspades-${dataset}-time.txt coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    mv coronaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fa
-    cp coronaspades_${dataset}/coronaspades-${dataset}.fa reconstructed/$dataset
+    cp coronaspades_${dataset}/coronaspades-${dataset}.fa ../reconstructed/$dataset
   done
+  cd ..
   conda activate base
 fi
 
@@ -189,22 +205,47 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   
 fi
 
-#savage - Runs, w/ ref ->no reads could be aligned to reference error
-#no ref - empty results
-if [[ "$RUN_SAVAGE" -eq "1" ]] 
+#savage - runs
+if [[ "$RUN_SAVAGE_NOREF" -eq "1" ]] 
   then
-  printf "Reconstructing with SAVAGE\n\n"
+  printf "Reconstructing with SAVAGE without reference\n\n"
   eval "$(conda shell.bash hook)"
   conda activate savage
   rm -rf savage
   mkdir savage
   cd savage
-  cp ../B19.fa .
-  
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}_1.fq ../${dataset}_2.fq .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" savage --split 500 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq #--ref $(pwd)/B19.fa
+    cp ../${dataset}_*.fq .
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o savage-${dataset}-time.txt  savage --split 1 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq -m 10 -t $NR_THREADS 
+    mv savage-${dataset}-time.txt ../reconstructed/$dataset
+    mv contigs_stage_c.fasta savage-${dataset}.fa
+    cp savage-${dataset}.fa ../reconstructed/$dataset
+  done
+  cd ..
+  conda activate base
+fi
+
+#savage - Runs, w/ ref ->no reads could be aligned to reference error
+if [[ "$RUN_SAVAGE_REF" -eq "1" ]] 
+  then
+  printf "Reconstructing with SAVAGE with reference\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate savage
+  rm -rf savage
+  mkdir savage
+  cd savage
+  for dataset in "${DATASETS[@]}"
+    do
+    for virus in "${VIRUSES[@]}"
+      do
+      cp ../${dataset}_*.fq .
+      cp ../$virus.fa .
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o savage-ref-${dataset}-time.txt  savage --split 1 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq -m 10 -t $NR_THREADS --ref $virus.fa
+      mv savage-ref-${dataset}-time.txt ../reconstructed/$dataset
+      mv savage/contigs_stage_c.fasta savage/savage-ref-${dataset}.fa
+      cp savage/savage-ref-${dataset}.fa ../reconstructed/$dataset 
+    done
   done
   cd ..
   conda activate base
@@ -225,7 +266,7 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
     chmod +x ./QSdpR_source/QSdpR_master.sh
     cd QSdpR_data/
 
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh 2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh #2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
     
     mv qsdpr-${dataset}-time.txt ../../reconstructed/$dataset
     mv sample_10_recon.fasta qsdpr_$dataset.fa
@@ -238,16 +279,18 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
 fi
 
 #qure - Runs with exception - Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0 at ReadSet.estimateBaseSet(ReadSet.java:243)
+# err - Exception in thread "Thread-380" java.lang.OutOfMemoryError
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
+  create_fa_from_sam_files
   printf "Reconstructing with QuRe\n\n"
   cd QuRe_v0.99971/
   for dataset in "${DATASETS[@]}"
     do
     for virus in "${VIRUSES[@]}"
     do
-    cp ../${dataset}.fa ../$virus.fa .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java QuRe ${dataset}.fa $virus.fa 1E-25 1E-25 1000
+    cp ../gen_$dataset.fasta ../$virus.fa .
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe ${dataset}.fa $virus.fa 1E-25 1E-25 1000
     done
   done
   cd ..
@@ -263,13 +306,16 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   chmod +x jbaaijens-virus-vg-69a05f3e74f2/scripts/build_graph_msga.py
   for dataset in "${DATASETS[@]}"
     do
+    cd jbaaijens-virus-vg-69a05f3e74f2
     rm -rf samples_virusvg
     mkdir samples_virusvg
-    cp ${dataset}_*.fq ${dataset}.fa samples_virusvg
-    cd jbaaijens-virus-vg-69a05f3e74f2
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" scripts/build_graph_msga.py -f ../samples_virusvg/${dataset}_1.fq -r ../samples_virusvg/${dataset}_2.fq -c ../samples_virusvg/${dataset}.fa -vg ./vg -t 2
+    cp ../${dataset}_*.fq ../${dataset}.fa samples_virusvg
+    cp .././vg .
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virusvg-${dataset}-time.txt scripts/build_graph_msga.py -f samples_virusvg/${dataset}_1.fq -r samples_virusvg/${dataset}_2.fq -c samples_virusvg/${dataset}.fa -vg ./vg -t $NR_THREADS
     
     #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
+   
+
     cd ..
   done
   conda activate base
@@ -289,7 +335,7 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
     mkdir samples_vgflow
     cp ../${dataset}_1.fq ../${dataset}_2.fq ../${dataset}.fa samples_vgflow
     cd samples_vgflow
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg .././vg -t 2
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vgflow-${dataset}-time.txt python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c ${dataset}.fa -vg .././vg -t $NR_THREADS
     
     #example
     #cd example
@@ -397,7 +443,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   then
   printf "Reconstructing with QVG\n\n"
   eval "$(conda shell.bash hook)"
-  conda activate qvg-env
+  conda activate qvg
   cd QVG
   rm -rf reconstruction_files
   mkdir reconstruction_files
@@ -417,6 +463,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
       gzip -cvf ${dataset}_2.fq > ${dataset}_R2.fastq.gz
       cd ..
       cp ../${virus}.fa reconstruction_files
+      ls
       /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes
       rm -rf ${dataset}_files/output/samples_multifasta_masked*
       cat ${dataset}_files/output/samples_multifasta_* > ${dataset}_files/output/qvg-${virus}-${dataset}.fasta      
