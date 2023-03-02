@@ -17,39 +17,39 @@ RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0; #np
-RUN_VIRUSVG=1;
+RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
-RUN_QVG=0;
-RUN_VPIPE=0;
+RUN_QVG=0; #np
+RUN_VPIPE=0; #sk
 RUN_STRAINLINE=0;
-RUN_HAPHPIPE=0;
+RUN_HAPHPIPE=1;
 RUN_ABAYESQR=0;
 RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
-RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; #
-RUN_VIQUAS=0;
+RUN_QUASIRECOMB=0; 
+RUN_LAZYPIPE=0; 
+RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
-RUN_CLIQUESNV=0;
+RUN_CLIQUESNV=0; #
 RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=0;
+RUN_VIRGENA=0; #
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0;
+RUN_DRVM=0; #np
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
-RUN_ENSEMBLEASSEMBLER=0;
+RUN_ENSEMBLEASSEMBLER=0; #np
 RUN_HAPLOFLOW=0;
-RUN_TENSQR=0;
+RUN_TENSQR=1; 
 RUN_ARAPANS=0;
-RUN_VIQUF=0;
+RUN_VIQUF=0; #np
 
 install_samtools () {
   wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
@@ -349,8 +349,12 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   git clone https://github.com/viromelab/tracespipe.git
   cd tracespipe/src/
   chmod +x TRACES*.sh
-  ./TRACESPipe.sh --install
-  ./TRACESPipe.sh --get-all-aux
+  ./TRACESPipe.sh --install  
+  conda install -c bioconda -y entrez-direct
+  ./TRACESPipe.sh --get-all-aux  
+  #./TRACESPipe.sh --build-viral
+  #cp ../../
+
   cd ../../  
   conda activate base
   
@@ -364,25 +368,25 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
   
   #install_samtools  
   
-  cpanm App::Cmd::Setup
+  cpan App::Cmd::Setup
   #cpanm Bio::DB::Sam
-  cpanm Bio::Seq
-  cpanm Bio::SeqIO
-  cpanm Cwd
-  cpanm File::Path
-  cpanm File:Slurp
-  cpanm File::Spec
-  cpanm IPC::Run
-  cpanm List::Util
-  cpanm Math::Round
-  cpanm Statistics::Descriptive::Full  
+  cpan Bio::Seq
+  cpan Bio::SeqIO
+  cpan Cwd
+  cpan File::Path
+  cpan File:Slurp
+  cpan File::Spec
+  cpan IPC::Run
+  cpan List::Util
+  cpan Math::Round
+  cpan Statistics::Descriptive::Full  
   rm -rf aspire/
   git clone https://github.com/kevingroup/aspire.git
   
 fi
 
 
-#QVG
+#QVG - missing ncurses 5
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Installing QVG\n\n"
@@ -390,16 +394,15 @@ if [[ "$RUN_QVG" -eq "1" ]]
   conda create -y -n qvg
   conda activate qvg  
   conda install -c bioconda -y samtools openssl=1.0 
-  conda install -c bioconda -y fastp bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
+  conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
   conda install -c r -y r
+  conda install -c anaconda -y ncurses
   #conda install -c conda-forge parallel
   conda install -c bioconda -y fastp
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
-  
-  
   conda activate base
 fi
 
@@ -468,8 +471,9 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -y -n haphpipe
   conda activate haphpipe
-  conda install -c bioconda -y gatk 
   conda install -y haphpipe
+  conda install -c bioconda -y gatk 
+  
   
   
   
@@ -531,7 +535,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -y --name quasirecomb
   conda activate quasirecomb
-  conda install -c bioconda -y samtools
+  conda install -c bioconda -y samtools picard
   
   #wget https://github.com/cbg-ethz/QuasiRecomb/archive/refs/tags/v1.2.zip
   #unzip v1.2.zip 
@@ -641,14 +645,14 @@ fi
 #  conda create -n pehaplo python=2.7 networkx==1.11 apsp 
 #fi
 
-#RegressHaplo - err - The following specifications were found to be incompatible with your system: -feature:linux-64::__glibc==2.35=0  - feature:|@/linux-64::__glibc==2.35=0
+#RegressHaplo - err - unsatisfiable error
 if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
   then
   printf "Installing RegressHaplo\n\n"
   eval "$(conda shell.bash hook)"
-  
-  sudo apt-get install r-base
-  sudo apt-get install libcurl4-openssl-dev libssl-dev
+  #tmp comment
+  #sudo apt-get install r-base
+  #sudo apt-get install libcurl4-openssl-dev libssl-dev
   
   
   conda create -y -n regresshaplo
@@ -689,10 +693,16 @@ fi
 if [[ "$RUN_CLIQUESNV" -eq "1" ]] 
   then
   printf "Installing CliqueSNV\n\n"
+  rm -rf CliqueSNV-2.0.3
   wget -O cliquesnv "https://github.com/vtsyvina/CliqueSNV/archive/refs/tags/2.0.3.zip"
   unzip cliquesnv
   rm -rf 2.0.3.zip 
   rm -rf cliquesnv
+  eval "$(conda shell.bash hook)"
+  conda create -n java-env -y
+  conda activate java-env
+  conda install -c bioconda -y picard
+  conda activate base
 fi
 
 #IVA - kmc not found
@@ -799,9 +809,15 @@ fi
 if [[ "$RUN_VIRGENA" -eq "1" ]] 
   then
   printf "Installing VirGenA\n\n"
+  rm -rf release_v1.4
   wget -O virgena "https://github.com/gFedonin/VirGenA/releases/download/1.4/VirGenA_v1.4.zip"
   unzip virgena
   rm -rf virgena
+  eval "$(conda shell.bash hook)"
+  conda create -n java-env -y
+  conda activate java-env
+  conda install -c bioconda -y picard
+  conda activate base
   
 fi
 
@@ -899,9 +915,10 @@ fi
 if [[ "$RUN_SSAKE" -eq "1" ]] 
   then
   printf "Installing SSAKE\n\n"
+  rm -rf ssake
   wget -O ssake "https://github.com/bcgsc/SSAKE/releases/download/v4.0.1/ssake_v4-0.tar.gz"
   tar -xzf ssake
-  #rm -rf ssake
+  
   
 fi
 
