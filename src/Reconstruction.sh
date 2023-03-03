@@ -8,27 +8,27 @@ CREATE_RECONSTRUCTION_FOLDERS=0;
 RUN_QURE=0;
 RUN_SAVAGE_NOREF=0; #t
 RUN_SAVAGE_REF=0;
-RUN_QSDPR=0; #-
+#RUN_QSDPR=0; #-
 RUN_SPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=0;
-RUN_PREDICTHAPLO=0;
+RUN_VGFLOW=1;
+#RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0; #
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
-RUN_HAPHPIPE=1;
-RUN_ABAYESQR=0;
-RUN_HAPLOCLIQUE=0;
+RUN_HAPHPIPE=0;
+#RUN_ABAYESQR=0;
+#RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
-RUN_QUASIRECOMB=0;
+#RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; 
-RUN_VIQUAS=0;
+#RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
@@ -43,14 +43,13 @@ RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
-RUN_TENSQR=0;
-RUN_ARAPANS=0;
+#RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-declare -a DATASETS=("DS1");
-#declare -a DATASETS=("DS1" "DS2" "DS3");
-#declare -a VIRUSES=( "VZV" );
-declare -a VIRUSES=("B19" "HPV" "VZV");
+#declare -a DATASETS=("DS3");
+declare -a DATASETS=("DS1" "DS2" "DS3");
+declare -a VIRUSES=( "B19" );
+#declare -a VIRUSES=("B19" "HPV" "VZV");
 
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
@@ -66,58 +65,18 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
   cd ..
 fi
 
-#create bam files from sam files
-create_bam_files () { 
-  printf "Creating .bam files from .sam files\n\n"
-  for dataset in "${DATASETS[@]}"
-  do	
-    cd samtools-1.16.1/
-    ./samtools view -bS ../${dataset}_.sam > ../${dataset}.bam
-    cd ..
-  done
-}
-
-#create bam files from sam files
-alt_create_bam_files () { 
-  printf "Creating .bam files from .sam files\n\n"
-  for dataset in "${DATASETS[@]}"
-  do	
-    
-    samtools view -bS ${dataset}_.sam > ${dataset}.bam
-    
-  done
-}
-
-#create fasta files from sam files
-create_fa_from_sam_files () { 
+#creates a fasta file for each of the datasets with paired reads
+create_paired_fa_files () { 
   printf "Creating fasta files from .sam files\n\n"
   for dataset in "${DATASETS[@]}"
-  do	
-    cd samtools-1.16.1/
-    ./samtools fasta ../${dataset}_.sam > ../gen_${dataset}.fasta 
-    cd ..
+  do	    
+    sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > tmp_${dataset}_1.fa
+    sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > tmp_${dataset}_2.fa
+    cat tmp_${dataset}_*.fa > input.fasta
+    perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d'
+    mv input.fasta gen_$dataset.fasta
   done
 }
-
-#create fasta files from sam files
-alt_create_fa_from_sam_files () { 
-  printf "Creating fasta files from .sam files\n\n"
-  for dataset in "${DATASETS[@]}"
-  do	
-    samtools fasta ${dataset}_.sam > gen_${dataset}.fasta 
-  done
-}
-
-#shorah
-#if [[ "$RUN_SHORAH" -eq "1" ]] 
-#  then
-#  printf "Reconstructing with Shorah\n\n"
-#  create_bam_files
-#  for dataset in "${DATASETS[@]}"
-#    do	
-#    shorah.py -b ${dataset}.bam -f HPV-1.fa
-#  done
-#fi
 
 #spades - working; stats.
 if [[ "$RUN_SPADES" -eq "1" ]] 
@@ -272,31 +231,30 @@ if [[ "$RUN_SAVAGE_REF" -eq "1" ]]
 fi
 
 #qsdpr - working
-if [[ "$RUN_QSDPR" -eq "1" ]] 
-  then
-  printf "Reconstructing with QSdpr\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate qsdpr
-  cd QSdpR_v3.2/
-  for dataset in "${DATASETS[@]}"
-    do
-    rm -rf QSdpR_data/${dataset}
-    mkdir QSdpR_data/${dataset}
-    cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data/${dataset}
-    chmod +x ./QSdpR_source/QSdpR_master.sh
-    cd QSdpR_data/
-
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh #2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
-    
-    mv qsdpr-${dataset}-time.txt ../../reconstructed/$dataset
-    mv sample_10_recon.fasta qsdpr_$dataset.fa
-    cp qsdpr_$dataset.fa ../../reconstructed/$dataset
-    cd ..
-  done
-  cd ../
-  python --version
-  conda activate base
-fi
+#if [[ "$RUN_QSDPR" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with QSdpr\n\n"
+#  eval "$(conda shell.bash hook)"
+#  conda activate qsdpr
+#  cd QSdpR_v3.2/
+#  for dataset in "${DATASETS[@]}"
+#    do
+#    rm -rf QSdpR_data/${dataset}
+#    mkdir QSdpR_data/${dataset}
+#    cp ../${dataset}.fa ../${dataset}_.sam ../${dataset}_1.fq ../${dataset}_2.fq QSdpR_data/${dataset}
+#    chmod +x ./QSdpR_source/QSdpR_master.sh
+#    cd QSdpR_data/
+#
+#    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qsdpr-${dataset}-time.txt ../QSdpR_source/QSdpR_master.sh #2 10 ../QSdpR_source ../QSdpR_data sample 1 1000 ../../samtools-1.16.1
+#    
+#    mv qsdpr-${dataset}-time.txt ../../reconstructed/$dataset
+#    mv sample_10_recon.fasta qsdpr_$dataset.fa
+#    cp qsdpr_$dataset.fa ../../reconstructed/$dataset
+#    cd ..
+#  done
+#  cd ../
+#  conda activate base
+#fi
 
 #qure - Runs with exception - Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0 at ReadSet.estimateBaseSet(ReadSet.java:243)
 # err - Exception in thread "Thread-380" java.lang.OutOfMemoryError
@@ -375,27 +333,27 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
 fi
 
 #PredictHaplo - runs; can't detect reads on the .sam file
-if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
-  then
-  printf "Reconstructing with PredictHaplo\n\n"
-  eval "$(conda shell.bash hook)"  
-  conda activate predicthaplo
-  rm -rf predicthaplo_data
-  mkdir predicthaplo_data
-  cd predicthaplo_data
-  for dataset in "${DATASETS[@]}"
-  do
-    cp ../${dataset}_.sam . 
-    for virus in "${VIRUSES[@]}"
-    do        
-      cp ../$virus.fa .    
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" predicthaplo --sam ${dataset}_.sam --reference $virus.fa       
-    done  
-  done
-  cd ..
-  conda activate base
-  
-fi
+#if [[ "$RUN_PREDICTHAPLO" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with PredictHaplo\n\n"
+#  eval "$(conda shell.bash hook)"  
+#  conda activate predicthaplo
+#  rm -rf predicthaplo_data
+#  mkdir predicthaplo_data
+#  cd predicthaplo_data
+#  for dataset in "${DATASETS[@]}"
+#  do
+#    cp ../${dataset}_.sam . 
+#    for virus in "${VIRUSES[@]}"
+#    do        
+#      cp ../$virus.fa .    
+#      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" predicthaplo --sam ${dataset}_.sam --reference $virus.fa       
+#    done  
+#  done
+#  cd ..
+#  conda activate base
+#  
+#fi
 
 #tracespipelite - working
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]] 
@@ -648,58 +606,57 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
 fi
 
 #aBayesQR - running; doesn't output results, may be because of the .sam files
-if [[ "$RUN_ABAYESQR" -eq "1" ]] 
-  then
-  printf "Reconstructing with aBayesQR\n\n"
-  cd aBayesQR 
-  for dataset in "${DATASETS[@]}"
-    do
-    
-    for virus in "${VIRUSES[@]}"
-    do
+#if [[ "$RUN_ABAYESQR" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with aBayesQR\n\n"
+#  cd aBayesQR 
+#  for dataset in "${DATASETS[@]}"
+#    do
+#    
+#    for virus in "${VIRUSES[@]}"
+#    do
     
       #cp ${dataset}_*.fq .
-      cp ../$virus.fa ../${dataset}_.sam .
-      rm -rf config_${dataset}
-      echo "filename of reference sequence (FASTA) : ${virus}.fa
-filname of the aligned reads (sam format) : ${dataset}_.sam
-paired-end (1 = true, 0 = false) : 1
-SNV_thres : 0.01
-reconstruction_start : 1
-reconstruction_stop: 300000
-min_mapping_qual : 10
-min_read_length : 10
-max_insert_length : 250
-characteristic zone name : test
-seq_err (assumed sequencing error rate(%)) : 0.1
-MEC improvement threshold : 0.0395 " >> config_${dataset}
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./aBayesQR config_${dataset}
-      done
-    done
-  cd ..
-    
-fi
+#      cp ../$virus.fa ../${dataset}_.sam .
+#      rm -rf config_${dataset}
+#      echo "filename of reference sequence (FASTA) : ${virus}.fa
+#filname of the aligned reads (sam format) : ${dataset}_.sam
+#paired-end (1 = true, 0 = false) : 1
+#SNV_thres : 0.01
+#reconstruction_start : 1
+#reconstruction_stop: 300000
+#min_mapping_qual : 10
+#min_read_length : 10
+#max_insert_length : 250
+#characteristic zone name : test
+#seq_err (assumed sequencing error rate(%)) : 0.1
+#MEC improvement threshold : 0.0395 " >> config_${dataset}
+#      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./aBayesQR config_${dataset}
+#      done
+#    done
+#  cd ..
+#    
+#fi
 
 #HaploClique - No reads could be retrieved from the BamFile.
-if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
-  then
-  printf "Reconstructing with HaploClique\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate haploclique  
-  alt_create_bam_files
-  rm -rf haploclique_data
-  mkdir haploclique_data
-  cd haploclique_data
-  for dataset in "${DATASETS[@]}"
-    do
-    cp ../$dataset.bam .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haploclique $dataset.bam 
-    sleep 5
-  done
-  cd ..
-  conda activate base
-
-fi
+#if [[ "$RUN_HAPLOCLIQUE" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with HaploClique\n\n"
+#  eval "$(conda shell.bash hook)"
+#  conda activate haploclique  
+#  alt_create_bam_files
+#  rm -rf haploclique_data
+#  mkdir haploclique_data
+#  cd haploclique_data
+#  for dataset in "${DATASETS[@]}"
+#    do
+#    cp ../$dataset.bam .
+#    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haploclique $dataset.bam 
+#  done
+#  cd ..
+#  conda activate base
+#
+#fi
 
 #ViSpA - runs; result files *_EM.txt are empty
 if [[ "$RUN_VISPA" -eq "1" ]] 
@@ -731,23 +688,23 @@ fi
 
 #QuasiRecomb -> ParsingException in thread "main" java.lang.reflect.InvocationTargetException
 #Caused by: net.sf.samtools.SAMException: No index is available for this BAM file.
-if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
-  then
-  printf "Reconstructing with QuasiRecomb\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate quasirecomb
-  alt_create_bam_files 
+#if [[ "$RUN_QUASIRECOMB" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with QuasiRecomb\n\n"
+#  eval "$(conda shell.bash hook)"
+#  conda activate quasirecomb
+#  alt_create_bam_files 
   #cd QuasiRecomb-1.2
-  for dataset in "${DATASETS[@]}"
-    do
+#  for dataset in "${DATASETS[@]}"
+#    do
     #cp ../${dataset}_.sam .
     #java -jar QuasiRecomb.jar -i ${dataset}_.sam
     #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -jar QuasiRecomb.jar -i ${dataset}_.sam -coverage
-    java -jar QuasiRecomb.jar -i $dataset.bam
+#    java -jar QuasiRecomb.jar -i $dataset.bam
 
-    done
-  conda activate base
-fi
+#    done
+#  conda activate base
+#fi
 
 #Lazypipe 
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
@@ -759,30 +716,30 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
 fi
 
 #ViQuaS - err - [0] smalt.c:1116 ERROR: could not open file cut: alnc.sam: No such file or directory, may be caused by lack of Bio::Seq module, which couldn't be installed
-if [[ "$RUN_VIQUAS" -eq "1" ]] 
-  then
-  printf "Reconstructing with ViQuaS\n\n"
-  create_bam_files
-  eval "$(conda shell.bash hook)"
-  conda activate viquas
-  cd ViQuaS1.3  
-  for dataset in "${DATASETS[@]}"
-    do 
-        
-    for virus in "${VIRUSES[@]}"
-    do       
-      cp ../${dataset}.bam .  
-      cp ../${virus}.fa .
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" Rscript ViQuaS.R ${virus}.fa $dataset.bam 1 1 1 20 
+#if [[ "$RUN_VIQUAS" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with ViQuaS\n\n"
+#  create_bam_files
+#  eval "$(conda shell.bash hook)"
+#  conda activate viquas
+#  cd ViQuaS1.3  
+#  for dataset in "${DATASETS[@]}"
+#    do 
+#        
+#    for virus in "${VIRUSES[@]}"
+#    do       
+#      cp ../${dataset}.bam .  
+#      cp ../${virus}.fa .
+#      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" Rscript ViQuaS.R ${virus}.fa $dataset.bam 1 1 1 20 
       
       #example
       #Rscript ViQuaS.R reference.fsa sample_reads.bam
     
-    done
-  done
-  conda activate base  
-  cd ..  
-fi
+#    done
+#  done
+#  conda activate base  
+#  cd ..  
+#fi
 
 #MLEHaplo - constructs graphs with 0 vertices and 0 edges, illegal division by 0
 if [[ "$RUN_MLEHAPLO" -eq "1" ]] 
@@ -1247,39 +1204,39 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   conda activate base 
 fi
 
-#TenSQR - FileNotFoundError: no data contained in sample_SNV_matrix.txt
-if [[ "$RUN_TENSQR" -eq "1" ]] 
-  then
-  printf "Reconstructing with TenSQR\n\n"
-  cd TenSQR
-  rm -rf reconstruction_data
-  for dataset in "${DATASETS[@]}"
-    do
-    
-    for virus in "${VIRUSES[@]}"
-    do
-    
-    cp ../${dataset}_.sam .
-    cp ../$virus.fa .
-    echo "filename of reference sequence (FASTA) : "$virus.fa"
-filname of the aligned reads (sam format) : "${dataset}_.sam"
-SNV_thres : 0.0001
-reconstruction_start : 500
-reconstruction_stop: 1200
-min_mapping_qual : 40
-min_read_length : 50
-max_insert_length : 500
-characteristic zone name : zone
-seq_err (assumed sequencing error rate(%)) : 0.2
-MEC improvement threshold : 0.0312
-initial population size : 5" >> config_${dataset}
-    ./ExtractMatrix config_${dataset}
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python3 TenSQR.py config_${dataset}  
-    done
-  done  
-  cd ..
-  
-fi
+#TenSQR -input contained no data: "zone_SNV_matrix.txt", no SNVs detected
+#if [[ "$RUN_TENSQR" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with TenSQR\n\n"
+# 
+#  cd TenSQR
+#  rm -rf reconstruction_data
+#  for dataset in "${DATASETS[@]}"
+#    do
+#    
+#    for virus in "${VIRUSES[@]}"
+#    do
+#    
+#    cp ../${dataset}_.sam .
+#    cp ../$virus.fa .
+#    echo "filename of reference sequence (FASTA) : "$virus.fa"
+#filname of the aligned reads (sam format) : "${dataset}_.sam"
+#SNV_thres : 0.0001
+#reconstruction_start : 0
+#reconstruction_stop: 300000
+#min_mapping_qual : 40
+#min_read_length : 50
+#max_insert_length : 500
+#characteristic zone name : zone
+#seq_err (assumed sequencing error rate(%)) : 0.2
+#MEC improvement threshold : 0.0312
+#initial population size : 5" > config_${dataset}
+#    ./ExtractMatrix config_${dataset}
+#    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python3 TenSQR.py config_${dataset}  
+#    done
+#  done  
+#  cd ..
+#fi
 
 #ViQUF - UnboundLocalError: local variable 'extension' referenced before assignment
 if [[ "$RUN_VIQUF" -eq "1" ]] 

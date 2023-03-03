@@ -12,42 +12,42 @@ INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-RUN_QSDPR=0; #np
+#RUN_QSDPR=0; #np
 RUN_SPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
-RUN_VIADBG=0; #np
+RUN_VIADBG=0; #np, boost
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
-RUN_PREDICTHAPLO=0;
+#RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0;
 RUN_TRACESPIPE=0;
 RUN_ASPIRE=0;
 RUN_QVG=0; #np
 RUN_VPIPE=0; #sk
 RUN_STRAINLINE=0;
-RUN_HAPHPIPE=1;
-RUN_ABAYESQR=0;
-RUN_HAPLOCLIQUE=0;
+RUN_HAPHPIPE=0;
+#RUN_ABAYESQR=0;
+#RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
-RUN_QUASIRECOMB=0; 
+#RUN_QUASIRECOMB=0; 
 RUN_LAZYPIPE=0; 
-RUN_VIQUAS=0; #np
+#RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0; #
-RUN_IVA=0; 
+RUN_IVA=0; #np,r 
 RUN_PRICE=0;
 RUN_VIRGENA=0; #
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0; #np
+RUN_DRVM=1; #np
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
 RUN_HAPLOFLOW=0;
-RUN_TENSQR=1; 
+#RUN_TENSQR=1; 
 RUN_ARAPANS=0;
 RUN_VIQUF=0; #np
 
@@ -105,8 +105,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt install make
   printf "Installing Java\n\n"
   sudo apt install default-jre  
-  printf "Installing Docker\n\n"
-  install_docker
+  #printf "Installing Docker\n\n"
+  #install_docker
   
   sudo apt install curl
   #printf "Installing mamba\n\n"
@@ -214,101 +214,24 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   #sudo apt-get install minimap2
 fi
 
-#viaDBG
+#viaDBG - issues with boost installation
 if [[ "$RUN_VIADBG" -eq "1" ]] 
   then
   printf "Installing viaDBG\n\n"
-  #wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz
-  #tar xfz boost_1_60_0.tar.gz
-  #rm boost_1_60_0.tar.gz
-  #cd boost_1_60_0
-  #./bootstrap.sh --prefix=/usr/local --with-libraries=program_options,regex,filesystem,system
-  #export
-  #./b2 install
-  #cd /home
-  #rm -rf boost_1_60_0
-  #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
-   
-  #conda install -c conda-forge -y boost 
-  #wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz
-  #tar xfz boost_1_60_0.tar.gz
-  #cd boost_1_60_0
-  #./bootstrap.sh --prefix=/usr/local --with-libraries=program_options,regex,filesystem,system
-  #export
-  #./b2 install 
-  #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
-  #ls /usr/local/bin/
-  
-  #cd ../../../  
   
   eval "$(conda shell.bash hook)"  
   conda create -y -n viadbg
   conda activate viadbg
   conda install -c "conda-forge/label/gcc7" -y boost
+  conda install -c conda-forge -y boost-cpp
+  #apt install libboost-all-dev
   conda install -c bioconda -y sga
-    
-  
-  #curr_path=$(pwd)
-  
-  #boost
-  
-
-  #sudo -s
-
-  #rm -rf boost_1_60_0
-  #rm -rf boost_1_60_0.tar.gz*
-  #cd /home && 
-  rm -rf tar xfz boost_1_60_0.tar.gz
-  rm -rf boost_1_60_0
-  wget http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.gz 
-  tar xfz boost_1_60_0.tar.gz 
-  #cd boost_1_60_0 
-  #./bootstrap.sh
-  #./b2 --prefix=$(pwd)
-  #export LD_LIBRARY_PATH=$(pwd)/bin
-  #echo $LD_LIBRARY_PATH
-  #./bjam install --prefix=$(pwd)
-  
-  cd boost_1_60_0/
-
-  ./bootstrap.sh --with-libraries=atomic,date_time,exception,filesystem,iostreams,locale,program_options,regex,signals,system,test,thread,timer,log
-
-  sudo ./b2 install
-
-  #sudo ls -s /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0 /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.60.0
-  #sudo ls -s /usr/lib/x86_64-linux-gnu/libboost_regex.so.1.74.0 /usr/lib/x86_64-linux-gnu/libboost_regex.so.1.60.0
-  
-  
-  #&& ./bootstrap.sh --prefix=/usr/local --with-libraries=program_options \
-  #&& ./b2 install \
-  #&& export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd) \
-  #ls $(pwd)/bin
-  cd ..
-  
-  #exit
-  
-  #cd $curr_path
-  
-  #rm -rf viadbg   
-  git clone https://bitbucket.org/bfreirec1/viadbg.git
-  cd viadbg
+ 
+  git clone https://github.com/borjaf696/viaDBG.git
+  cd viaDBG
   make clean && make
   cd ..
 
-
-  #conda activate base 
-  
-  #docker attempt
-  #rm -rf viadbg_docker
-  #git clone https://github.com/borjaf696/viaDBG-DockerFile.git
-  #mv -T viaDBG-DockerFile viadbg_docker 
-  #sudo docker build -t viadbg_docker .
-  
-  
-  ./Reconstruction.sh
-  
-  
-  
   
 fi
 
@@ -352,9 +275,6 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   ./TRACESPipe.sh --install  
   conda install -c bioconda -y entrez-direct
   ./TRACESPipe.sh --get-all-aux  
-  #./TRACESPipe.sh --build-viral
-  #cp ../../
-
   cd ../../  
   conda activate base
   
@@ -365,9 +285,7 @@ fi
 if [[ "$RUN_ASPIRE" -eq "1" ]] 
   then
   printf "Installing ASPIRE\n\n"
-  
-  #install_samtools  
-  
+
   cpan App::Cmd::Setup
   #cpanm Bio::DB::Sam
   cpan Bio::Seq
@@ -705,91 +623,12 @@ if [[ "$RUN_CLIQUESNV" -eq "1" ]]
   conda activate base
 fi
 
-#IVA - kmc not found
+#IVA
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Installing IVA\n\n"
-  
+  install_docker
   sudo docker pull sangerpathogens/iva
-  
-
-  
-  #wget https://github.com/refresh-bio/KMC/releases/download/v3.2.1/KMC3.2.1.linux.tar.gz
-  #rm -rf kmc
-  #mkdir kmc
-  #tar -xzf KMC3.2.1.linux.tar.gz
-  #rm -rf KMC3.2.1.linux.tar.gz
-  
-  
-  #wget -O smalt https://sourceforge.net/projects/smalt/files/latest/download
-  #tar zxvf smalt
-  #rm -rf smalt
-  #cd smalt-0.7.6
-  #./configure
-  #make
-  #sudo make install
-  #cd ..
-  #missing add to path
-  
-  #rm -rf IVAdependencies
-  #mkdir IVAdependencies   
-  #cd IVAdependencies
-  #cp ../bin/* .
-  #cp -R ../smalt-0.7.6 .
-  
-  #error, not adding to path and iva can't find kmc and smalt.
-  #echo "\n\n Adding $(pwd) to path" 
-  #export PATH=$PATH:$(pwd)
-  
-  #pip3 install iva
-  
-  
-  
-  
-  #pip3 install iva
-  #cd ..
-  
-  #v2----------
-  #curr_dir = $pwd
-  
-  #sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
-  #sudo apt-get update
-  #sudo apt-get install python3-pip zlib1g-dev libncurses5-dev libncursesw5-dev
-  
-  #export PATH=$PATH:$HOME/bin/:$HOME/.local/bin/
-  
-  #cd $HOME/bin
-  #wget http://sun.aei.polsl.pl/kmc/download/kmc
-  #wget http://sun.aei.polsl.pl/kmc/download/kmc_dump
-  #chmod 755 kmc kmc_dump
-  
-  #cd $HOME/bin
-  #wget http://downloads.sourceforge.net/project/mummer/mummer/3.23/MUMmer3.23.tar.gz
-  #tar -zxf MUMmer3.23.tar.gz
-  #cd MUMmer3.23
-  #make
-  #cd ..
-  #for x in `find MUMmer3.23/ -maxdepth 1 -executable -type f`; do cp -s $x . ; done
-  
-  #cd $HOME/bin
-  #wget http://downloads.sourceforge.net/project/samtools/samtools/1.0/samtools-1.0.tar.bz2
-  #tar -xjf samtools-1.0.tar.bz2
-  #cd samtools-1.0/
-  #make
-  #cd ..
-  #cp -s samtools-1.0/samtools .
-  
-  #cd $HOME/bin
-  #wget http://downloads.sourceforge.net/project/smalt/smalt-0.7.6-bin.tar.gz
-  #tar -zxf smalt-0.7.6-bin.tar.gz
-  #cp -s smalt-0.7.6-bin/smalt_x86_64 smalt
-  
-  #pip3 install iva
-  
-  #cd $curr_dir
-  
-  
-  
 fi
 
 #PRICE
@@ -801,8 +640,7 @@ if [[ "$RUN_PRICE" -eq "1" ]]
   rm -rf price
   cd PriceSource130506
   make
-  cd ..
-    
+  cd ..    
 fi
 
 #VirGenA
@@ -817,8 +655,7 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
   conda create -n java-env -y
   conda activate java-env
   conda install -c bioconda -y picard
-  conda activate base
-  
+  conda activate base  
 fi
 
 #TAR-VIR
@@ -1000,11 +837,16 @@ fi
 if [[ "$RUN_TENSQR" -eq "1" ]] 
   then
   printf "Installing TenSQR\n\n"
+  eval "$(conda shell.bash hook)"
   rm -rf TenSQR
   git clone https://github.com/SoYeonA/TenSQR.git
   cd TenSQR
   make
   cd ..  
+  
+  pip install numpy
+  pip install scipy
+  
 fi
 
 #Arapan-S - error on qt v4 dependency

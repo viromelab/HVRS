@@ -7,7 +7,7 @@ declare -a VIRUSES=("SVA" "B19" "HPV" "VZV");
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Time	Mem	%CPU" > total_stats.tsv
+echo "Dataset	File	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Time	Mem	%CPU	Accuracy(%)" > total_stats.tsv
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   printf "$dataset\n";	  
@@ -37,8 +37,26 @@ for dataset in "${DATASETS[@]}" #analyse each virus
     MEM=`cat $dataset/$file_wout_extension-time.txt | grep "MEM" | awk '{ print $2;}'`;
     CPU_P=`cat $dataset/$file_wout_extension-time.txt | grep "CPU_perc" | awk '{ print $2;}'`;
     
+    TMP=$(($TALBA * 100))
+    #ACCURACY=$(($TMP / $$TMP))
+    ACCURACY=$(echo $TMP \/ $TBASES |bc -l | xargs printf %.3f)
+    #FPOS=$SNPS
+    #TPOS=$((TALBA - SNPS))
+   # 
+    #NEG=$((TBASES - TALBA))
+   # FNEG=1
+    #TNEG=1
+   # 
+   # AUX2=$((TPOS + FPOS + FNEG))
+   # python -c "print( round( $TPOS / $AUX2, 3) )" > tmp_file
+   # 
+   # F1SCORE= $((cat tmp_file))
+    
+   
+    
+    
     #ds/file	tbases	alignedbases	snps	avg_identity
-    echo "$dataset	$file	$NRBASES	$TALBA	$SNPS	$IDEN	$TIME	$MEM	$CPU_P" >> total_stats.tsv
+    echo "$dataset	$file	$NRBASES	$TALBA	$SNPS	$IDEN	$TIME	$MEM	$CPU_P	$ACCURACY" >> total_stats.tsv
     printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     rm -f G_A.fa G_B.fa ; #remove tmp files
   done

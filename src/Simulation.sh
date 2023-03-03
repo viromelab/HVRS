@@ -43,6 +43,6 @@ art_illumina -rs 3  -i DS1.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS1_
 art_illumina -rs 7  -i DS2.fa -p -sam -l 150 -f 30 -m 200 -s 10 -o DS2_
 art_illumina -rs 11 -i DS3.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS3_
 art_illumina -rs 3  -i DS4.fa -p -sam -l 75 -f 20 -m 200 -s 10 -o DS4_
-art_illumina -rs 3  -i DS5.fa -p -sam -l 250 -f 20 -m 200 -s 10 -o DS5_ #err - read length
+art_illumina -rs 3  -i DS5.fa -p -sam -l 250 -f 20 -m 400 -s 10 -o DS5_ #err - read length
 rm *.aln
 #
