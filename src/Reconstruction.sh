@@ -14,7 +14,7 @@ RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=1;
+RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0;
@@ -25,14 +25,14 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0;
+RUN_VISPA=1;
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
-RUN_CLIQUESNV=0; #t
+#RUN_CLIQUESNV=0; #t
 RUN_IVA=0; #np
 RUN_PRICE=0;
 RUN_VIRGENA=0; #t
@@ -658,7 +658,7 @@ fi
 #
 #fi
 
-#ViSpA - runs; result files *_EM.txt are empty
+#ViSpA - runs; generates some results
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Reconstructing with ViSpA\n\n"  
@@ -673,14 +673,14 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do	
     cp ../../../gen_${dataset}.fasta ../../test
-    cp ../../../${dataset}.bam ../../test
+    #cp ../../../${dataset}.bam ../../test
     for virus in "${VIRUSES[@]}"
     do
       cp ../../../$virus.fa ../../test 
      
       echo "" >> ../../test/${dataset}.txt
     
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./main_mosaik.bash ../../test/${dataset}.bam ../../test/$virus.fa $NR_THREADS 100 120
+      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./main_mosaik.bash ../../test/gen_${dataset}.fasta ../../test/$virus.fa $NR_THREADS 100 120
       done
     done    
     conda activate base  
@@ -853,23 +853,23 @@ if [[ "$RUN_REGRESSHAPLO" -eq "1" ]]
 fi
 
 #CliqueSNV - working
-if [[ "$RUN_CLIQUESNV" -eq "1" ]] 
-  then
-  printf "Reconstructing with CliqueSNV\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate java-env
-  cd CliqueSNV-2.0.3
-  for dataset in "${DATASETS[@]}"
-    do
-    cp ../${dataset}_.sam .
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o cliquesnv-${dataset}-time.txt java -jar clique-snv.jar -m snv-illumina -in ${dataset}_.sam -outDir $(pwd)
-    cp ${dataset}_.fasta cliquesnv-${dataset}.fa
-    mv cliquesnv-${dataset}-time.txt ../reconstructed/$dataset
-    cp cliquesnv-${dataset}.fa ../reconstructed/${dataset}
-    done
-  cd ..  
-  conda activate base
-fi
+#if [[ "$RUN_CLIQUESNV" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with CliqueSNV\n\n"
+#  eval "$(conda shell.bash hook)"
+#  conda activate java-env
+#  cd CliqueSNV-2.0.3
+#  for dataset in "${DATASETS[@]}"
+#    do
+#    cp ../${dataset}_.sam .
+#    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o cliquesnv-${dataset}-time.txt java -jar clique-snv.jar #-m snv-illumina -in ${dataset}_.sam -outDir $(pwd)
+#    cp ${dataset}_.fasta cliquesnv-${dataset}.fa
+#    mv cliquesnv-${dataset}-time.txt ../reconstructed/$dataset
+#    cp cliquesnv-${dataset}.fa ../reconstructed/${dataset}
+#    done
+#  cd ..  
+#  conda activate base
+#fi
 
 #IVA - err - Failed to make first seed. Cannot continue
 if [[ "$RUN_IVA" -eq "1" ]] 
