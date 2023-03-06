@@ -663,7 +663,6 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   then
   printf "Reconstructing with ViSpA\n\n"  
   eval "$(conda shell.bash hook)"
-  alt_create_bam_files
   conda activate vispa  
   cd home
   rm -rf test
@@ -680,9 +679,14 @@ if [[ "$RUN_VISPA" -eq "1" ]]
      
       echo "" >> ../../test/${dataset}.txt
     
-      /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./main_mosaik.bash ../../test/gen_${dataset}.fasta ../../test/$virus.fa $NR_THREADS 100 120
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vispa-${dataset}-time.txt ./main_mosaik.bash ../../test/gen_${dataset}.fasta ../../test/$virus.fa $NR_THREADS 100 120
+      mv ../../test/gen_${dataset}_I_*_*_CNTGS_DIST0.txt ../../test/tmp_$virus-$dataset.fa
       done
+      cat ../../test/tmp_*-$dataset.fa > ../../test/vispa-$dataset.fa
+      cp ../../test/vispa-$dataset.fa ../../../reconstructed/$dataset
+      cp vispa-${dataset}-time.txt ../../../reconstructed/$dataset
     done    
+    cd ../../../
     conda activate base  
 fi
 
