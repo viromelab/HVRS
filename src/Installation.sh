@@ -42,7 +42,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0; #
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=1; #np
+RUN_DRVM=0; #np
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
@@ -373,9 +373,9 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
   rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz   
-  printf "Please insert the path to miniconda installation. Example: /home/USER/miniconda3\n" 
-  read condapath    
-  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $condapath/envs/strainline/bin/daccord
+  #printf "Please insert the path to miniconda installation. Example: /home/USER/miniconda3\n" 
+  #read condapath    
+  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $CONDA_PREFIX/envs/strainline/bin/daccord
   rm -rf Strainline
   git clone "https://github.com/HaploKit/Strainline.git"
   conda activate base
@@ -717,7 +717,7 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   unzip drvm
   rm -rf drvm
   cd Tools
-  printf "If this tool is not working and giving you the error /usr/bin/python2: bad interpreter: No such file or directory, please comment the line below.\n\n"
+  printf "If this tool is not working and giving you the error * bad interpreter: No such file or directory, please comment the for below.\n\n"
   for filename in $(ls *.py); #for each fasta file in curr dir
   do   
     printf "Processing file $filename \n\n\n"  
