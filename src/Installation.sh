@@ -14,6 +14,7 @@ RUN_QURE=0;
 RUN_SAVAGE=0;
 #RUN_QSDPR=0; #np
 RUN_SPADES=0;
+RUN_METASPADES=0;
 RUN_METAVIRALSPADES=0;
 RUN_CORONASPADES=0;
 RUN_VIADBG=0; #np, boost
@@ -118,7 +119,7 @@ fi
 #
 #
 #spades, metaviralspades and coronaspades
-if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]]
+if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]] || [[ "$RUN_METASPADES" -eq "1" ]] 
   then
   printf "Installing SPAdes, metaviralSPAdes and coronaSPAdes\n\n"
   eval "$(conda shell.bash hook)"
@@ -322,6 +323,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
   conda activate base
+  sudo apt-get install libncurses5
 fi
 
 #V-pipe

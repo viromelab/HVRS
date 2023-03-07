@@ -10,6 +10,7 @@ RUN_SAVAGE_NOREF=0; #t
 RUN_SAVAGE_REF=0;
 #RUN_QSDPR=0; #-
 RUN_SPADES=0; #t
+RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
@@ -46,10 +47,23 @@ RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS3");
-declare -a DATASETS=("DS1" "DS2" "DS3");
-declare -a VIRUSES=( "B19" );
-#declare -a VIRUSES=("B19" "HPV" "VZV");
+declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS1" "DS2" "DS3");
+#declare -a VIRUSES=( "B19" );
+declare -a VIRUSES=("B19" "HPV" "VZV");
+
+#creates a fasta file for each of the datasets with paired reads
+create_paired_fa_files () { 
+  printf "Creating fasta files from .sam files\n\n"
+  for dataset in "${DATASETS[@]}"
+  do	    
+    sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > tmp_${dataset}_1.fa
+    sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > tmp_${dataset}_2.fa
+    cat tmp_${dataset}_*.fa > input.fasta
+    perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d'
+    mv input.fasta gen_$dataset.fasta
+  done
+}
 
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
@@ -65,20 +79,7 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
   cd ..
 fi
 
-#creates a fasta file for each of the datasets with paired reads
-create_paired_fa_files () { 
-  printf "Creating fasta files from .sam files\n\n"
-  for dataset in "${DATASETS[@]}"
-  do	    
-    sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > tmp_${dataset}_1.fa
-    sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > tmp_${dataset}_2.fa
-    cat tmp_${dataset}_*.fa > input.fasta
-    perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d'
-    mv input.fasta gen_$dataset.fasta
-  done
-}
-
-#spades - working; stats.
+#spades - working
 if [[ "$RUN_SPADES" -eq "1" ]] 
   then
   printf "Reconstructing with SPAdes\n\n"
@@ -98,6 +99,29 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
     cp spades_${dataset}/spades-${dataset}.fa ../reconstructed/$dataset
  
+  done
+  cd ..
+  conda activate base
+fi
+
+#metaspades - working
+if [[ "$RUN_METASPADES" -eq "1" ]] 
+  then
+  printf "Reconstructing with metaSPAdes\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate spades
+  rm -rf metaspades_reconstruction
+  mkdir metaspades_reconstruction
+  cd metaspades_reconstruction
+  for dataset in "${DATASETS[@]}"
+    do
+    mkdir metaspades_${dataset}	
+    cp ../${dataset}_*.fq metaspades_${dataset}
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaspades-${dataset}-time.txt metaspades.py -t 1 -o metaspades_${dataset} -1 metaspades_${dataset}/${dataset}_1.fq -2 metaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    
+    mv metaspades-${dataset}-time.txt ../reconstructed/$dataset
+    mv metaspades_${dataset}/scaffolds.fasta metaspades_${dataset}/metaspades-${dataset}.fa
+    cp metaspades_${dataset}/metaspades-${dataset}.fa ../reconstructed/$dataset
   done
   cd ..
   conda activate base
@@ -456,15 +480,53 @@ if [[ "$RUN_QVG" -eq "1" ]]
       cd ..
       cp ../${virus}.fa reconstruction_files
     
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes -np $NR_THREADS
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-$virus-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes -np $NR_THREADS
       rm -rf ${dataset}_files/output/samples_multifasta_masked*
       cat ${dataset}_files/output/samples_multifasta_* > ${dataset}_files/output/qvg-${virus}-${dataset}.fasta      
       cp ${dataset}_files/output/qvg-${virus}-${dataset}.fasta .
     done
     cat *.fasta > qvg-${dataset}.fa
     rm -rf *.fasta
-    mv qvg-${dataset}-time.txt ../reconstructed/$dataset
+    
     cp qvg-${dataset}.fa ../reconstructed/$dataset 
+    
+    
+    total_time=0
+    total_mem=0
+    total_cpu=0
+    count=0
+    
+    for f in qvg-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"
+      printf "$TIME    $MEM     $CPU \n\n\n\n "
+       
+      total_time=`echo "$total_time+$TIME" | bc -l`
+      
+      if [[ $MEM -gt $total_mem ]]
+      then
+      total_mem=`echo "$total_mem+$MEM" | bc -l`
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`
+     
+    done
+    total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
+    printf "\n\n wefhio \n\n"
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu"
+    
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu" > qvg-${dataset}-time.txt
+    
+    
+    mv qvg-${dataset}-time.txt ../reconstructed/$dataset
   done
   
   conda activate base 
@@ -667,25 +729,61 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   cd home
   rm -rf test
   mkdir test
+  
   #touch test/log.txt 
-  cd code/vispa_mosaik   
+  cd test 
   for dataset in "${DATASETS[@]}"
     do	
-    cp ../../../gen_${dataset}.fasta ../../test
+    cp ../../gen_${dataset}.fasta .
     #cp ../../../${dataset}.bam ../../test
     for virus in "${VIRUSES[@]}"
     do
-      cp ../../../$virus.fa ../../test 
+      cp ../../$virus.fa .
      
-      echo "" >> ../../test/${dataset}.txt
+      echo "" >> ${dataset}.txt
     
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vispa-${dataset}-time.txt ./main_mosaik.bash ../../test/gen_${dataset}.fasta ../../test/$virus.fa $NR_THREADS 100 120
-      mv ../../test/gen_${dataset}_I_*_*_CNTGS_DIST0.txt ../../test/tmp_$virus-$dataset.fa
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vispa-$virus-${dataset}-time.txt  ../code/vispa_mosaik/./main_mosaik.bash gen_${dataset}.fasta $virus.fa $NR_THREADS 100 120
+      mv gen_${dataset}_I_*_*_CNTGS_DIST0.txt tmp_$virus-$dataset.fa
       done
-      cat ../../test/tmp_*-$dataset.fa > ../../test/vispa-$dataset.fa
-      cp ../../test/vispa-$dataset.fa ../../../reconstructed/$dataset
-      cp vispa-${dataset}-time.txt ../../../reconstructed/$dataset
-    done    
+      
+      for f in tmp_*-$dataset.fa
+        do
+        printf "changing $f \n\n"
+        content=$(cat $f)
+
+        echo ">${f}
+${content}" > zz_$f
+     
+        
+        done
+        
+      cat zz_tmp_*-$dataset.fa > vispa-$dataset.fa
+      cp vispa-$dataset.fa ../../reconstructed/$dataset
+      
+      for f in vispa-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"       
+      total_time=`echo "$total_time+$TIME" | bc -l`      
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=`echo "$total_mem+$MEM" | bc -l`
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`     
+    done
+    total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu" > qvg-${dataset}-time.txt
+    
+    
+    cp vispa-${dataset}-time.txt ../../reconstructed/$dataset
+  done
+      
     cd ../../../
     conda activate base  
 fi

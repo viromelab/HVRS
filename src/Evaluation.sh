@@ -13,12 +13,31 @@ for dataset in "${DATASETS[@]}" #analyse each virus
   printf "$dataset\n";	  
   #for virus in "${VIRUSES[@]}" #analyse each virus
     #do
-  for file in `cd ${dataset};ls -1 ${file} *.fa*` #for each fasta file in curr dir
+  for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
   do 	 
     printf "\n\nFile: $file\nDataset: $dataset \n\n"; #print file name, virus and dataset	  
     #cp $dataset/$file G_A.fa; #reference
     #cp ../$dataset.fa G_B.fa #query
     #
+    fst_char=$(cat $dataset/$file | head -c 1)
+    if [[ -z "$fst_char" ]]; then
+      printf "no calc\n\n"
+    
+    else
+      printf "calc\n\n"
+      
+      if [[ "$fst_char" != ">" ]]; then
+    
+        printf "There will be some changes made.\n\n"
+        content=cat $dataset/$file
+        echo ">test
+$content" > $dataset/$file
+        cat $dataset/$file
+      
+      fi
+    
+    
+    
     dnadiff $dataset/$file ../$dataset.fa ; #run dnadiff
     #quast $dataset/$file -r ../$dataset.fa ; #run quast
     #mv quast_results/results_*_*_*_*_* quast_results/results_${dataset}_$file
@@ -59,6 +78,9 @@ for dataset in "${DATASETS[@]}" #analyse each virus
     echo "$dataset	$file	$NRBASES	$TALBA	$SNPS	$IDEN	$TIME	$MEM	$CPU_P	$ACCURACY" >> total_stats.tsv
     printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     rm -f G_A.fa G_B.fa ; #remove tmp files
+    
+    fi
+  
   done
 done
 #
