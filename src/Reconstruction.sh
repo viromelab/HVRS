@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-NR_THREADS=4;
-MAX_RAM=28;
+NR_THREADS=2;
+MAX_RAM=8;
 #
 CREATE_RECONSTRUCTION_FOLDERS=0;
 #
@@ -26,7 +26,7 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1;
+RUN_VISPA=0;
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
@@ -36,7 +36,7 @@ RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0; #t
 RUN_IVA=0; #np
 RUN_PRICE=0;
-RUN_VIRGENA=0; #t
+RUN_VIRGENA=1; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
@@ -48,7 +48,7 @@ RUN_HAPLOFLOW=0;
 RUN_VIQUF=0;
 
 declare -a DATASETS=("DS1");
-#declare -a DATASETS=("DS1" "DS2" "DS3");
+#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
@@ -756,29 +756,33 @@ ${content}" > zz_$f
      
         
         done
-        
+          
       cat zz_tmp_*-$dataset.fa > vispa-$dataset.fa
       cp vispa-$dataset.fa ../../reconstructed/$dataset
       
+      total_time=0
+      total_mem=0
+      total_cpu=0 
+      count=0
       for f in vispa-*-$dataset-time.txt
-    do
-      echo "Processing $f" 
-      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
-      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
-      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
-      CPU="$(cut -d'%' -f1 <<< $CPU)"       
-      total_time=`echo "$total_time+$TIME" | bc -l`      
-      if [[ $MEM -gt $total_mem ]]
-      then
-        total_mem=`echo "$total_mem+$MEM" | bc -l`
-      fi
-      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
-      count=`echo "$count+1" | bc -l`     
-    done
+      do
+        echo "Processing $f" 
+        TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+        MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+        CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+        CPU="$(cut -d'%' -f1 <<< $CPU)"       
+        total_time=`echo "$total_time+$TIME" | bc -l`      
+        if [[ $MEM -gt $total_mem ]]
+        then
+          total_mem=`echo "$total_mem+$MEM" | bc -l`
+        fi
+        total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+        count=`echo "$count+1" | bc -l`     
+      done
     total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
     echo "TIME	$total_time
 MEM	$total_mem
-CPU_perc	$total_cpu" > qvg-${dataset}-time.txt
+CPU_perc	$total_cpu%" > vispa-${dataset}-time.txt
     
     
     cp vispa-${dataset}-time.txt ../../reconstructed/$dataset
@@ -1101,12 +1105,38 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
         <Debug>false</Debug>
     </Postprocessor>
 </config>" > $dataset-conf.xml
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-${dataset}-time.txt java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt  java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
     done
     cd res
     cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
     rm -rf *_complete_genome_assembly.fasta
+    
+    
+    total_time=0
+    total_mem=0
+    total_cpu=0 
+    count=0
+    for f in ../virgena-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"       
+      total_time=`echo "$total_time+$TIME" | bc -l`      
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=`echo "$total_mem+$MEM" | bc -l`
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`     
+    done
+    total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
+        
     mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
     cp virgena-$dataset.fa ../../reconstructed/$dataset 
     cd ..
