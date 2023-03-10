@@ -3,7 +3,7 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/lx/miniconda3;
+CONDA_PREFIX=/home/x/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
@@ -27,7 +27,7 @@ RUN_ASPIRE=0;
 RUN_QVG=0; #np
 RUN_VPIPE=0; #sk
 RUN_STRAINLINE=0;
-RUN_HAPHPIPE=1;
+RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
@@ -43,7 +43,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0; #
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0; #np
+RUN_DRVM=1; #np
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
@@ -75,14 +75,6 @@ install_docker() {
   sudo sh get-docker.sh
 }
 
-#install_mamba() {
-#  wget -O mamba.sh https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
-#  chmod +x mamba.sh
-#  ./mamba.sh
-#  rm -rf mamba.sh 
-#  printf "Please restart the terminal. Thank you."
-#}
-
 if [[ "$INSTALL_MINICONDA" -eq "1" ]] 
   then
   printf "Installing Miniconda\n\n"
@@ -101,7 +93,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   printf "Installing G++\n\n"
   sudo apt-get install g++
   printf "Installing Samtools\n\n"
-  install_samtools
+  #install_samtools
+  conda install -c bioconda -y samtools
   printf "Installing make\n\n"
   sudo apt install make
   printf "Installing Java\n\n"
@@ -118,7 +111,7 @@ fi
 # INSTALL ASSEMBLY TOOLS:
 #
 #
-#spades, metaviralspades and coronaspades
+#spades, metaspades, metaviralspades and coronaspades
 if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]] || [[ "$RUN_METASPADES" -eq "1" ]] 
   then
   printf "Installing SPAdes, metaviralSPAdes and coronaSPAdes\n\n"
@@ -305,17 +298,19 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
 fi
 
 
-#QVG - missing ncurses 5
+#QVG 
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Installing QVG\n\n"
   eval "$(conda shell.bash hook)"  
   conda create -y -n qvg
   conda activate qvg  
-  conda install -c bioconda -y samtools openssl=1.0 
+  conda install samtools-1.16.1-h6899075_1.tar.bz2 --force-reinstall
+  conda install htslib libgcc-ng libzlib ncurses zlib
+
   conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
   conda install -c r -y r
-  conda install -c anaconda -y ncurses
+  #conda install -c anaconda -y ncurses
   #conda install -c conda-forge parallel
   conda install -c bioconda -y fastp
   rm -rf QVG/
@@ -372,12 +367,13 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   conda create -y -n strainline
   conda activate strainline
   conda install -c bioconda -y minimap2 spoa samtools dazz_db daligner metabat2 bbmap python
+  conda install -c dranew -y libmaus
   wget https://github.com/gt1/daccord/releases/download/0.0.10-release-20170526170720/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz
   tar -zvxf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz 
   rm -rf daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu.tar.gz   
   #printf "Please insert the path to miniconda installation. Example: /home/USER/miniconda3\n" 
   #read condapath    
-  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $CONDA_PREFIX/envs/strainline/bin/daccord
+  ln -fs $PWD/daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu/bin/daccord $CONDA_PREFIX/bin/daccord
   rm -rf Strainline
   git clone "https://github.com/HaploKit/Strainline.git"
   conda activate base
@@ -478,23 +474,25 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
   cd lazypipe
   
-  #conda create -y -n blast
-  #conda activate blast
-  #conda install -c bioconda -y blast 
- 
-  #conda create -y -n lazypipe
-  #conda activate lazypipe
-  #conda install -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
-  
+  conda create -y -n blast
   conda activate blast
-  conda activate --stack lazypipe 
+  conda install -c bioconda -y blast 
+ 
+  conda create -y -n lazypipe
+  conda activate lazypipe
+  conda install -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  
+  #conda activate blast
+  #conda activate --stack lazypipe 
   
   rm -rf $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy ln -s $data/taxonomy $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
   export TM=$CONDA_PREFIX/share/trimmomatic 
   
   
   
-  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz tar -zxvf SANSPANZ.3.tar.gz sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py ln -sf $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
+  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz 
+  tar -zxvf SANSPANZ.3.tar.gz sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py 
+  ln -sf $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
   
   cpan --local-lib=~/perl5 File::Basename File::Temp Getopt::Long YAML::Tiny
 export PERL5LIB=~/perl5/lib/perl5:$PERL5LIB
@@ -703,6 +701,23 @@ if [[ "$RUN_VIP" -eq "1" ]]
   #./db_installer.sh -r ../ #-r #[PATH]/[TO]/[DATABASE]
   cd ../../
   conda activate base
+  
+fi
+#drVM
+if [[ "$RUN_DRVM_DOCKER" -eq "1" ]] 
+  then
+  sudo docker run -t -i -v /home/manager/Templates:/drVM 990210oliver/drvm /bin/bash
+  
+  cd drVM
+  mkdir VMDB
+  cd VMDB
+  wget https://sourceforge.net/projects/sb2nhri/files/drVM/sequence_20160316.tar.gz
+  tar -zxvf sequence_20160316.tar.gz
+
+  CreateDB.py -s sequence.fasta
+  
+  export MyDB='/drVM/VMDB'
+  drVM.py -1 DRR049387_1.fastq -2 DRR049387_2.fastq -t $NR_THREADS
   
 fi
 

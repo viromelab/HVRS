@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-NR_THREADS=2;
-MAX_RAM=8;
+NR_THREADS=4;
+MAX_RAM=28;
 #
 CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 RUN_QURE=0;
-RUN_SAVAGE_NOREF=0; #t
+RUN_SAVAGE_NOREF=1; #t
 RUN_SAVAGE_REF=0;
 #RUN_QSDPR=0; #-
 RUN_SPADES=0; #t
@@ -32,11 +32,11 @@ RUN_LAZYPIPE=0;
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
-RUN_REGRESSHAPLO=0;
+#RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0; #t
 RUN_IVA=0; #np
 RUN_PRICE=0;
-RUN_VIRGENA=1; #t
+RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
@@ -47,7 +47,8 @@ RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS1");
+declare -a DATASETS=("DS1" "DS2" "DS3");
 #declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV");
@@ -292,7 +293,7 @@ if [[ "$RUN_QURE" -eq "1" ]]
     for virus in "${VIRUSES[@]}"
     do
     cp ../gen_$dataset.fasta ../$virus.fa .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe ${dataset}.fa $virus.fa 1E-25 1E-25 1000
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe ${dataset}.fa $virus.fa 
     done
   done
   cd ..
@@ -454,7 +455,7 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
   cd ..
 fi
 
-#QVG - working
+#QVG - working?
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Reconstructing with QVG\n\n"
@@ -468,7 +469,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
     do	 
     for virus in "${VIRUSES[@]}"
       do
-      #rm -rf ${dataset}_files
+      rm -rf ${dataset}_files
       mkdir ${dataset}_files
       echo "${dataset}" > ${dataset}_files/samples
       cd ${dataset}_files
@@ -481,21 +482,18 @@ if [[ "$RUN_QVG" -eq "1" ]]
       cp ../${virus}.fa reconstruction_files
     
       /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-$virus-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes -np $NR_THREADS
-      rm -rf ${dataset}_files/output/samples_multifasta_masked*
+      #rm -rf ${dataset}_files/output/samples_multifasta_masked*
       cat ${dataset}_files/output/samples_multifasta_* > ${dataset}_files/output/qvg-${virus}-${dataset}.fasta      
       cp ${dataset}_files/output/qvg-${virus}-${dataset}.fasta .
     done
     cat *.fasta > qvg-${dataset}.fa
     rm -rf *.fasta
-    
     cp qvg-${dataset}.fa ../reconstructed/$dataset 
-    
     
     total_time=0
     total_mem=0
     total_cpu=0
     count=0
-    
     for f in qvg-*-$dataset-time.txt
     do
       echo "Processing $f" 
@@ -503,32 +501,21 @@ if [[ "$RUN_QVG" -eq "1" ]]
       MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
       CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
       CPU="$(cut -d'%' -f1 <<< $CPU)"
-      printf "$TIME    $MEM     $CPU \n\n\n\n "
-       
       total_time=`echo "$total_time+$TIME" | bc -l`
-      
       if [[ $MEM -gt $total_mem ]]
       then
-      total_mem=`echo "$total_mem+$MEM" | bc -l`
+        total_mem=$MEM
       fi
       total_cpu=`echo "$total_cpu+$CPU" | bc -l`
       count=`echo "$count+1" | bc -l`
-     
     done
-    total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
-    printf "\n\n wefhio \n\n"
-    echo "TIME	$total_time
-MEM	$total_mem
-CPU_perc	$total_cpu"
-    
+    printf "$total_cpu    -   $count     "
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.3f)
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu" > qvg-${dataset}-time.txt
-    
-    
     mv qvg-${dataset}-time.txt ../reconstructed/$dataset
   done
-  
   conda activate base 
 fi
 
@@ -539,8 +526,6 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda activate snakemake 
   #cd V-pipe-2.99.3
-  
-  
     
   for dataset in "${DATASETS[@]}"
     do 
@@ -598,11 +583,11 @@ output:
   cd ..
 fi
 
-#Strainline - missing reads*.las, may be an error due to the reads being short or due to them being generated from a sam file
+#Strainline - missing reads*.las, may be an error due to the reads being short 
 if [[ "$RUN_STRAINLINE" -eq "1" ]] 
   then
   printf "Reconstructing with Strainline\n\n"
-  alt_create_fa_from_sam_files
+  create_paired_fa_files
   eval "$(conda shell.bash hook)"
   conda activate strainline
   cd Strainline/src/
@@ -616,7 +601,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
     cd ${dataset}    
     cp ../../gen_${dataset}.fasta .
     
-    ../src/strainline.sh -i gen_${dataset}.fasta -o out -p ont -k 20 -t $NR_THREADS
+    ../src/strainline.sh -i gen_${dataset}.fasta -o out -p ont -k 200 -t $NR_THREADS
     
     
     #./strainline.sh -i ../../${dataset}*.fa -o out -p ont
@@ -720,11 +705,12 @@ fi
 #
 #fi
 
-#ViSpA - runs; generates some results
+#ViSpA - working
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Reconstructing with ViSpA\n\n"  
   eval "$(conda shell.bash hook)"
+  create_paired_fa_files
   conda activate vispa  
   cd home
   rm -rf test
@@ -754,7 +740,6 @@ if [[ "$RUN_VISPA" -eq "1" ]]
         echo ">${f}
 ${content}" > zz_$f
      
-        
         done
           
       cat zz_tmp_*-$dataset.fa > vispa-$dataset.fa
@@ -764,7 +749,7 @@ ${content}" > zz_$f
       total_mem=0
       total_cpu=0 
       count=0
-      for f in vispa-*-$dataset-time.txt
+      for f in vispa-*-${dataset}-time.txt
       do
         echo "Processing $f" 
         TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
@@ -779,15 +764,12 @@ ${content}" > zz_$f
         total_cpu=`echo "$total_cpu+$CPU" | bc -l`
         count=`echo "$count+1" | bc -l`     
       done
-    total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
+    total_cpu==$(echo $total_cpu \/ $count |bc -l | xargs printf %.3f)
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu%" > vispa-${dataset}-time.txt
-    
-    
     cp vispa-${dataset}-time.txt ../../reconstructed/$dataset
   done
-      
     cd ../../../
     conda activate base  
 fi
@@ -898,65 +880,42 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   conda activate base 
 fi
 
-#PEHaplo - err - Command 'sga index Contigs.fa' returned non-zero exit status 1, seg fault,  working with test example
+#PEHaplo - working
 if [[ "$RUN_PEHAPLO" -eq "1" ]] 
   then
   printf "Reconstructing with PEHaplo\n\n"
   eval "$(conda shell.bash hook)"
   conda activate bio2
   cd TAR-VIR/PEHaplo/  
-  
+  rm -rf assembly
+  mkdir assembly  
+  cd assembly  
   for dataset in "${DATASETS[@]}"
-    do	
-    
-    for virus in "${VIRUSES[@]}"
-    do
-    
-      #rm -rf data
-      #mkdir data
-      #cd data
-    
-      #cp ../../../${virus}.fa .
-      #cp ../../../gen_${dataset}.fasta .
-      #cp ../../../${dataset}_.sam .
-      #mv ${dataset}_.sam result.sam
-      #mkdir index
-      #bowtie2-build -f ${virus}.fa index/HXB2
-      #bowtie2 -x index/HXB2 -f gen_${dataset}.fasta --score-min L,0,-0.05 -t -p 4 -S result.sam
-      #samtools view -F 4 result.sam > result_mapped.sam
-      #cd ..
-      #build -f data/gen_${dataset}.fasta -o virus
-      #overlap -S data/result_mapped.sam -x virus -f data/gen_${dataset}.fasta -c 180 -o data/virus_recruit.fa
-      
-      #rm -rf test
-      #mkdir test
-      #cd test
-      
-      printf "\n $(pwd)\n\n"
-      
-      #python ../tools/get_read_pairs.py ../data/virus_recruit.fa
-      cp ../../${dataset}_*.fq .
+    do	 
+      printf "\n $(pwd)\n\n"      
+      cp ../../../${dataset}_*.fq .
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > ${dataset}_1.fa
-      sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa
-      
-      python pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 180 -l1 210 -r 250 -F 600 -std 150 -n 3 -correct no #-t $NR_THREADS -m $MAX_RAM
-      
-      #cd ..
-    done
+      sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa      
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 #-t $NR_THREADS -m $MAX_RAM
+      printf "\n\n $(pwd) \n\n\n"
+      cp pehaplo-${dataset}-time.txt ../../../reconstructed/$dataset
+      mv Contigs.fa pehaplo-${dataset}.fa
+      cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
+      rm -rf Contigs.fa
   done
-  conda activate base
-  
+  cd ../../../
+  conda activate base  
 fi
 
 #RegressHaplo
-if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
-  then
-  printf "Reconstructing with RegressHaplo\n\n"
-  
-  #timer
-  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
-  
-fi
+#if [[ "$RUN_REGRESSHAPLO" -eq "1" ]] 
+#  then
+#  printf "Reconstructing with RegressHaplo\n\n"
+#  
+#  timer
+#  /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
+#  
+#fi
 
 #CliqueSNV - working
 #if [[ "$RUN_CLIQUESNV" -eq "1" ]] 
@@ -995,12 +954,16 @@ fi
 #PRICE - did nothing, no errors
 if [[ "$RUN_PRICE" -eq "1" ]] 
   then
+  create_paired_fa_files
   printf "Reconstructing with PRICE\n\n"
   cd PriceSource130506
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}_*.fq .    
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -a 8 -fp ${dataset}_1.fq ${dataset}_2.fq 150 -nc 1 -o result_${dataset}.fasta
+    cp ../${dataset}_*.fq .
+    cp ../gen_${dataset}.fasta .
+        
+    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fp ${dataset}_1.fq ${dataset}_2.fq 150 -nc 3 -o result_${dataset}.fasta
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fs gen_${dataset}.fasta 250 -nc 3 -o result_${dataset}.fasta
     done
   cd ..  
 fi
@@ -1127,12 +1090,13 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
       total_time=`echo "$total_time+$TIME" | bc -l`      
       if [[ $MEM -gt $total_mem ]]
       then
-        total_mem=`echo "$total_mem+$MEM" | bc -l`
+        total_mem=$MEM
       fi
       total_cpu=`echo "$total_cpu+$CPU" | bc -l`
       count=`echo "$count+1" | bc -l`     
     done
-    total_cpu=`echo "$total_cpu/$count" | bc -l` | xargs printf %.3f
+    printf "$total_cpu    -   $count     "
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.3f)
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
@@ -1147,40 +1111,27 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
   
 fi
 
-#TAR-VIR - no errors but no seed reads, example runs and detects seed reads
-#likely an error in the sam file format
+#TAR-VIR - no errors but no seed reads
 if [[ "$RUN_TARVIR" -eq "1" ]] 
   then
   printf "Reconstructing with TAR-VIR\n\n"
   eval "$(conda shell.bash hook)"
   conda activate bio2
   
-  #timer
-  #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
-  
   cd TAR-VIR/
   for dataset in "${DATASETS[@]}"
     do
     rm -rf data
     mkdir data
+    cp ../gen_${dataset}.fasta data
+    cp ../${dataset}_.sam data
     cd Overlap_extension/
-  
-    cp ../../gen_${dataset}.fasta ../data
-    cp ../../${dataset}_.sam ../data
-    
-    #example
-    #./build -f test_data/virus.fa -o virus   
-    #./overlap -S test_data/HIV.sam -x virus -f test_data/virus.fa -c 180 -o virus_recruit.fa 
-    
-    ./build -f ../data/gen_${dataset}.fasta -o virus
-    ./overlap -S data/${dataset}_.sam -x virus -f ../data/gen_${dataset}.fasta -c 180 -o virus_recruit.fa
-    
+    ./build -f ../data/gen_${dataset}.fasta -o data
+    ./overlap -S data/${dataset}_.sam -x data -f ../data/gen_${dataset}.fasta -c 10 -o virus_recruit.fa
     cd ..
   done 
-  
   cd ../../
   conda activate base
-  
 fi
 
 #VIP - missing DBI module, can´t install it
@@ -1237,18 +1188,15 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   then
   printf "Reconstructing with SSAKE\n\n"
   cd ssake/tools/
-  
   for dataset in "${DATASETS[@]}"
     do
     cp ../../${dataset}_*.fq .
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o ssake-${dataset}-time.txt ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
-    
     mv ${dataset}_assembly_scaffolds.fa ssake-${dataset}.fa
     cp ssake-${dataset}.fa ../../reconstructed/${dataset}
     mv ssake-${dataset}-time.txt ../../reconstructed/$dataset
   done
   cd ../../
-
 fi
 
 #viralFlye - err can't find out dir, can't create out dir with flye - ERROR: No reads above minimum length threshold (1000)
