@@ -12,20 +12,20 @@ INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE=0;
-#RUN_QSDPR=0; #np
-RUN_SPADES=0;
-RUN_METASPADES=0;
-RUN_METAVIRALSPADES=0;
-RUN_CORONASPADES=0;
-RUN_VIADBG=0; #np, boost
+#RUN_QSDPR=0;
+RUN_SPADES=0; #t
+RUN_METASPADES=0; #t
+RUN_METAVIRALSPADES=0; #t
+RUN_CORONASPADES=0; #t
+RUN_VIADBG=0; #np, boost err
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0;
-RUN_TRACESPIPE=0;
+RUN_TRACESPIPELITE=0; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #np
-RUN_VPIPE=0; #sk
+RUN_QVG=1; #w
+RUN_VPIPE=0; #nw
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -38,12 +38,12 @@ RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0; #
-RUN_IVA=0; #np,r 
+RUN_IVA=0; #err
 RUN_PRICE=0;
 RUN_VIRGENA=0; #
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=1; #np
+RUN_DRVM=0; #err
 RUN_SSAKE=0;
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
@@ -305,14 +305,9 @@ if [[ "$RUN_QVG" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n qvg
   conda activate qvg  
-  conda install samtools-1.16.1-h6899075_1.tar.bz2 --force-reinstall
-  conda install htslib libgcc-ng libzlib ncurses zlib
-
-  conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk #samtools liftoff minimap
+  conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk fastp
   conda install -c r -y r
-  #conda install -c anaconda -y ncurses
-  #conda install -c conda-forge parallel
-  conda install -c bioconda -y fastp
+  conda install -c bioconda -y samtools --force-reinstall
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/

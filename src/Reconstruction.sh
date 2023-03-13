@@ -6,9 +6,9 @@ MAX_RAM=28;
 CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 RUN_QURE=0;
-RUN_SAVAGE_NOREF=0; #
+RUN_SAVAGE_NOREF=0; #w?
 RUN_SAVAGE_REF=0;
-#RUN_QSDPR=0; #-
+#RUN_QSDPR=0; 
 RUN_SPADES=0; #t
 RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
@@ -20,27 +20,27 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #err
+RUN_QVG=0; #w
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #?
+RUN_VISPA=0; #w
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
 #RUN_REGRESSHAPLO=0;
-#RUN_CLIQUESNV=0; #t
+#RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=0; #?
+RUN_VIRGENA=1; #?
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0; #?
+RUN_SSAKE=1; #?
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
@@ -715,13 +715,10 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   cd home
   rm -rf test
   mkdir test
-  
-  #touch test/log.txt 
   cd test 
   for dataset in "${DATASETS[@]}"
     do	
     cp ../../gen_${dataset}.fasta .
-    #cp ../../../${dataset}.bam ../../test
     for virus in "${VIRUSES[@]}"
     do
       cp ../../$virus.fa .
