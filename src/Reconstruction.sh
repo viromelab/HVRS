@@ -5,9 +5,9 @@ MAX_RAM=28;
 #
 CREATE_RECONSTRUCTION_FOLDERS=0;
 #
-RUN_QURE=0;
-RUN_SAVAGE_NOREF=0; #w?
-RUN_SAVAGE_REF=0;
+RUN_QURE=1;
+RUN_SAVAGE_NOREF=0; #w?trn
+RUN_SAVAGE_REF=0; #trn
 #RUN_QSDPR=0; 
 RUN_SPADES=0; #t
 RUN_METASPADES=0; #t
@@ -15,18 +15,18 @@ RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 RUN_VIRUSVG=0;
-RUN_VGFLOW=0;
+RUN_VGFLOW=0; #trn
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPE=0; #rn
 RUN_ASPIRE=0;
-RUN_QVG=0; #w
+RUN_QVG=0; #wrn
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #w
+RUN_VISPA=0; #wrn
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
@@ -36,11 +36,11 @@ RUN_PEHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=1; #?
+RUN_VIRGENA=0; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=1; #?
+RUN_SSAKE=0; #?nr
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
@@ -281,11 +281,10 @@ fi
 #  conda activate base
 #fi
 
-#qure - Runs with exception - Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0 at ReadSet.estimateBaseSet(ReadSet.java:243)
-# err - Exception in thread "Thread-380" java.lang.OutOfMemoryError
+#qure - running
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
-  alt_create_fa_from_sam_files
+  create_paired_fa_files
   printf "Reconstructing with QuRe\n\n"
   cd QuRe_v0.99971/
   for dataset in "${DATASETS[@]}"
@@ -293,8 +292,40 @@ if [[ "$RUN_QURE" -eq "1" ]]
     for virus in "${VIRUSES[@]}"
     do
     cp ../gen_$dataset.fasta ../$virus.fa .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe ${dataset}.fa $virus.fa 
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qure-$virus-${dataset}-time.txt java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe gen_$dataset.fasta $virus.fa 
+    mv gen_${dataset}_reconstructedVariants.txt results_$virus.fa
     done
+    
+    cat results_*.fa  >  qure-${dataset}.fa
+    cp qure-${dataset}.fa ../reconstructed/${dataset}
+    
+    total_time=0
+    total_mem=0
+    total_cpu=0
+    count=0
+    
+    for f in qure-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"
+      total_time=`echo "$total_time+$TIME" | bc -l`
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=$MEM
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`
+    done
+    printf "$total_cpu    -   $count     "
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu%" > qure-${dataset}-time.txt
+    mv qure-${dataset}-time.txt ../reconstructed/$dataset
+    
   done
   cd ..
 fi
@@ -340,6 +371,11 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
     for virus in "${VIRUSES[@]}"
     do    
     cp ../../${dataset}_1.fq ../../${dataset}_2.fq ../../$virus.fa .
+    
+    #generate contigs with SAVAGE
+    conda activate savage
+    savage --split 1 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq -m 10 -t $NR_THREADS --no_stage_b --no_stage_c
+    conda activate vg-flow-env
     
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vgflow_${dataset}-time.txt python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c $virus.fa -vg .././vg -t $NR_THREADS
     python ../scripts/vg-flow.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
@@ -391,7 +427,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   do	
     cp ../../${dataset}_*.fq .
     lzma -d VDB.mfa.lzma
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset}
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots
     
     
     cd test_viral_analysis_${dataset}
@@ -433,7 +469,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     cd ../src/
     cp ../../VDB.fa .
 
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig -t $NR_THREADS
     cp tracespipe-${dataset}-time.txt ../
     cd ../output_data/TRACES_viral_consensus
     cat *.fa > ../../tracespipe-${dataset}.fa     
@@ -510,13 +546,15 @@ if [[ "$RUN_QVG" -eq "1" ]]
       count=`echo "$count+1" | bc -l`
     done
     printf "$total_cpu    -   $count     "
-    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.3f)
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
     echo "TIME	$total_time
 MEM	$total_mem
-CPU_perc	$total_cpu" > qvg-${dataset}-time.txt
+CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
     mv qvg-${dataset}-time.txt ../reconstructed/$dataset
   done
   conda activate base 
+  cd ..
+  
 fi
 
 #V-pipe - Failed to open source file https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/workflow/rules/scripts/functions.sh
@@ -733,10 +771,8 @@ if [[ "$RUN_VISPA" -eq "1" ]]
         do
         printf "changing $f \n\n"
         content=$(cat $f)
-
         echo ">${f}
 ${content}" > zz_$f
-     
         done
           
       cat zz_tmp_*-$dataset.fa > vispa-$dataset.fa
@@ -761,13 +797,13 @@ ${content}" > zz_$f
         total_cpu=`echo "$total_cpu+$CPU" | bc -l`
         count=`echo "$count+1" | bc -l`     
       done
-    total_cpu==$(echo $total_cpu \/ $count |bc -l | xargs printf %.3f)
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu%" > vispa-${dataset}-time.txt
     cp vispa-${dataset}-time.txt ../../reconstructed/$dataset
   done
-    cd ../../../
+    cd ../../
     conda activate base  
 fi
 
@@ -888,13 +924,11 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
   mkdir assembly  
   cd assembly  
   for dataset in "${DATASETS[@]}"
-    do	 
-      printf "\n $(pwd)\n\n"      
+    do	    
       cp ../../../${dataset}_*.fq .
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > ${dataset}_1.fa
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa      
       /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 #-t $NR_THREADS -m $MAX_RAM
-      printf "\n\n $(pwd) \n\n\n"
       cp pehaplo-${dataset}-time.txt ../../../reconstructed/$dataset
       mv Contigs.fa pehaplo-${dataset}.fa
       cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
@@ -1093,7 +1127,7 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
       count=`echo "$count+1" | bc -l`     
     done
     printf "$total_cpu    -   $count     "
-    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.3f)
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt

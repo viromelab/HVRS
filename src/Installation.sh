@@ -24,7 +24,7 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #w
+RUN_QVG=0; #w
 RUN_VPIPE=0; #nw
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -32,7 +32,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=0; 
+RUN_LAZYPIPE=1; 
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
@@ -247,6 +247,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n tracespipelite
   conda activate tracespipelite
+  rm -rf TRACESPipeLite
   git clone https://github.com/viromelab/TRACESPipeLite.git
   cd TRACESPipeLite/src/
   chmod +x *.sh
@@ -469,37 +470,29 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
   cd lazypipe
   
-  conda create -y -n blast
+  mkdir data
+  cd data
+  mkdir taxonomy
+  cd ..
+  
+  conda create -n blast -c bioconda -y blast
+  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  
   conda activate blast
-  conda install -c bioconda -y blast 
- 
-  conda create -y -n lazypipe
-  conda activate lazypipe
-  conda install -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  conda activate --stack lazypipe
   
-  #conda activate blast
-  #conda activate --stack lazypipe 
+  rm -rf $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
+  ln -s data/taxonomy $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
   
-  rm -rf $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy ln -s $data/taxonomy $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
-  export TM=$CONDA_PREFIX/share/trimmomatic 
+  export TM=$CONDA_PREFIX/share/trimmomatic
   
-  
-  
-  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz 
-  tar -zxvf SANSPANZ.3.tar.gz sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py 
-  ln -sf $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
-  
-  cpan --local-lib=~/perl5 File::Basename File::Temp Getopt::Long YAML::Tiny
-export PERL5LIB=~/perl5/lib/perl5:$PERL5LIB
-  
-  Rscript -e 'install.packages( c("reshape","openxlsx") , repos="https://cloud.r-project.org")' 
-  
-  cpan YAML::Tiny
-  sudo perl perl/install_db.pl --db taxonomy
-  
-  perl perl/install_db.pl --db blastn_vi
+  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
+  tar -zxvf SANSPANZ.3.tar.gz
+  sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
+  ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
   
   cd ..
+  ls
   
 fi
 
