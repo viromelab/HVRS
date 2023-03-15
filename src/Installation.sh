@@ -494,6 +494,20 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   cd ..
   ls
   
+  #experimental
+  cpan
+  install CPAN
+  install Term::ReadLine::Perl
+  reload CPAN
+  install File::Basename File::Temp Getopt::Long YAML::Tiny 
+  exit
+  
+  conda activate base
+  
+  
+  
+  
+  
 fi
 
 #ViQuaS
