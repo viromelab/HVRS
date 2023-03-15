@@ -18,7 +18,7 @@ RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0; #np, boost err
-RUN_VIRUSVG=0;
+RUN_VIRUSVG=1;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
@@ -32,7 +32,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=1; 
+RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
@@ -170,8 +170,10 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   wget -O virus-vg "https://bitbucket.org/jbaaijens/virus-vg/get/69a05f3e74f26e5571830f5366570b1d88ed9650.zip"
   unzip virus-vg
   rm -rf virus-vg
+  
   rm vg
-  wget "https://github.com/vgteam/vg/releases/download/v1.43.0/vg"
+  wget "https://github.com/vgteam/vg/releases/download/v1.7.0/vg-v1.7.0"
+  mv vg-v1.7.0 vg
   chmod +x vg
   cp vg jbaaijens-virus-vg-69a05f3e74f2
   eval "$(conda shell.bash hook)"
@@ -200,7 +202,8 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   unzip vg-flow
   rm -rf vg-flow
   rm -rf vg
-  wget "https://github.com/vgteam/vg/releases/download/v1.43.0/vg"
+  wget "https://github.com/vgteam/vg/releases/download/v1.7.0/vg-v1.7.0"
+  mv vg-v1.7.0 vg
   chmod +x vg
   cp vg jbaaijens-vg-flow-ac68093bbb23/
   conda activate base
@@ -461,7 +464,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - issues installing perl dependencies
+#Lazypipe - currently under construction
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"  
@@ -489,18 +492,28 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
   tar -zxvf SANSPANZ.3.tar.gz
   sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
-  ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
+  #echo " " > ~/bin/runsanspanz.py
+  sudo ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py /usr/bin #~/bin/runsanspanz.py
   
   cd ..
   ls
   
   #experimental
-  cpan
-  install CPAN
-  install Term::ReadLine::Perl
-  reload CPAN
-  install File::Basename File::Temp Getopt::Long YAML::Tiny 
-  exit
+  
+  cpan CPAN
+  
+  cpan Term::ReadLine::Perl 
+  
+  #reload CPAN
+  
+  cpan File::Basename File::Temp Getopt::Long YAML::Tiny 
+  
+  Rscript -e 'install.packages( c("reshape","openxlsx") )'
+  
+  cd lazypipe
+  perl perl/install_db.pl --db taxonomy
+  cd ..
+  
   
   conda activate base
   

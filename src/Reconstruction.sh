@@ -14,8 +14,8 @@ RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
-RUN_VIRUSVG=0;
-RUN_VGFLOW=0; #trn
+RUN_VIRUSVG=1;
+RUN_VGFLOW=0; 
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #rn
@@ -28,10 +28,10 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0; #wrn
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; 
+RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0;
+RUN_PEHAPLO=0; #w?
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
@@ -344,9 +344,18 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
     do
     rm -rf samples_virusvg
     mkdir samples_virusvg
-    cp ../${dataset}_*.fq ../B19.fa samples_virusvg
+    cp ../${dataset}_*.fq .
     
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virusvg-${dataset}-time.txt scripts/build_graph_msga.py -f samples_virusvg/${dataset}_1.fq -r samples_virusvg/${dataset}_2.fq -c samples_virusvg/B19.fa -vg ./vg -t $NR_THREADS
+    rm -rf spades_${dataset}
+    mkdir spades_${dataset} 
+    
+    #generate contigs with spades
+    conda activate spades 
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    conda activate virus-vg-deps
+    
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virusvg-${dataset}-time.txt scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c spades_${dataset}/contigs.fasta -vg ./vg -t $NR_THREADS
+    python ../scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
     
     #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
   done
@@ -354,7 +363,7 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   conda activate base
 fi
 
-#vg-flow - working; .fa file needs to be changed to a file with contigs preassembled instead of the virus sample; timer issues
+#vg-flow - RecursionError: maximum recursion depth exceeded while calling a Python object
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Reconstructing with VG-Flow\n\n"
@@ -373,11 +382,20 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
     cp ../../${dataset}_1.fq ../../${dataset}_2.fq ../../$virus.fa .
     
     #generate contigs with SAVAGE
-    conda activate savage
-    savage --split 1 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq -m 10 -t $NR_THREADS --no_stage_b --no_stage_c
+    #conda activate savage
+    #savage --split 1 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq -m 10 -t $NR_THREADS --no_stage_b --no_stage_c
+    #conda activate vg-flow-env
+    
+    rm -rf spades_${dataset}
+    mkdir spades_${dataset} 
+    
+    #generate contigs with spades
+    conda activate spades 
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     conda activate vg-flow-env
     
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vgflow_${dataset}-time.txt python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c $virus.fa -vg .././vg -t $NR_THREADS
+    
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vgflow_${dataset}-time.txt python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c spades_${dataset}/contigs.fasta -vg .././vg -t $NR_THREADS
     python ../scripts/vg-flow.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
     
     mv sorted_contigs.fasta vgflow_$virus.fa
@@ -952,7 +970,7 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
       cp ../../../${dataset}_*.fq .
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > ${dataset}_1.fa
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa      
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 #-t $NR_THREADS -m $MAX_RAM
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 -t $NR_THREADS -m ${MAX_RAM}GB
       cp pehaplo-${dataset}-time.txt ../../../reconstructed/$dataset
       mv Contigs.fa pehaplo-${dataset}.fa
       cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
