@@ -18,7 +18,7 @@ RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0; #np, boost err
-RUN_VIRUSVG=1;
+RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
@@ -32,7 +32,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0;
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=0; 
+RUN_LAZYPIPE=1; 
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0;
@@ -479,7 +479,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   cd ..
   
   conda create -n blast -c bioconda -y blast
-  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests
+  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster  requests r r-essentials r-base
   
   conda activate blast
   conda activate --stack lazypipe
@@ -498,19 +498,14 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   cd ..
   ls
   
-  #experimental
-  
-  cpan CPAN
-  
-  cpan Term::ReadLine::Perl 
-  
-  #reload CPAN
-  
-  cpan File::Basename File::Temp Getopt::Long YAML::Tiny 
+  #experimental  
+  cpan CPAN  
+  cpan Term::ReadLine::Perl   
+  #reload CPAN  
+  cpan File::Basename File::Temp Getopt::Long YAML::Tiny 	
   
   Rscript -e 'install.packages( c("reshape","openxlsx") )'
   
-  cd lazypipe
   perl perl/install_db.pl --db taxonomy
   cd ..
   
@@ -838,6 +833,8 @@ if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]]
 $file_content" > ensembleAssembly  
   cd ..
 
+
+  https://github.com/bcgsc/abyss/archive/refs/tags/2.1.5.zip
 
   #for file in `cd ensembleAssembly_1;ls -1 ${file}` #for each fasta file in curr dir
   #do 

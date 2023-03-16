@@ -14,8 +14,8 @@ RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
-RUN_VIRUSVG=1;
-RUN_VGFLOW=0; 
+RUN_VIRUSVG=0; #t
+RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #rn
@@ -42,12 +42,12 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0; #?nr
 RUN_VIRALFLYE=0; #err
-RUN_ENSEMBLEASSEMBLER=0;
+RUN_ENSEMBLEASSEMBLER=1;
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS5");
 #declare -a DATASETS=("DS1" "DS2" "DS3");
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5");
 #declare -a VIRUSES=( "B19" );
@@ -351,19 +351,52 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
     
     #generate contigs with spades
     conda activate spades 
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o exec_times-1-$dataset-time.txt spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     conda activate virus-vg-deps
     
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virusvg-${dataset}-time.txt scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c spades_${dataset}/contigs.fasta -vg ./vg -t $NR_THREADS
-    python ../scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o exec_times-2-$dataset-time.txt scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c spades_${dataset}/contigs.fasta -vg ./vg -t $NR_THREADS
+    python scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
     
-    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" python scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
+    
+    rm -rf node_abundance.txt
+    rm -rf contig_graph.final.gfa
+    
+    total_time=0
+    total_mem=0
+    total_cpu=0
+    count=0
+    for f in exec_times-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"
+      total_time=`echo "$total_time+$TIME" | bc -l`
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=$MEM
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`
+    done
+    printf "$total_cpu    -   $count     "
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu%" > virusvg-${dataset}-time.txt
+    
+    mv virusvg-${dataset}-time.txt ../reconstructed/$dataset
+    
+    mv haps.fasta virusvg-$dataset.fa 
+    cp virusvg-$dataset.fa ../reconstructed/$dataset
+
   done
   cd ..
   conda activate base
 fi
 
-#vg-flow - RecursionError: maximum recursion depth exceeded while calling a Python object
+#vg-flow - working
 if [[ "$RUN_VGFLOW" -eq "1" ]] 
   then
   printf "Reconstructing with VG-Flow\n\n"
@@ -391,20 +424,46 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
     
     #generate contigs with spades
     conda activate spades 
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o exec_times-1-$dataset-time.txt spades.py -o spades_${dataset} -1 ${dataset}_1.fq -2 ${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     conda activate vg-flow-env
     
     
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vgflow_${dataset}-time.txt python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c spades_${dataset}/contigs.fasta -vg .././vg -t $NR_THREADS
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o exec_times-2-$dataset-time.txt python ../scripts/build_graph_msga.py -f ${dataset}_1.fq -r ${dataset}_2.fq -c spades_${dataset}/contigs.fasta -vg .././vg -t $NR_THREADS
     python ../scripts/vg-flow.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
     
     mv sorted_contigs.fasta vgflow_$virus.fa
     
     done
-    cat vgflow_*.fa > vgflow_$dataset.fa
+    cat vgflow_*.fa > vgflow-$dataset.fa
     
-    mv vgflow_${dataset}-time.txt ../../reconstructed/$dataset
-    cp vgflow_$dataset.fa ../../reconstructed/$dataset
+    
+    total_time=0
+    total_mem=0
+    total_cpu=0
+    count=0
+    for f in exec_times-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"
+      total_time=`echo "$total_time+$TIME" | bc -l`
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=$MEM
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`
+    done
+    printf "$total_cpu    -   $count     "
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu%" > vgflow-${dataset}-time.txt
+    
+    mv vgflow-${dataset}-time.txt ../../reconstructed/$dataset
+    cp vgflow-$dataset.fa ../../reconstructed/$dataset
 
     cd ..
   done
@@ -910,7 +969,7 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
   printf "Reconstructing with MLEHaplo\n\n"  
   #timer
   #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P"
-  alt_create_fa_from_sam_files
+  create_paired_fa_files
   eval "$(conda shell.bash hook)"
   conda activate mlehaplo
   cd MLEHaplo-0.4.1  
@@ -1034,9 +1093,12 @@ if [[ "$RUN_PRICE" -eq "1" ]]
     do
     cp ../${dataset}_*.fq .
     cp ../gen_${dataset}.fasta .
+     
+    #example
+    ./PriceTI -fp s_1_1_sequence.txt s_1_2_sequence.txt 300 500 s_1_1_sequence.txt 1 1 1 -nc 20 -a 10 -o lane1job.fasta
         
-    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fp ${dataset}_1.fq ${dataset}_2.fq 150 -nc 3 -o result_${dataset}.fasta
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./PriceTI -fs gen_${dataset}.fasta 250 -nc 3 -o result_${dataset}.fasta
+    #./PriceTI -fp ${dataset}_1.fq ${dataset}_2.fq 1 1 1 -nc 3 -a $NR_THREADS -o result.fasta
+    
     done
   cd ..  
 fi
@@ -1316,18 +1378,19 @@ if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]]
     mkdir reconstruction
     cd reconstruction    
     cp ../../${dataset}_*.fq
-    echo "PE=260 30 $(pwd)/${dataset}_1.fq $(pwd)/${dataset}_2.fq
+    echo "PE=150 0 $(pwd)/${dataset}_1.fq $(pwd)/${dataset}_2.fq
 #SE=$(pwd)/${dataset}_2.fq
-NUM_THREADS= 3
-SOAP_KMER=31
-ABYSS_KMER = 31
-METAVELVET_KMER=31
-CON_LEN_DBG=50
-CON_LEN_OLC=50
+NUM_THREADS= $NR_THREADS
+SOAP_KMER=21
+ABYSS_KMER = 21
+METAVELVET_KMER= 21
+CON_LEN_DBG=21
+CON_LEN_OLC=21
 ASSEMBLY_MODE=optimal
 #ASSEMBLY_MODE=quick " > config.txt
     .././ensembleAssembly config.txt
-    
+    chmod +x ./ensemble.sh
+    ./ensemble.sh
     cd ..
     
     #chmod +x ./ensemble.sh
