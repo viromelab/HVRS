@@ -42,7 +42,7 @@ RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=0; #?nr
 RUN_VIRALFLYE=0; #err
-RUN_ENSEMBLEASSEMBLER=1;
+RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
@@ -568,7 +568,7 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
   cd ..
 fi
 
-#QVG - working?
+#QVG - working
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Reconstructing with QVG\n\n"

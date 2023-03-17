@@ -464,7 +464,8 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - currently under construction
+#Lazypipe - Use of uninitialized value within %ENV in substitution iterator at perl/install_db.pl line 41.
+#No such file or directory at perl/install_db.pl line 112.
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"  
@@ -481,6 +482,8 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   conda create -n blast -c bioconda -y blast
   conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster  requests r r-essentials r-base
   
+
+
   conda activate blast
   conda activate --stack lazypipe
   
@@ -492,21 +495,20 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
   tar -zxvf SANSPANZ.3.tar.gz
   sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
-  #echo " " > ~/bin/runsanspanz.py
+  echo " " > ~/bin/runsanspanz.py
   sudo ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py /usr/bin #~/bin/runsanspanz.py
-  
-  cd ..
-  ls
   
   #experimental  
   cpan CPAN  
   cpan Term::ReadLine::Perl   
   #reload CPAN  
-  cpan File::Basename File::Temp Getopt::Long YAML::Tiny 	
-  
+  cpan File::Basename File::Temp Getopt::Long YAML::Tiny
+  export PERL5LIB=~/perl5/lib/perl5:{$PERL5LIB}
+
   Rscript -e 'install.packages( c("reshape","openxlsx") )'
   
-  perl perl/install_db.pl --db taxonomy
+  printf "curr path $(pwd)\n\n"
+  perl perl/install_db.pl --db blastn_vi
   cd ..
   
   
