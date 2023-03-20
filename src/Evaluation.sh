@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 #declare -a DATASETS=("DS1" "DS2" "DS3");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5");
-declare -a VIRUSES=("SVA" "B19" "HPV" "VZV");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
+declare -a VIRUSES=("B19" "HPV" "VZV");
 #
 D_PATH="reconstructed";
 #

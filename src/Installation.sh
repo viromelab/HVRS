@@ -3,14 +3,14 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/lx/miniconda3;
+CONDA_PREFIX=/home/x/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
 INSTALL_TOOLS=0;
 INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
-RUN_QURE=1; #t
+RUN_QURE=0; #t
 RUN_SAVAGE=0; #
 #RUN_QSDPR=0;
 RUN_SPADES=0; #t
@@ -98,7 +98,9 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   printf "Installing make\n\n"
   sudo apt install make
   printf "Installing Java\n\n"
-  sudo apt install default-jre  
+  sudo apt install default-jre
+  printf "Installing AlcoR"
+  conda install -y -c bioconda alcor  
   #printf "Installing Docker\n\n"
   #install_docker
   
@@ -130,6 +132,17 @@ if [[ "$RUN_SAVAGE" -eq "1" ]]
   conda create -y -n savage
   conda activate savage
   conda install -c bioconda -c conda-forge -y boost savage
+  conda activate base
+fi
+
+#ShoRAH 
+if [[ "$RUN_SHORAH" -eq "1" ]] 
+  then
+  printf "Installing ShoRAH\n\n"
+  eval "$(conda shell.bash hook)"
+  conda create -y -n shorah
+  conda activate shorah
+  conda install -c bioconda -y shorah
   conda activate base
 fi
 
@@ -323,7 +336,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
   conda activate base
-  sudo apt-get install libncurses5
+  sudo apt-get install libncurses6
   cd ..
 fi
 
