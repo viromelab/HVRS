@@ -3,44 +3,44 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=0;
+CREATE_RECONSTRUCTION_FOLDERS=1;
 #
-RUN_QURE=0;
+RUN_QURE=1;
 RUN_SAVAGE_NOREF=0; #w?trn
 RUN_SAVAGE_REF=0; #trn
 #RUN_QSDPR=0; 
-RUN_SPADES=0; #t
-RUN_METASPADES=0; #t
-RUN_METAVIRALSPADES=0; #t
-RUN_CORONASPADES=0; #t
+RUN_SPADES=1; #t
+RUN_METASPADES=1; #t
+RUN_METAVIRALSPADES=1; #t
+RUN_CORONASPADES=1; #t
 RUN_VIADBG=0;
-RUN_VIRUSVG=0; #t
-RUN_VGFLOW=0; #t
+RUN_VIRUSVG=1; #t
+RUN_VGFLOW=1; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #rn
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #rn
 RUN_ASPIRE=0;
-RUN_QVG=0; #wrn
+RUN_QVG=1; #wrn
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #wrn
+RUN_VISPA=1; #wrn
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #w?
+RUN_PEHAPLO=1; #w?
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=0; #?nr
+RUN_VIRGENA=1; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0; #?nr
+RUN_SSAKE=1; #?nr
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
@@ -284,6 +284,8 @@ fi
 #qure - running
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
+  eval "$(conda shell.bash hook)"
+  conda activate java-env
   create_paired_fa_files
   printf "Reconstructing with QuRe\n\n"
   cd QuRe_v0.99971/
@@ -328,6 +330,7 @@ CPU_perc	$total_cpu%" > qure-${dataset}-time.txt
     
   done
   cd ..
+  conda activate base
 fi
 
 #virus-vg - err; Subcommand 'msga' is deprecated and is no longer being actively maintained. Future releases may eliminate it entirely.
@@ -467,6 +470,7 @@ CPU_perc	$total_cpu%" > vgflow-${dataset}-time.txt
 
     cd ..
   done
+  cd ..
   conda activate base
 fi
 
@@ -568,7 +572,7 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
   cd ..
 fi
 
-#QVG - working
+#QVG - working?
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Reconstructing with QVG\n\n"

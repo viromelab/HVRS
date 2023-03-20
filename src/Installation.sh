@@ -3,15 +3,15 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/x/miniconda3;
+CONDA_PREFIX=/home/lx/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
 INSTALL_TOOLS=0;
 INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
-RUN_QURE=0;
-RUN_SAVAGE=0;
+RUN_QURE=1; #t
+RUN_SAVAGE=0; #
 #RUN_QSDPR=0;
 RUN_SPADES=0; #t
 RUN_METASPADES=0; #t
@@ -24,27 +24,27 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #w
-RUN_VPIPE=0; #nw
+RUN_QVG=0; #t
+RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0;
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=1; 
+RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0;
+RUN_PEHAPLO=0; #t
 RUN_REGRESSHAPLO=0;
-RUN_CLIQUESNV=0; #
-RUN_IVA=0; #err
+RUN_CLIQUESNV=0; 
+RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=0; #
+RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0; #err
-RUN_SSAKE=0;
+RUN_DRVM=0; 
+RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
 RUN_HAPLOFLOW=0;
@@ -157,6 +157,12 @@ fi
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
   printf "Installing Qure\n\n"
+  eval "$(conda shell.bash hook)"
+  conda create -n java-env -y
+  conda activate java-env
+  conda install -c bioconda -y picard
+  conda activate base
+  rm -rf QuRe_v0.99971
   wget -O qure "https://sourceforge.net/projects/qure/files/latest/download"
   unzip qure
   rm -rf qure
@@ -318,6 +324,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   conda create -y --name qvg-env --file qvg-env.yaml 
   conda activate base
   sudo apt-get install libncurses5
+  cd ..
 fi
 
 #V-pipe
@@ -464,8 +471,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - Use of uninitialized value within %ENV in substitution iterator at perl/install_db.pl line 41.
-#No such file or directory at perl/install_db.pl line 112.
+#Lazypipe - currently under construction
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"  
@@ -482,8 +488,6 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   conda create -n blast -c bioconda -y blast
   conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster  requests r r-essentials r-base
   
-
-
   conda activate blast
   conda activate --stack lazypipe
   
@@ -495,20 +499,21 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
   tar -zxvf SANSPANZ.3.tar.gz
   sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
-  echo " " > ~/bin/runsanspanz.py
+  #echo " " > ~/bin/runsanspanz.py
   sudo ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py /usr/bin #~/bin/runsanspanz.py
+  
+  cd ..
+  ls
   
   #experimental  
   cpan CPAN  
   cpan Term::ReadLine::Perl   
   #reload CPAN  
-  cpan File::Basename File::Temp Getopt::Long YAML::Tiny
-  export PERL5LIB=~/perl5/lib/perl5:{$PERL5LIB}
-
+  cpan File::Basename File::Temp Getopt::Long YAML::Tiny 	
+  
   Rscript -e 'install.packages( c("reshape","openxlsx") )'
   
-  printf "curr path $(pwd)\n\n"
-  perl perl/install_db.pl --db blastn_vi
+  perl perl/install_db.pl --db taxonomy
   cd ..
   
   
