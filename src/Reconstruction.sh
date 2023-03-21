@@ -5,7 +5,7 @@ MAX_RAM=28;
 #
 CREATE_RECONSTRUCTION_FOLDERS=0;
 #
-RUN_SHORAH=1;
+RUN_SHORAH=0;
 RUN_QURE=0;
 RUN_SAVAGE_NOREF=0; #w?trn
 RUN_SAVAGE_REF=0; #trn
@@ -15,13 +15,13 @@ RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
-RUN_VIRUSVG=0; #t
-RUN_VGFLOW=0; #t
+#RUN_VIRUSVG=0; #t
+#RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #rn
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #wrn
+RUN_QVG=0; #t
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -29,7 +29,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0; #wrn
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; 
+RUN_LAZYPIPE=0; 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0; #w?
@@ -37,7 +37,7 @@ RUN_PEHAPLO=0; #w?
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=0; #?nr
+RUN_VIRGENA=1; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
@@ -70,7 +70,7 @@ create_paired_fa_files () {
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
   then  
-  printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/"
+  printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
   rm -rf reconstructed
   mkdir reconstructed
   cd reconstructed
@@ -1116,148 +1116,6 @@ if [[ "$RUN_PRICE" -eq "1" ]]
   cd ..  
 fi
 
-#VirGenA 
-if [[ "$RUN_VIRGENA" -eq "1" ]] 
-  then
-  printf "Reconstructing with VirGenA\n\n"
-  eval "$(conda shell.bash hook)"
-  conda activate java-env
-  cd release_v1.4
-  chmod +x ./tools/vsearch
-  for dataset in "${DATASETS[@]}"
-    do
-    
-    for virus in "${VIRUSES[@]}"
-    do
-      rm -rf ${dataset}_*.fq
-      rm -rf ${virus}.fa
-      rm -rf *.gz
-      
-      cp ../${dataset}_*.fq .
-      cp ../${virus}.fa .
-    
-      gzip *.fq
-      
-      #rm -rf $dataset-$virus 
-      #mkdir $dataset-$virus
-    
-      echo "<config>
-    <Data>
-        <pathToReads1>${dataset}_1.fq.gz</pathToReads1>
-        <pathToReads2>${dataset}_2.fq.gz</pathToReads2>
-        <InsertionLength>1000</InsertionLength>
-    </Data>
-    <Reference>${virus}.fa</Reference>
-    <OutPath>./res/$dataset-$virus</OutPath>
-    <ThreadNumber>-1</ThreadNumber>
-	<BatchSize>1000</BatchSize>
-    <ReferenceSelector>
-		<Enabled>true</Enabled>
-        <UseMajor>false</UseMajor>
-        <ReferenceMSA>./data/HIV_RefSet_msa.fasta</ReferenceMSA>
-        <PathToVsearch>./tools/vsearch</PathToVsearch>
-        <UclustIdentity>0.95</UclustIdentity>
-        <MinReadLength>50</MinReadLength>
-        <MinContigLength>1000</MinContigLength>
-        <Delta>0.05</Delta>
-		<MaxNongreedyComponentNumber>5</MaxNongreedyComponentNumber>
-        <MapperToMSA>
-			<K>7</K>
-			<IndelToleranceThreshold>1.5</IndelToleranceThreshold>
-			<pValue>0.01</pValue>
-			<RandomModelParameters>
-				<Order>4</Order>
-				<ReadNum>1000</ReadNum>
-				<Step>10</Step>
-			</RandomModelParameters>
-        </MapperToMSA>
-        <Graph>
-            <MinReadNumber>5</MinReadNumber>
-            <VertexWeight>10</VertexWeight>
-			<SimilarityThreshold>0.5</SimilarityThreshold>
-			<Debug>false</Debug>
-        </Graph>
-        <Debug>false</Debug>
-    </ReferenceSelector>
-    <Mapper>
-		<K>5</K>
-		<IndelToleranceThreshold>1.25</IndelToleranceThreshold>
-        <pValue>0.01</pValue>
-		<RandomModelParameters>
-			<Order>4</Order>
-			<ReadNum>1000</ReadNum>
-			<Step>10</Step>
-		</RandomModelParameters>
-        <Aligner>
-            <Match>2</Match>
-            <Mismatch>-3</Mismatch>
-            <GapOpenPenalty>5</GapOpenPenalty>
-            <GapExtensionPenalty>2</GapExtensionPenalty>
-        </Aligner>
-    </Mapper>
-    <ConsensusBuilder>
-        <IdentityThreshold>0.9</IdentityThreshold>
-        <CoverageThreshold>0</CoverageThreshold>
-        <MinIntersectionLength>10</MinIntersectionLength>
-        <MinTerminationReadsNumber>1</MinTerminationReadsNumber>
-        <Reassembler>
-            <IdentityThreshold>0.9</IdentityThreshold>
-            <MinTerminatingSequenceCoverage>0</MinTerminatingSequenceCoverage>
-            <PairReadTerminationThreshold>0.1</PairReadTerminationThreshold>
-            <MinReadLength>50</MinReadLength>
-        </Reassembler>
-        <Debug>false</Debug>
-    </ConsensusBuilder>
-    <Postprocessor>
-        <Enabled>true</Enabled>
-        <MinFragmentLength>500</MinFragmentLength>
-        <MinIdentity>0.99</MinIdentity>
-		<MinFragmentCoverage>0.99</MinFragmentCoverage>
-        <Debug>false</Debug>
-    </Postprocessor>
-</config>" > $dataset-conf.xml
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt  java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
-    #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
-    done
-    cd res
-    cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
-    rm -rf *_complete_genome_assembly.fasta
-    
-    
-    total_time=0
-    total_mem=0
-    total_cpu=0 
-    count=0
-    for f in ../virgena-*-$dataset-time.txt
-    do
-      echo "Processing $f" 
-      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
-      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
-      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
-      CPU="$(cut -d'%' -f1 <<< $CPU)"       
-      total_time=`echo "$total_time+$TIME" | bc -l`      
-      if [[ $MEM -gt $total_mem ]]
-      then
-        total_mem=$MEM
-      fi
-      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
-      count=`echo "$count+1" | bc -l`     
-    done
-    printf "$total_cpu    -   $count     "
-    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
-    echo "TIME	$total_time
-MEM	$total_mem
-CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
-        
-    mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
-    cp virgena-$dataset.fa ../../reconstructed/$dataset 
-    cd ..
-    
-  done
-  cd ..
-  conda activate base
-  
-fi
 
 #TAR-VIR - no errors but no seed reads
 if [[ "$RUN_TARVIR" -eq "1" ]] 
@@ -1494,6 +1352,150 @@ if [[ "$RUN_VIQUF" -eq "1" ]]
   cd ..
   #conda activate base  
 fi
+
+#VirGenA 
+if [[ "$RUN_VIRGENA" -eq "1" ]] 
+  then
+  printf "Reconstructing with VirGenA\n\n"
+  eval "$(conda shell.bash hook)"
+  conda activate java-env
+  cd release_v1.4
+  chmod +x ./tools/vsearch
+  for dataset in "${DATASETS[@]}"
+    do
+    
+    for virus in "${VIRUSES[@]}"
+    do
+      rm -rf ${dataset}_*.fq
+      rm -rf ${virus}.fa
+      rm -rf *.gz
+      
+      cp ../${dataset}_*.fq .
+      cp ../${virus}.fa .
+    
+      gzip *.fq
+      
+      #rm -rf $dataset-$virus 
+      #mkdir $dataset-$virus
+    
+      echo "<config>
+    <Data>
+        <pathToReads1>${dataset}_1.fq.gz</pathToReads1>
+        <pathToReads2>${dataset}_2.fq.gz</pathToReads2>
+        <InsertionLength>1000</InsertionLength>
+    </Data>
+    <Reference>${virus}.fa</Reference>
+    <OutPath>./res/$dataset-$virus</OutPath>
+    <ThreadNumber>-1</ThreadNumber>
+	<BatchSize>1000</BatchSize>
+    <ReferenceSelector>
+		<Enabled>true</Enabled>
+        <UseMajor>false</UseMajor>
+        <ReferenceMSA>./data/HIV_RefSet_msa.fasta</ReferenceMSA>
+        <PathToVsearch>./tools/vsearch</PathToVsearch>
+        <UclustIdentity>0.95</UclustIdentity>
+        <MinReadLength>50</MinReadLength>
+        <MinContigLength>1000</MinContigLength>
+        <Delta>0.05</Delta>
+		<MaxNongreedyComponentNumber>5</MaxNongreedyComponentNumber>
+        <MapperToMSA>
+			<K>7</K>
+			<IndelToleranceThreshold>1.5</IndelToleranceThreshold>
+			<pValue>0.01</pValue>
+			<RandomModelParameters>
+				<Order>4</Order>
+				<ReadNum>1000</ReadNum>
+				<Step>10</Step>
+			</RandomModelParameters>
+        </MapperToMSA>
+        <Graph>
+            <MinReadNumber>5</MinReadNumber>
+            <VertexWeight>10</VertexWeight>
+			<SimilarityThreshold>0.5</SimilarityThreshold>
+			<Debug>false</Debug>
+        </Graph>
+        <Debug>false</Debug>
+    </ReferenceSelector>
+    <Mapper>
+		<K>5</K>
+		<IndelToleranceThreshold>1.25</IndelToleranceThreshold>
+        <pValue>0.01</pValue>
+		<RandomModelParameters>
+			<Order>4</Order>
+			<ReadNum>1000</ReadNum>
+			<Step>10</Step>
+		</RandomModelParameters>
+        <Aligner>
+            <Match>2</Match>
+            <Mismatch>-3</Mismatch>
+            <GapOpenPenalty>5</GapOpenPenalty>
+            <GapExtensionPenalty>2</GapExtensionPenalty>
+        </Aligner>
+    </Mapper>
+    <ConsensusBuilder>
+        <IdentityThreshold>0.9</IdentityThreshold>
+        <CoverageThreshold>0</CoverageThreshold>
+        <MinIntersectionLength>10</MinIntersectionLength>
+        <MinTerminationReadsNumber>1</MinTerminationReadsNumber>
+        <Reassembler>
+            <IdentityThreshold>0.9</IdentityThreshold>
+            <MinTerminatingSequenceCoverage>0</MinTerminatingSequenceCoverage>
+            <PairReadTerminationThreshold>0.1</PairReadTerminationThreshold>
+            <MinReadLength>50</MinReadLength>
+        </Reassembler>
+        <Debug>false</Debug>
+    </ConsensusBuilder>
+    <Postprocessor>
+        <Enabled>true</Enabled>
+        <MinFragmentLength>500</MinFragmentLength>
+        <MinIdentity>0.99</MinIdentity>
+		<MinFragmentCoverage>0.99</MinFragmentCoverage>
+        <Debug>false</Debug>
+    </Postprocessor>
+</config>" > $dataset-conf.xml
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt  java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
+    #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
+    done
+    cd res
+    cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
+    rm -rf *_complete_genome_assembly.fasta
+    
+    
+    total_time=0
+    total_mem=0
+    total_cpu=0 
+    count=0
+    for f in ../virgena-*-$dataset-time.txt
+    do
+      echo "Processing $f" 
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"       
+      total_time=`echo "$total_time+$TIME" | bc -l`      
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=$MEM
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`     
+    done
+    printf "$total_cpu    -   $count     "
+    total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
+    echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
+        
+    mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
+    cp virgena-$dataset.fa ../../reconstructed/$dataset 
+    cd ..
+    
+  done
+  cd ..
+  conda activate base
+  
+fi
+
 
 
  

@@ -7,7 +7,8 @@ declare -a VIRUSES=("B19" "HPV" "VZV");
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Mem	%CPU	Accuracy(%)" > total_stats.tsv
+echo "Dataset	File	Time	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Accuracy(%)	Mem	%CPU" > total_stats.tsv
+rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   printf "$dataset\n";	  
@@ -44,7 +45,9 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       ACCURACY=$(echo $TMP \/ $TBASES |bc -l | xargs printf %.3f)
       
     #ds	file	exec_time	tbases	alignedbases	snps	avg_identity	max_mem	cpu_avg
-    echo "$dataset	$file	$TIME	$NRBASES	$TALBA	$SNPS	$IDEN	$MEM	$CPU_P	$ACCURACY" >> total_stats.tsv
+    echo "$dataset	$file	$TIME	$NRBASES	$TALBA	$SNPS	$IDEN	$ACCURACY	$MEM	$CPU_P" >> total_stats.tsv
+    CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
+    echo "$file & $TIME & $NRBASES & $TALBA & $SNPS & $IDEN & $ACCURACY & $MEM & $CPU &  \\\\\\hline" >> total_stats.tex
     printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     #rm -f G_A.fa G_B.fa ; #remove tmp files
     fi
