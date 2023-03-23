@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#
+#If you are going to use lazypipe or drVM, please run this as . ./Installation.sh
 #
 PYTHON2_PATH="#!/usr/bin/python2";
 CONDA_PREFIX=/home/x/miniconda3;
@@ -489,44 +489,67 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   then
   printf "Installing Lazypipe\n\n"  
   eval "$(conda shell.bash hook)"  
-  #rm -rf lazypipe  
-  #git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
-  #cd lazypipe
- # 
- # mkdir data
- # cd data
- # mkdir taxonomy
- # cd ..
- # 
- # conda create -n blast -c bioconda -y blast
- # conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests perl
+  rm -rf lazypipe  
+  git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
+  cd lazypipe
   
- # conda activate blast
- # conda activate --stack lazypipe
+  mkdir data
+  cd data
+  mkdir taxonomy
+  cd ..
+
+  conda create -n blast -c bioconda -y blast
+  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests perl
   
- # rm -rf $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
- # ln -s data/taxonomy $CONDA_PREFIX/conda/env/lazypipe/opt/krona/taxonomy
+  conda activate blast
+  conda activate --stack lazypipe
   
- # export TM=$CONDA_PREFIX/share/trimmomatic
+  rm -rf $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy
+  ln -s data/taxonomy $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy
   
- # wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
- # tar -zxvf SANSPANZ.3.tar.gz
- # sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
-  #echo " " > ~/bin/runsanspanz.py
- # sudo ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py /usr/bin #~/bin/runsanspanz.py
+  export TM=$CONDA_PREFIX/share/trimmomatic
+  
+  wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
+  tar -zxvf SANSPANZ.3.tar.gz
+  sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
+  sudo ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py /usr/bin ~/bin/runsanspanz.py
   
  # cd ..
  # ls
   
-  #experimental  
-  cpan CPAN  
-  cpan
-  install --local-lib=/home/x/miniconda3/pkgs/perl-5.32.1-2_h7f98852_perl5/ File::Basename File::Temp Getopt::Long YAML::Tiny
-  export PERL5LIB=$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/lib/perl5:{$PERL5LIB}
+  #experimental 
+  #rm -rf ~/perl5
+  #mkdir ~/perl5
+  #rm -rf perl-5.36.0.tar.gz
+  #wget https://www.cpan.org/src/5.0/perl-5.36.0.tar.gz
+  #tar -xzf perl-5.36.0.tar.gz
+  #cd perl-5.36.0
+  #./Configure -des -Dprefix=~/perl5
+  #make
+  #make test
+  #make install
+  
+  #mv ~/bin ~/perl5
+  #mv ~/lib ~/perl5
+  #mv ~/man ~/perl5
+  
+  #sudo apt-get install r-base
+  #sudo apt-get install r-base-dev  
+
+  
+  cpan File::Basename File::Temp Getopt::Long YAML::Tiny
+  export PERL5LIB=$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/bin/perl
+  echo $PERL5LIB
+  
+  #mkdir TM
+  #mkdir BLASTDB
   
   Rscript -e 'install.packages( c("reshape","openxlsx") )'
   
+  
+  
   perl perl/install_db.pl --db taxonomy
+  
   cd ..
   
   
