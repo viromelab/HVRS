@@ -493,16 +493,18 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
   cd lazypipe
   
-  mkdir data
+  #mkdir data
   cd data
   mkdir taxonomy
   cd ..
 
-  conda create -n blast -c bioconda -y blast
-  conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests perl
+  #conda create -n blast -c bioconda -y blast
+  #conda create -n lazypipe -c bioconda -c eclarke -y bwa centrifuge csvtk fastp krona megahit mga minimap2 samtools seqkit spades snakemake-minimal taxonkit trimmomatic numpy scipy fastcluster requests perl
   
+
   conda activate blast
   conda activate --stack lazypipe
+  ln -fs ~/miniconda3/envs/lazypipe/bin/ ~/
   
   rm -rf $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy
   ln -s data/taxonomy $CONDA_PREFIX/envs/lazypipe/opt/krona/taxonomy
@@ -512,7 +514,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
   tar -zxvf SANSPANZ.3.tar.gz
   sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
-  sudo ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py /usr/bin ~/bin/runsanspanz.py
+  ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
   
  # cd ..
  # ls
