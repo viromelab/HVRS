@@ -3,45 +3,45 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=1;
+CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 RUN_SHORAH=0;
-RUN_QURE=1;
-RUN_SAVAGE_NOREF=1; #w?
-RUN_SAVAGE_REF=1; #t
+RUN_QURE=0;
+RUN_SAVAGE_NOREF=0; #w?
+RUN_SAVAGE_REF=0; #t
 #RUN_QSDPR=0; 
-RUN_SPADES=1; #t
-RUN_METASPADES=1; #t
-RUN_METAVIRALSPADES=1; #t
-RUN_CORONASPADES=1; #t
+RUN_SPADES=0; #t
+RUN_METASPADES=0; #t
+RUN_METAVIRALSPADES=0; #t
+RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1; #t
-RUN_TRACESPIPE=1; #t
+RUN_TRACESPIPELITE=0; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t
+RUN_QVG=0; #t
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #w
+RUN_VISPA=0; #w
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; 
+RUN_LAZYPIPE=1; 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=1; #w
+RUN_PEHAPLO=0; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=1; #?nr
+RUN_VIRGENA=0; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=1; #w
+RUN_SSAKE=0; #w
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
@@ -933,13 +933,11 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
     rm -rf results_$dataset
     mkdir results_$dataset
     
-    #/bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o lazypipe-${dataset}-time.txt perl lazypipe.pl -1 data/samples/M15small_R1.fastq -s results_$dataset -t $MAX_THREADS
-    perl lazypipe.pl -1 data/samples/M15small_R1.fastq -s M15 -p main -t 8
-    
-    #mv spades-${dataset}-time.txt ../reconstructed/$dataset
-    #mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fa
-    #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
-    #cp spades_${dataset}/spades-${dataset}.fa ../reconstructed/$dataset
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o lazypipe-${dataset}-time.txt perl lazypipe.pl -1 ${dataset}_1.fq -2 ${dataset}_2.fq --pipe all -v -t $NR_THREADS
+
+    mv results/$dataset/contigs.fa results/$dataset/lazypipe-$dataset.fa
+    cp results/$dataset/lazypipe-$dataset.fa ../reconstructed/${dataset}
+    mv lazypipe-${dataset}-time.txt ../reconstructed/${dataset}
  
   done
   cd ..
