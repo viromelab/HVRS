@@ -32,7 +32,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=1; #w, needs testing
+RUN_LAZYPIPE=0; #w, needs testing
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0; #t
@@ -43,7 +43,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0; 
+RUN_DRVM=1; 
 RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
@@ -754,14 +754,14 @@ if [[ "$RUN_DRVM_DOCKER" -eq "1" ]]
   sudo docker run -t -i -v /home/manager/Templates:/drVM 990210oliver/drvm /bin/bash
   
   cd drVM
-  mkdir VMDB
-  cd VMDB
+  mkdir MyDB
+  cd MyDB
   wget https://sourceforge.net/projects/sb2nhri/files/drVM/sequence_20160316.tar.gz
   tar -zxvf sequence_20160316.tar.gz
 
   CreateDB.py -s sequence.fasta
   
-  export MyDB='/drVM/VMDB'
+  export MyDB='/drVM/MyDB'
   drVM.py -1 DRR049387_1.fastq -2 DRR049387_2.fastq -t $NR_THREADS
   
 fi
@@ -790,20 +790,23 @@ $file_content" > $filename
   
   
   #gawk -i inplace $0=="#!/usr/bin/python" {$0="${PYTHON2_PATH}"} 1 *.py
-  rm -rf VMDB
-  mkdir VMDB
-  cd VMDB
+  rm -rf MyDB
+  mkdir MyDB
+  cd MyDB
   rm -rf sequence_20160316.tar.gz 
   wget https://sourceforge.net/projects/sb2nhri/files/drVM/sequence_20160316.tar.gz
   tar -zxvf sequence_20160316.tar.gz
-   
-  ./../CreateDB.py -s sequence.fasta -d 10 -kn off
   
+  ./../CreateDB.py -s sequence.fasta -d 10 -kn off
+  ./../CreateTaxInfo.py sequence.fasta nucl_gb.accession2taxid
+  ./../CreateSnapDB.py sequence.fasta snap 10000000 off
+  ./../CreateBlastDB.py makeblastdb
+
   
   cd ../
   #./CreateSnapDB.py ../DS1.fa snap-0.15.4-linux
   cd ../
-  export MyDB="$(pwd)/Tools/VMDB"
+  export MyDB="$(pwd)/Tools/MyDB"
   printf "path exported  ->  $MyDB \n\n"
   
   

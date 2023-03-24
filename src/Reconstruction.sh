@@ -3,7 +3,7 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=1;
+CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 RUN_SHORAH=0;
 RUN_QURE=0;
@@ -29,7 +29,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; #w 
+RUN_LAZYPIPE=0; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0; #w
@@ -40,7 +40,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=0;
+RUN_DRVM=1;
 RUN_SSAKE=0; #w
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
@@ -925,6 +925,9 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   conda activate blast
   conda activate --stack lazypipe
   cd lazypipe
+  export TM="$CONDA_PREFIX/share/trimmomatic"
+  export BLASTDB="$(pwd)/BLASTDB/"
+  export data="$(pwd)/data/"
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_*.fq .
@@ -1095,12 +1098,14 @@ if [[ "$RUN_PRICE" -eq "1" ]]
     do
     cp ../${dataset}_*.fq .
     cp ../gen_${dataset}.fasta .
-     
+    mv gen_${dataset}.fasta gen_${dataset}_sequence.txt
+    mv ${dataset}_1.fq ${dataset}_1_sequence.txt
+    mv ${dataset}_2.fq ${dataset}_2_sequence.txt
     #example
-    ./PriceTI -fp s_1_1_sequence.txt s_1_2_sequence.txt 300 500 s_1_1_sequence.txt 1 1 1 -nc 20 -a 10 -o lane1job.fasta
-        
-    #./PriceTI -fp ${dataset}_1.fq ${dataset}_2.fq 1 1 1 -nc 3 -a $NR_THREADS -o result.fasta
+    #./PriceTI -fp s_1_1_sequence.txt s_1_2_sequence.txt 300 500 s_1_1_sequence.txt 1 1 1 -nc 20 -a 10 -o lane1job.fasta
     
+    ./PriceTI -fp ${dataset}_1_sequence.txt ${dataset}_2_sequence.txt 1 1 1 -nc 3 -a $NR_THREADS -o result.fasta
+    #./PriceTI -fs gen_${dataset}_sequence.txt 1 1 1 -nc 3 -a $NR_THREADS -o result.fasta
     done
   cd ..  
 fi
@@ -1164,7 +1169,7 @@ if [[ "$RUN_VIP" -eq "1" ]]
   conda activate base
 fi
 
-#drVM - err - Please check your snap DB location
+#drVM - err - No such file or directory: 'GenusCovDepth.txt'
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Reconstructing with drVM\n\n"
@@ -1174,7 +1179,7 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_*.fq .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ${dataset}_1.fq -2 ${dataset}_2.fq
+    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ${dataset}_1.fq -2 ${dataset}_2.fq -type illumina -dn off -t $NR_THREADS -ar 0.1 -cl 150
   done
   cd ..
   #printf "$(env)"
