@@ -3,7 +3,7 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=0;
+CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 RUN_SHORAH=0;
 RUN_QURE=0;
@@ -27,9 +27,9 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #w
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; 
+RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0; #w
@@ -917,35 +917,26 @@ fi
 #  conda activate base
 #fi
 
-#Lazypipe 
+#Lazypipe - working
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Reconstructing with Lazypipe\n\n"
   eval "$(conda shell.bash hook)"
   conda activate blast
   conda activate --stack lazypipe
-  
   cd lazypipe
   for dataset in "${DATASETS[@]}"
     do
-    	
     cp ../${dataset}_*.fq .
     rm -rf results_$dataset
     mkdir results_$dataset
-    
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o lazypipe-${dataset}-time.txt perl lazypipe.pl -1 ${dataset}_1.fq -2 ${dataset}_2.fq --pipe all -v -t $NR_THREADS
-
     mv results/$dataset/contigs.fa results/$dataset/lazypipe-$dataset.fa
     cp results/$dataset/lazypipe-$dataset.fa ../reconstructed/${dataset}
     mv lazypipe-${dataset}-time.txt ../reconstructed/${dataset}
- 
   done
   cd ..
-  conda activate base
-  
-  
-  
-  
+  conda activate base 
 fi
 
 #ViQuaS - err - [0] smalt.c:1116 ERROR: could not open file cut: alnc.sam: No such file or directory, may be caused by lack of Bio::Seq module, which couldn't be installed
@@ -1179,12 +1170,14 @@ if [[ "$RUN_DRVM" -eq "1" ]]
   printf "Reconstructing with drVM\n\n"
 
   cd Tools 
+  export MyDB="$(pwd)/MyDB"
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_*.fq .
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ${dataset}_1.fq -2 ${dataset}_2.fq
   done
   cd ..
+  #printf "$(env)"
 fi
 
 #SSAKE - running

@@ -32,7 +32,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=1; 
+RUN_LAZYPIPE=1; #w, needs testing
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0; #t
@@ -99,7 +99,7 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt install make
   printf "Installing Java\n\n"
   sudo apt install default-jre
-  printf "Installing AlcoR"
+  printf "Installing AlcoR\n\n"
   conda install -y -c bioconda alcor  
   #printf "Installing Docker\n\n"
   #install_docker
@@ -484,7 +484,7 @@ if [[ "$RUN_QUASIRECOMB" -eq "1" ]]
   
 fi
 
-#Lazypipe - currently under construction
+#Lazypipe - working on some machines, conda issues
 if [[ "$RUN_LAZYPIPE" -eq "1" ]] 
   then
   printf "Installing Lazypipe\n\n"  
@@ -516,6 +516,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
   tar -zxvf SANSPANZ.3.tar.gz
   sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
+  mkdir ~/bin
   ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
   
  # cd ..
@@ -538,102 +539,18 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   #mv ~/man ~/perl5
   
   #sudo apt-get install r-base
-  #sudo apt-get install r-base-dev  
-
+  #sudo apt-get install r-base-dev
   
   cpan File::Basename File::Temp Getopt::Long YAML::Tiny
-  export PERL5LIB="$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/bin/perl"
+  export PERL5LIB="$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/bin/perl:$PERL5LIB"
   echo $PERL5LIB
-  
   #mkdir TM
   #mkdir BLASTDB
-  
-  Rscript -e 'install.packages( c("reshape","openxlsx") )'
-  
-  
-  
+  #Rscript -e 'install.packages( c("reshape","openxlsx") )'
   perl perl/install_db.pl --db taxonomy
-  
+  perl perl/install_db.pl --db blastn_vi
   cd ..
-  
-  echo "# Lazypipe v2.0 config
-# can include env vars
-
-# SNAKEMAKE PARAMETERS 
-datain:
-    M15:  data/samples/M15small_R1.fastq
-    C13:  data/samples/C13_R1.fastq.gz
-    #clinical: data/clinical_R1.fastq
-    
-hostgen_sm:
-    M15:      "$data/hostgen/GCA_900108605.1_NNQGG.v01_genomic.fna.gz"         # Neovison vison
-    C13:      "$data/hostgen/GCF_000181335.3_Felis_catus_9.0_genomic.fna.gz"   # Felis catus
-    #clinical: "$data/hostgen/GCA_000001405.15_GRCh38_genomic.fna.gz"      # H. sapiens
-
-hostgen_taxid_sm:                            # assign reads mapped to hostgen to this taxid in abundance est
-    M15:            452646
-    C13:            9685
-    #clinical:      9606                       
-threads_max:        64
-blastv:             0
-blastu:             0
-
-
-# GENERAL PARAMETERS
-R_call:                          "singularity_wrapper exec Rscript --no-save"
-hostgen:                         0
-hostgen_taxid:                   0
-hostgen_flt_th:                  50      # minimum alignment score for read mapping to hostgen
-min_gene_length:                 72
-min_sans_bits:                   120     # minimum alignment score for orf mapping with SANS
-min_blastp_bits:                 120     # minimum alignment score for orf mapping with BLASTP
-min_blastn_bits:                 100     # minimum alignment score for contig mapping with blastn
-min_cent_bits:                   100     # minimum alignment score for contig mapping with Centrifuge
-min_minimap_DPpeak_score:        100     # minimum alignment score for contig mapping with minimap2
-min_minimap_DPtotal_score:       1
-realign_read_th:                 50      # minimum alignment score for read mapping to contigs
-numth:                           16                   
-tail:                            0       # Remove taxa that correspond to this percentile in abundance estimation. Set to zero to keep all predictions.
-cont_score_tail:                 5       # Remove taxa from contig that correspond to this percentile. Reduces noise in abundance estimation.
-trimm_par:                       "ILLUMINACLIP:$TM/adapters/TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
-fastp_par:                       "-q 15 -u 40 -l 36 --detect_adapter_for_pe --cut_right --cut_window_size 4 --cut_mean_quality 15 --correction"
-tmpdir:                          "$data/wrkdir"
-keep_tmpdir:                     0
-res:                             "results"   # results directory
-logs:                            "logs"      # logs directory
-trimm_sample_name:               1           # when setting sample-name to read1-name, trimm sample-name to the first occurance of "_"
-
-# DEFAULT COMMAND LINE OPTIONS
-pre:                "fastp"     # preprocess: fastp/trimm/none
-ass:                "megahit"   # assembler: megahit/spades
-ann:                "sans"      # homology search engine: blastp/sans/cent/minimap
-weights:            "bitscore"  # model for read abundance estimation: taxacount/bitscore/bitscore2
-gen:                ""
-
-# FILES & DATABASES
-blastp_db:             "$BLASTDB/nr"
-#blastn_vi_db_url:     "https://ftp.ncbi.nih.gov/blast/db/ref_viruses_rep_genomes.tar.gz"
-#blastn_vi_db:         "$data/blast/ref_viruses_rep_genomes"    # Refseq viruses representative genomes
-blastn_vi_db_url:      "https://zenodo.org/record/7303045/files/blast_gb_vi_2023_01_01.tar.gz"
-blastn_vi_db:          "$data/blast/gb_vi_2023_01_01"           # NCBI GeneBank Viruses Complete genomes
-centrifuge_db:         "$data/centrifuge/nt_2021_12_habv"
-minimap_db:            "$data/ncbi/2023_01_01.nt_abv.fa.mmi"        # NCBI nt Archae+Bacteria+Virus sequences
-minimap_db_phages:     "$data/GPD/GPD_sequences.fa.gz.mmi"			# i.e. Gut Phage Database (Camarillo-Guerrero et al., 2021)
-minimap_db_phages_metadata: "$data/GPD/GPD_metadata.tsv"
-
-taxonomy:              "$data/taxonomy"
-taxonomy_update:       1 # 1 => update, 0 => don't update
-taxonomy_update_time:  5 # in days
-taxonomy_url:          "ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
-" > config.yaml
-  
-  
-  conda activate base
-  
-  
-  
-  
-  
+  conda activate base 
 fi
 
 #ViQuaS
