@@ -1,13 +1,15 @@
 #!/bin/bash
 #
-#declare -a DATASETS=("DS1" "DS2" "DS3");
+#declare -a DATASETS=("DS3" "DS4" "DS5");
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
 declare -a VIRUSES=("B19" "HPV" "VZV");
+declare -a METAGENOMIC=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe");
+declare -a NOT_METAGENOMIC=("qvg" "qure" "vispa" "virgena");
 #
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Accuracy(%)	Mem	%CPU" > total_stats.tsv
+echo "Dataset	File	Time	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Accuracy(%)	Mem	%CPU	Metagenomic" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
@@ -44,10 +46,30 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       TMP=$(($TALBA * 100))
       ACCURACY=$(echo $TMP \/ $TBASES |bc -l | xargs printf %.3f)
       
-    #ds	file	exec_time	tbases	alignedbases	snps	avg_identity	max_mem	cpu_avg
-    echo "$dataset	$file	$TIME	$NRBASES	$TALBA	$SNPS	$IDEN	$ACCURACY	$MEM	$CPU_P" >> total_stats.tsv
+      NAME_TOOL="$(cut -d'-' -f1 <<< $file_wout_extension)"
+      CLASS="?"
+      
+
+      for i in "${METAGENOMIC[@]}" #analyse each virus
+      do
+        if [ "$i" == "$NAME_TOOL" ] ; then
+          CLASS="Yes"
+        fi 
+      done
+      
+      for i in "${NOT_METAGENOMIC[@]}"
+      do
+        if [ "$i" == "$NAME_TOOL" ] ; then
+          CLASS="No"
+        fi 
+      done
+      
+      
+      
+    #ds	file	exec_time	tbases	alignedbases	snps	avg_identity	max_mem	cpu_avg	metagenomic
+    echo "$dataset	$file	$TIME	$NRBASES	$TALBA	$SNPS	$IDEN	$ACCURACY	$MEM	$CPU_P	$CLASS" >> total_stats.tsv
     CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
-    echo "$file & $TIME & $NRBASES & $TALBA & $SNPS & $IDEN & $ACCURACY & $MEM & $CPU &  \\\\\\hline" >> total_stats.tex
+    echo "$file & $TIME & $NRBASES & $TALBA & $SNPS & $IDEN & $ACCURACY & $MEM & $CPU & $CLASS \\\\\\hline" >> total_stats.tex
     printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     #rm -f G_A.fa G_B.fa ; #remove tmp files
     fi
