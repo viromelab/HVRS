@@ -26,6 +26,8 @@ RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
 RUN_QVG=0; #t
 RUN_VPIPE=0;
+RUN_VPIPE_V3=1;
+RUN_VPIPE_QI=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -43,7 +45,7 @@ RUN_PRICE=0;
 RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=1; 
+RUN_DRVM=0; 
 RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
@@ -238,15 +240,25 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n viadbg
   conda activate viadbg
-  conda install -c "conda-forge/label/gcc7" -y boost
-  conda install -c conda-forge -y boost-cpp
+  #conda install -c "conda-forge/label/gcc7" -y boost
+  #conda install -c conda-forge -y boost-cpp
   #apt install libboost-all-dev
   conda install -c bioconda -y sga
  
-  git clone https://github.com/borjaf696/viaDBG.git
-  cd viaDBG
-  make clean && make
-  cd ..
+  rm -rf boost_1_60_0.tar.gz
+  wget http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz
+  tar xvzf boost_1_60_0.tar.gz
+  cd boost_1_60_0
+  ./bootstrap.sh
+  ./bjam install --prefix=~
+  #./bjam install --prefix=~/boost
+  #export PATH="$(pwd):$PATH"
+  sudo ./b2 install 
+ 
+  #git clone https://github.com/borjaf696/viaDBG.git
+  #cd viaDBG
+  #make clean && make
+  #cd ..
 
   
 fi
@@ -339,6 +351,39 @@ if [[ "$RUN_QVG" -eq "1" ]]
   sudo apt-get install libncurses6
   cd ..
 fi
+
+#V-pipe
+if [[ "$RUN_VPIPE_V3" -eq "1" ]]
+  then
+  printf "Installing with V-pipe ver 3\n\n"
+  eval "$(conda shell.bash hook)"  
+  conda create -y -n vpipe
+  conda activate vpipe
+  conda install -c bioconda snakemake -y
+  rm -rf vpipe_v2
+  mkdir vpipe_v2
+  cd vpipe_v2
+  git clone https://github.com/cbg-ethz/V-pipe.git
+  cd ..
+  
+  
+  conda activate base
+  
+fi
+
+#V-pipe
+if [[ "$RUN_VPIPE_QI" -eq "1" ]]
+  then
+  printf "Installing with V-pipe ver quick install, altered\n\n"
+  rm -rf V-Pipe
+  cat quick_install.sh > install_vpipe.sh
+  chmod +x install_vpipe.sh
+  ./install_vpipe.sh -f
+  cd V-pipe
+  ./init_project.sh 
+  cd ..
+fi
+
 
 #V-pipe
 if [[ "$RUN_VPIPE" -eq "1" ]] 

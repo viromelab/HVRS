@@ -3,54 +3,56 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=0;
+CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 RUN_SHORAH=0;
-RUN_QURE=0;
+RUN_QURE=1;
 RUN_SAVAGE_NOREF=0; #w?
 RUN_SAVAGE_REF=0; #t
 #RUN_QSDPR=0; 
-RUN_SPADES=0; #t
-RUN_METASPADES=0; #t
-RUN_METAVIRALSPADES=0; #t
-RUN_CORONASPADES=0; #t
+RUN_SPADES=1; #t
+RUN_METASPADES=1; #t
+RUN_METAVIRALSPADES=1; #t
+RUN_CORONASPADES=1; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
+RUN_QVG=1; #t
 RUN_VPIPE=0;
+RUN_VPIPE_DOCKER=0;
+RUN_VPIPE_QI=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; #w 
+RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #w
+RUN_PEHAPLO=1; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=0; #?nr
+RUN_VIRGENA=1; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
-RUN_DRVM=1;
-RUN_SSAKE=0; #w
+RUN_DRVM=0;
+RUN_SSAKE=1; #w
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS5");
-#declare -a DATASETS=("DS6");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
+declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS3" "DS4" "DS5");
+#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV");
 
@@ -178,23 +180,23 @@ fi
 if [[ "$RUN_VIADBG" -eq "1" ]] 
   then
   printf "Reconstructing with viaDBG\n\n"
-  #cd viadbg/
+  cd viaDBG/
   for dataset in "${DATASETS[@]}"
     do
+    rm -rf $dataset
+    mkdir $dataset
     
-    rm -rf viadbg_${dataset}
-    mkdir viadbg_${dataset}	    
-    cp ${dataset}_*.fq viadbg_${dataset}
+    rm -rf res_$dataset
+    mkdir res_$dataset
     
-    rm -rf viadbg_output_${dataset} 
-    mkdir viadbg_output_${dataset}
+    rm -rf uni_$dataset
+    mkdir uni_$dataset
     
-    cd viadbg/
+    cp ../${dataset}_*.fq $dataset
+    
+    ./bin/viaDBG -p $dataset -o res_$dataset -u uni_$dataset -k 5 -t $NR_THREADS #-reference [path to reference] --metaquastpath [path to metaquast.py file] --postprocess [remove duplicates from contigs file]
     
     
-    ./bin/viaDBG -p ../viadbg_${dataset} -o ../viadbg_output_${dataset}
-    
-    cd ..
   
      
     
@@ -206,6 +208,8 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
     #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" sudo docker run -d viadbg_docker
     
   done
+  
+  cd ..
   
   
 fi
@@ -648,67 +652,199 @@ CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
 fi
 
 #V-pipe - Failed to open source file https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/workflow/rules/scripts/functions.sh
-if [[ "$RUN_VPIPE" -eq "1" ]]
+if [[ "$RUN_VPIPE_QI" -eq "1" ]]
   then
-  printf "Reconstructing with V-pipe\n\n"
+  printf "Reconstructing with V-pipe, covid version\n\n"
   eval "$(conda shell.bash hook)"
-  conda activate snakemake 
-  #cd V-pipe-2.99.3
+
+  cd V-pipe
     
   for dataset in "${DATASETS[@]}"
     do 
     
-    for virus in "${VIRUSES[@]}"
-    do  
-    #cd config
-    rm -rf samples
-    mkdir samples
-    cd samples
-    
-    mkdir ${dataset}
-    cd ${dataset}
-    mkdir ${dataset}_2
-    cd ${dataset}_2 
-    mkdir raw_data
-    cd raw_data 
-    cp ../../../../${dataset}_*.fq .    
-    cd ../../../../
-    
-    rm -rf resources
-    mkdir resources
-    cd resources
-    mkdir $virus
-    cd $virus
-    cp ../../$virus.fa .
-    cd ../../
-    
-    
-    echo "input:
-  datadir: samples
-  samples_file: config/samples.tsv
-  reference: resources/$virus/$virus.fa
+    echo "general:
+    virus_base_config: 'sars-cov-2'
+
+input:
+    samples_file: samples.tsv
 
 output:
-  datadir: results
-  snv: true
-  local: true
-  global: false
-  visualization: true
-  QA: true" > config/config.yaml 
+    trim_primers: false
+    snv: false
+    local: false
+    global: false
+    visualization: false
+    diversity: false
+    QA: false
+    upload: false
+    dehumanized_raw_reads: false" > config.yaml 
     
+    for virus in "${VIRUSES[@]}"
+      do  
+      
+      rm -rf samples
+      mkdir samples
+      cd samples
     
+      mkdir ${dataset}
+      cd ${dataset}
+      
+      mkdir ${dataset}_2
+      cd ${dataset}_2 
+      
+      mkdir raw_data
+      cd raw_data 
+      
+      
+      
+      cp ../../../../../${dataset}_*.fq .   
+      mv ${dataset}_1.fq ${dataset}_R1.fq
+      mv ${dataset}_2.fq ${dataset}_R2.fq
+      cd ../../../
+      
+      
+      
+      cd ..
+      printf "curr path -->   $(pwd)\n\n"
     
-    
-    snakemake --use-conda --jobs 4 --printshellcmds --dry-run
+      rm -rf resources
+      mkdir resources
+      
+      cd resources
+      mkdir $virus
+      cd $virus
+      printf "curr path vir -->   $(pwd)\n\n"
+      cp ../../../../$virus.fa .
+      cd ../
+      
+      printf "curr path2 -->   $(pwd)\n\n"
+      cd ..
+      rm -rf results
+      mkdir results 
+      cd results
+      cp ../../$virus.fa .
+      mv $virus.fa cohort_consensus.fasta
+      
+      cd ..
+      
+      printf "curr path 3 -->   $(pwd)\n\n"
+      
+      
+    #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
     
     # edit config.yaml and provide samples/ directory
     #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
-    #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./vpipe --cores 1
+      ./vpipe -p --cores 2 --conda-frontend conda --force-use-threads -T 2 --use-conda  #missing timer
     
-   done
+    done
   done
-  conda activate base
   cd ..
+  conda activate base
+ 
+fi
+
+#V-pipe - Failed to open source file https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/workflow/rules/scripts/functions.sh
+if [[ "$RUN_VPIPE" -eq "1" ]]
+  then
+  printf "Reconstructing with V-pipe\n\n"
+  eval "$(conda shell.bash hook)"
+
+  cd V-pipe
+    
+  for dataset in "${DATASETS[@]}"
+    do 
+    
+    echo "general:
+  virus_base_config: ''
+  
+input:
+  datadir: samples
+  samples_file: $(pwd)/config/samples.tsv
+  reference: $(pwd)/references/B19.fa
+
+output:
+  datadir: $(pwd)/results
+  snv: false
+  local: false
+  global: false
+  visualization: false
+  QA: false" > config/config.yaml 
+    
+    for virus in "${VIRUSES[@]}"
+      do  
+      
+      rm -rf samples
+      mkdir samples
+      cd samples
+    
+      mkdir ${dataset}
+      cd ${dataset}
+      
+      mkdir ${dataset}_2
+      cd ${dataset}_2 
+      
+      mkdir raw_data
+      cd raw_data 
+      
+      
+      
+      cp ../../../../../${dataset}_*.fq .   
+      mv ${dataset}_1.fq ${dataset}_R1.fq
+      mv ${dataset}_2.fq ${dataset}_R2.fq
+      cd ../../../
+      
+      
+      
+      cd ..
+      printf "curr path -->   $(pwd)\n\n"
+    
+      rm -rf resources
+      mkdir resources
+      
+      cd resources
+      mkdir $virus
+      cd $virus
+      printf "curr path vir -->   $(pwd)\n\n"
+      cp ../../../$virus.fa .
+      printf "AT THIS POINT $(ls) \n\n"
+      cd ../../
+      
+      rm -rf references
+      mkdir references      
+      cd references
+      cp ../../$virus.fa .
+      cp $virus.fa cohort_consensus.fasta
+      
+      mkdir results
+      mv cohort_consensus.fasta results
+      printf "AT THIS POINT2 $(ls) $(pwd)\n\n"
+      cd ../
+      
+      
+      printf "curr path2 -->   $(pwd)\n\n"
+    
+      #rm -rf results
+      #mkdir results 
+      #cd results
+      #cp ../../reconstructed/DS1/tracespipe*.fa .
+      #mv tracespipe*$virus.fa cohort_consensus.fasta
+      
+      #cd ..
+      
+      printf "curr path 3 -->   $(pwd)\n\n"
+      
+      
+    #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
+    
+    # edit config.yaml and provide samples/ directory
+    #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
+      ./vpipe  --cores 2 --conda-frontend conda #missing timer
+    
+    done
+  done
+  cd ..
+  conda activate base
+ 
 fi
 
 #Strainline - missing reads*.las, may be an error due to the reads being short 
@@ -1034,7 +1170,7 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
       cp ../../../${dataset}_*.fq .
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > ${dataset}_1.fa
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa      
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 -t $NR_THREADS -m ${MAX_RAM}GB
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 -t $NR_THREADS -m ${MAX_RAM}GB -correct yes 
       cp pehaplo-${dataset}-time.txt ../../../reconstructed/$dataset
       mv Contigs.fa pehaplo-${dataset}.fa
       cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
