@@ -6,22 +6,22 @@ MAX_RAM=28;
 CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 RUN_SHORAH=0;
-RUN_QURE=1;
+RUN_QURE=0;
 RUN_SAVAGE_NOREF=0; #w?
 RUN_SAVAGE_REF=0; #t
 #RUN_QSDPR=0; 
 RUN_SPADES=1; #t
-RUN_METASPADES=1; #t
-RUN_METAVIRALSPADES=1; #t
-RUN_CORONASPADES=1; #t
+RUN_METASPADES=0; #t
+RUN_METAVIRALSPADES=0; #t
+RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=1; #t
-RUN_TRACESPIPE=1; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t
+RUN_QVG=0; #t
 RUN_VPIPE=0;
 RUN_VPIPE_DOCKER=0;
 RUN_VPIPE_QI=0;
@@ -29,32 +29,32 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #t
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=1; #w
+RUN_PEHAPLO=0; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=1; #?nr
+RUN_VIRGENA=0; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=1; #w
+RUN_SSAKE=0; #w
 RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS3" "DS4" "DS5");
-#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
 #declare -a VIRUSES=( "B19" );
-declare -a VIRUSES=("B19" "HPV" "VZV");
+declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
 
 #creates a fasta file for each of the datasets with paired reads
 create_paired_fa_files () { 
@@ -71,16 +71,45 @@ create_paired_fa_files () {
 
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
-  then  
-  printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
-  rm -rf reconstructed
-  mkdir reconstructed
-  cd reconstructed
-  for dataset in "${DATASETS[@]}"
-  do
-    mkdir $dataset  
-  done
-  cd ..
+  then   
+  
+  if [[ -d "$(pwd)/reconstructed" ]]
+  then
+    printf "Main folder where the results will be stored exists. Do you wish to remove it and create a new folder? [Y/N]\n"
+    
+    read char
+    
+    printf "ans was --$char--\n\n"
+    
+    if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
+      printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
+      rm -rf reconstructed
+      mkdir reconstructed
+      cd reconstructed
+      for dataset in "${DATASETS[@]}"
+      do
+        mkdir $dataset  
+      done
+      cd ..
+    
+    elif [ "$char" = "N" ] || [ "$char" = "n" ]; then 
+      printf "Skipping ...\n\n"
+    else
+      printf "Not a valid option. Skipping ... \n\n"
+    fi
+    
+  else
+    printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
+    rm -rf reconstructed
+    mkdir reconstructed
+    cd reconstructed
+    for dataset in "${DATASETS[@]}"
+    do
+      mkdir $dataset  
+    done
+    cd ..
+  fi
+  
 fi
 
 #spades - working

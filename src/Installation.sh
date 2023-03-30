@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#If you are going to use lazypipe or drVM, please run this as . ./Installation.sh
+#
 #
 PYTHON2_PATH="#!/usr/bin/python2";
 CONDA_PREFIX=/home/x/miniconda3;
@@ -102,7 +102,9 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   printf "Installing Java\n\n"
   sudo apt install default-jre
   printf "Installing AlcoR\n\n"
-  conda install -y -c bioconda alcor  
+  conda install -y -c bioconda alcor 
+  printf "Installing GeCo3\n\n"
+  conda install -c bioconda -y geco3 
   #printf "Installing Docker\n\n"
   #install_docker
   

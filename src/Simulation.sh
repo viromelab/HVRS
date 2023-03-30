@@ -9,6 +9,7 @@ rm -f DS*.bam
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
 gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
+#gto_fasta_extract_read_by_pattern -p "KF373730.1" < VDB.fa > EBV.fa
 #
 #
 # MUTATE SEQUENCES:
@@ -26,21 +27,25 @@ gto_fasta_mutate -s 12 -e 0.03 < VZV.fa > VZV-2.fa
 gto_fasta_mutate -s 13 -e 0.05 < VZV.fa > VZV-3.fa
 #
 #
-# CREATE RANDOM FASTA SEQUENCES:
+# CREATE RANDOM FASTA SEQUENCES AS CONTAMINATION:
 #
 AlcoR simulation --rand-segment 50000:0:1:0.3:0.0:0.0 > tmp1.fa
 AlcoR simulation --rand-segment 50000:0:1:0.6:0.0:0.0 > tmp2.fa
 #
 #
+# GET MITOCHONDRIAL SEQUENCE:
+#
+gto_fasta_extract_read_by_pattern -p "NC_012920.1" < VDB.fa > MT.fa
+#
 # CREATE DATASETS:
 #
 rm -f DS1.fa DS2.fa DS3.fa DS4.fa DS5.fa DS6.fa;
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa > DS1.fa
-cat B19-2.fa HPV-2.fa VZV-2.fa tmp1.fa > DS2.fa
-cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa > DS3.fa
-cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa > DS4.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa > DS5.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa > DS6.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS1.fa
+cat B19-2.fa HPV-2.fa VZV-2.fa tmp1.fa MT.fa > DS2.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa MT.fa > DS3.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa tmp2.fa MT.fa > DS4.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS5.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS6.fa
 #
 #
 # SIMULATE FASTQ READS:

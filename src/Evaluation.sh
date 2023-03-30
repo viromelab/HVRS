@@ -3,7 +3,7 @@
 #declare -a DATASETS=("DS3" "DS4" "DS5");
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
 declare -a VIRUSES=("B19" "HPV" "VZV");
-declare -a METAGENOMIC=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe");
+declare -a METAGENOMIC=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
 declare -a NOT_METAGENOMIC=("qvg" "qure" "vispa" "virgena");
 #
 D_PATH="reconstructed";
@@ -14,6 +14,13 @@ rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   printf "$dataset\n";	  
+
+
+  echo "
+  
+$dataset
+  
+" >> total_stats.tex
 
   for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
   do 	 
@@ -71,7 +78,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
     #ds	file	exec_time	tbases	alignedbases	snps	avg_identity	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic
     echo "$dataset	$file	$TIME	$NRBASES	$TALBA	$SNPS	$IDEN	$ACCURACY	$MEM	$CPU_P	$NR_SPECIES	$CLASS" >> total_stats.tsv
     CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
-    echo "$file & $TIME & $NRBASES & $TALBA & $SNPS & $IDEN & $ACCURACY & $MEM & $CPU & $NR_SPECIES & $CLASS \\\\\\hline" >> total_stats.tex
+    echo "$NAME_TOOL & $TIME & $NRBASES & $TALBA & $SNPS & $IDEN & $ACCURACY & $MEM & $CPU & $NR_SPECIES & $CLASS \\\\\\hline" >> total_stats.tex
     printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     #rm -f G_A.fa G_B.fa ; #remove tmp files
     fi
