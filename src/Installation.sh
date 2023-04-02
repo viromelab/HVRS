@@ -3,7 +3,7 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/x/miniconda3;
+CONDA_PREFIX=/home/lx/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
@@ -24,15 +24,15 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
+RUN_QVG=1; #t
 RUN_VPIPE=0;
-RUN_VPIPE_V3=1;
+RUN_VPIPE_V3=0;
 RUN_VPIPE_QI=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0; 
 RUN_LAZYPIPE=0; #w, needs testing
 #RUN_VIQUAS=0; #np
@@ -66,10 +66,10 @@ install_samtools () {
 }
 
 install_conda() {
-  rm -rf Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
-  wget https://repo.anaconda.com/miniconda/Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
-  chmod +x Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
-  bash Miniconda3-py39_22.11.1-1-Linux-x86_64.sh
+  rm -rf Miniconda3-latest-Linux-x86_64.sh
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  chmod +x Miniconda3-latest-Linux-x86_64.sh
+  bash Miniconda3-latest-Linux-x86_64.sh
 }
 
 install_docker() {
@@ -120,7 +120,7 @@ fi
 #spades, metaspades, metaviralspades and coronaspades
 if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$RUN_CORONASPADES" -eq "1" ]] || [[ "$RUN_METASPADES" -eq "1" ]] 
   then
-  printf "Installing SPAdes, metaviralSPAdes and coronaSPAdes\n\n"
+  printf "Installing SPAdes, metaSPAdes, metaviralSPAdes and coronaSPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda create -y -n spades
   conda activate spades
@@ -598,6 +598,9 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   perl perl/install_db.pl --db blastn_vi
   cd ..
   conda activate base 
+  
+  printf "Please open the R console and type install.packages( c("reshape","openxlsx") )\n\n"
+  
 fi
 
 #ViQuaS

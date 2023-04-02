@@ -39,22 +39,28 @@ gto_fasta_extract_read_by_pattern -p "NC_012920.1" < VDB.fa > MT.fa
 #
 # CREATE DATASETS:
 #
-rm -f DS1.fa DS2.fa DS3.fa DS4.fa DS5.fa DS6.fa;
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS1.fa
-cat B19-2.fa HPV-2.fa VZV-2.fa tmp1.fa MT.fa > DS2.fa
-cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa MT.fa > DS3.fa
-cat B19-3.fa HPV-3.fa VZV-3.fa tmp2.fa MT.fa > DS4.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS5.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS6.fa
+rm -f DS*.fa;
+cat B19-1.fa HPV-1.fa VZV-1.fa > DS1.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa > DS2.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MT.fa > DS3.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS4.fa
+cat B19-2.fa HPV-2.fa VZV-2.fa tmp1.fa MT.fa > DS5.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa MT.fa > DS6.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa tmp2.fa MT.fa > DS7.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS8.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS9.fa
 #
 #
 # SIMULATE FASTQ READS:
 #
 art_illumina -rs 3  -i DS1.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS1_
-art_illumina -rs 7  -i DS2.fa -p -sam -l 150 -f 30 -m 200 -s 10 -o DS2_
-art_illumina -rs 11 -i DS3.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS3_
-art_illumina -rs 11 -i DS3.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS4_
-art_illumina -rs 3  -i DS4.fa -p -sam -l 75 -f 20 -m 200 -s 10 -o DS5_
-art_illumina -rs 3  -i DS5.fa -p -sam -l 250 -f 20 -m 400 -s 10 -o DS6_
+art_illumina -rs 3  -i DS2.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS2_
+art_illumina -rs 3  -i DS3.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS3_
+art_illumina -rs 3  -i DS4.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS4_
+art_illumina -rs 7  -i DS5.fa -p -sam -l 150 -f 30 -m 200 -s 10 -o DS5_
+art_illumina -rs 11 -i DS6.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS6_
+art_illumina -rs 11 -i DS7.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS7_
+art_illumina -rs 3  -i DS8.fa -p -sam -l 75 -f 20 -m 200 -s 10 -o DS8_
+art_illumina -rs 3  -i DS9.fa -p -sam -l 250 -f 20 -m 400 -s 10 -o DS9_
 rm *.aln *.sam
 #

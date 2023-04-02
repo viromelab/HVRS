@@ -1,15 +1,18 @@
 #!/bin/bash
 #
 #declare -a DATASETS=("DS3" "DS4" "DS5");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6");
-declare -a VIRUSES=("B19" "HPV" "VZV");
-declare -a METAGENOMIC=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
-declare -a NOT_METAGENOMIC=("qvg" "qure" "vispa" "virgena");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9");
+declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
+#
+declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
+declare -a NOT_ANALYSIS=("qvg" "qure" "vispa" "virgena");
+#
+declare -a CLASSIFICATION=("tracespipelite" "tracespipe");
 #
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time	Nr_bases	Total_Nr_Aligned_Bases	SNPs	AvgIdentity	Accuracy(%)	Mem	%CPU	Nr contigs	Metagenomic" > total_stats.tsv
+echo "Dataset	File	Time	SNPs	AvgIdentity	NCD	NRC	Mem	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
@@ -54,31 +57,65 @@ $dataset
       ACCURACY=$(echo $TMP \/ $TBASES |bc -l | xargs printf %.3f)
       
       NAME_TOOL="$(cut -d'-' -f1 <<< $file_wout_extension)"
-      CLASS="?"
+      
+      DOES_ANALYSIS="?"
+      DOES_CLASSIFICATION="?"
       
 
-      for i in "${METAGENOMIC[@]}" #analyse each virus
+      for i in "${ANALYSIS[@]}" #analyse each virus
       do
         if [ "$i" == "$NAME_TOOL" ] ; then
-          CLASS="Yes"
+          DOES_ANALYSIS="Yes"
         fi 
       done
       
-      for i in "${NOT_METAGENOMIC[@]}"
+      for i in "${NOT_ANALYSIS[@]}"
       do
         if [ "$i" == "$NAME_TOOL" ] ; then
-          CLASS="No"
+          DOES_ANALYSIS="No"
+        fi 
+      done
+      
+      
+      for i in "${CLASSIFICATION[@]}"
+      do
+        if [ "$i" == "$NAME_TOOL" ] ; then
+          DOES_CLASSIFICATION="No"
         fi 
       done
       
       NR_SPECIES=$(grep '>' $dataset/$file -c)
       
+      #Compressing sequences C(X) or C(X,Y)
+      GeCo3 -l 1 -lr 0.06 -hs 8 $dataset/$file
+      COMPRESSED_SIZE_WOUT_REF=$(ls -l $dataset/$file_wout_extension.fa.co | cut -d' ' -f5)
+      rm $dataset/$file_wout_extension.fa.*
+      
+      #Conditional compression C(X|Y) [use reference and target]
+      GeCo3 -rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -lr 0.03 -hs 64 -r ../DS1.fa $dataset/$file
+      COMPRESSED_SIZE_COND_COMPRESSION=$(ls -l $dataset/$file_wout_extension.fa.co | cut -d' ' -f5)      
+      rm $dataset/$file_wout_extension.fa.*
+      
+      #Conditional (referential) exclusive compression C(X||Y)
+      GeCo3 rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -tm 10:200:0:1:0/0:200:0 -tm 15:100:0:1:0/0:100:0 -c 20 -g 0.85 -r ../DS1.fa $dataset/$file
+      COMPRESSED_SIZE_W_REF=$(ls -l $dataset/$file_wout_extension.fa.co | cut -d' ' -f5)      
+      rm $dataset/$file_wout_extension.fa.*
+            
+      FILE_SIZE=$(ls -l $dataset/$file_wout_extension.fa | cut -d' ' -f5)
       
       
-    #ds	file	exec_time	tbases	alignedbases	snps	avg_identity	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic
-    echo "$dataset	$file	$TIME	$NRBASES	$TALBA	$SNPS	$IDEN	$ACCURACY	$MEM	$CPU_P	$NR_SPECIES	$CLASS" >> total_stats.tsv
+      printf "Cond compress -> $COMPRESSED_SIZE_COND_COMPRESSION ; Compressed size wout ref -> $COMPRESSED_SIZE_WOUT_REF\n\n"
+      NCD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
+      AUX_MULT=$(($FILE_SIZE * 2))
+      NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)
+      
+      
+      
+      
+    #ds	file	exec_time	snps	avg_identity	NCD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION" >> total_stats.tsv
     CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
-    echo "$NAME_TOOL & $TIME & $NRBASES & $TALBA & $SNPS & $IDEN & $ACCURACY & $MEM & $CPU & $NR_SPECIES & $CLASS \\\\\\hline" >> total_stats.tex
+    echo "$NAME_TOOL & $TIME & $SNPS & $IDEN & $NCD & $NRC & $MEM & $CPU & $NR_SPECIES & $DOES_ANALYSIS & $DOES_CLASSIFICATION \\\\\\hline" >> total_stats.tex
     printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     #rm -f G_A.fa G_B.fa ; #remove tmp files
     fi
