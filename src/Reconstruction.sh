@@ -6,45 +6,45 @@ MAX_RAM=28;
 CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 RUN_SHORAH=0;
-RUN_QURE=0;
+RUN_QURE=1;
 RUN_SAVAGE_NOREF=0; #w?
 RUN_SAVAGE_REF=0; #t
 #RUN_QSDPR=0; 
-RUN_SPADES=0; #t
-RUN_METASPADES=0; #t
+RUN_SPADES=1; #t
+RUN_METASPADES=1; #t
 RUN_METAVIRALSPADES=1; #t
 RUN_CORONASPADES=1; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
+RUN_QVG=1; #t
 RUN_VPIPE=0;
-RUN_VPIPE_DOCKER=0;
-RUN_VPIPE_QI=0;
+#RUN_VPIPE_DOCKER=0;
+#RUN_VPIPE_QI=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; #w 
+RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #w
+RUN_PEHAPLO=1; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; #err
 RUN_PRICE=0;
-RUN_VIRGENA=0; #?nr
+RUN_VIRGENA=1; #?nr
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0; #w
-RUN_VIRALFLYE=0; #err
+RUN_SSAKE=1; #w
+#RUN_VIRALFLYE=0; #err
 RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0;
@@ -772,7 +772,7 @@ output:
  
 fi
 
-#V-pipe - Failed to open source file https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/workflow/rules/scripts/functions.sh
+#V-pipe - err
 if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
@@ -787,6 +787,7 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   virus_base_config: ''
   
 input:
+  read_length: 150
   datadir: samples
   samples_file: $(pwd)/config/samples.tsv
   reference: $(pwd)/references/B19.fa
@@ -817,7 +818,12 @@ output:
       
       
       
-      cp ../../../../../${dataset}_*.fq .   
+      cp ../../../../../${dataset}_*.fq .
+      sed -i 's/J/I/g' ${dataset}_1.fq  
+      sed -i 's/J/I/g' ${dataset}_2.fq  
+       
+      #sed -r -n 's/[Jj]/I/g' ${dataset}_1.fq   
+      #sed -r -n 's/[Jj]/I/g' ${dataset}_2.fq   
       mv ${dataset}_1.fq ${dataset}_R1.fq
       mv ${dataset}_2.fq ${dataset}_R2.fq
       cd ../../../

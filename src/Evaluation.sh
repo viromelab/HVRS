@@ -1,23 +1,22 @@
 #!/bin/bash
 #
-#declare -a DATASETS=("DS3" "DS4" "DS5");
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9");
 declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
-declare -a NOT_ANALYSIS=("qvg" "qure" "vispa" "virgena");
+declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena");
 #
 declare -a CLASSIFICATION=("tracespipelite" "tracespipe");
+declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena");
 #
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time	SNPs	AvgIdentity	NCD	NRC	Mem	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification" > total_stats.tsv
+echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   printf "$dataset\n";	  
-
 
   echo "
   
@@ -62,27 +61,41 @@ $dataset
       DOES_CLASSIFICATION="?"
       
 
-      for i in "${ANALYSIS[@]}" #analyse each virus
+      for i in "${ANALYSIS[@]}" #check if the tool does metagenomic analysis
       do
         if [ "$i" == "$NAME_TOOL" ] ; then
           DOES_ANALYSIS="Yes"
+          break
         fi 
       done
       
-      for i in "${NOT_ANALYSIS[@]}"
+      if [ "$DOES_ANALYSIS" == "?" ] ; then
+        for i in "${NO_ANALYSIS[@]}"
+        do
+          if [ "$i" == "$NAME_TOOL" ] ; then
+            DOES_ANALYSIS="No"
+            break
+          fi 
+        done
+      fi
+      
+      for i in "${CLASSIFICATION[@]}" #check if the tool does metagenomic classification
       do
         if [ "$i" == "$NAME_TOOL" ] ; then
-          DOES_ANALYSIS="No"
-        fi 
+          DOES_CLASSIFICATION="Yes"
+          break
+        fi
       done
       
-      
-      for i in "${CLASSIFICATION[@]}"
-      do
-        if [ "$i" == "$NAME_TOOL" ] ; then
-          DOES_CLASSIFICATION="No"
-        fi 
-      done
+      if [ "$DOES_CLASSIFICATION" == "?" ] ; then
+        for i in "${NO_CLASSIFICATION[@]}"
+        do
+          if [ "$i" == "$NAME_TOOL" ] ; then
+            DOES_CLASSIFICATION="No"
+            break
+          fi 
+        done
+      fi
       
       NR_SPECIES=$(grep '>' $dataset/$file -c)
       
@@ -102,15 +115,17 @@ $dataset
       rm $dataset/$file_wout_extension.fa.*
             
       FILE_SIZE=$(ls -l $dataset/$file_wout_extension.fa | cut -d' ' -f5)
-      
-      
-      printf "Cond compress -> $COMPRESSED_SIZE_COND_COMPRESSION ; Compressed size wout ref -> $COMPRESSED_SIZE_WOUT_REF\n\n"
+     
       NCD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
-      AUX_MULT=$(($FILE_SIZE * 2))
+      
+      AUX_MULT=$(echo "$FILE_SIZE * 2.321928" | bc -l )
+      
+      printf "AUX mult -> $AUX_MULT\n\n"
       NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)
       
       
-      
+      IDEN=$(echo $IDEN |bc -l | xargs printf %.3f)
+      MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
     #ds	file	exec_time	snps	avg_identity	NCD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification
     echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION" >> total_stats.tsv
