@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12");
 declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
@@ -98,27 +98,30 @@ $dataset
       fi
       
       NR_SPECIES=$(grep '>' $dataset/$file -c)
+      gto_fasta_rand_extra_chars < $dataset/$file > tmp.fa
+      gto_fasta_to_seq < tmp.fa > $dataset/$file_wout_extension.seq
       
       #Compressing sequences C(X) or C(X,Y)
-      GeCo3 -l 1 -lr 0.06 -hs 8 $dataset/$file
-      COMPRESSED_SIZE_WOUT_REF=$(ls -l $dataset/$file_wout_extension.fa.co | cut -d' ' -f5)
-      rm $dataset/$file_wout_extension.fa.*
+      GeCo3 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 $dataset/$file_wout_extension.seq
+   
+      COMPRESSED_SIZE_WOUT_REF=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)
+      rm $dataset/$file_wout_extension.seq.*
       
       #Conditional compression C(X|Y) [use reference and target]
-      GeCo3 -rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -lr 0.03 -hs 64 -r ../DS1.fa $dataset/$file
-      COMPRESSED_SIZE_COND_COMPRESSION=$(ls -l $dataset/$file_wout_extension.fa.co | cut -d' ' -f5)      
-      rm $dataset/$file_wout_extension.fa.*
+      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 -r ../DS1.fa $dataset/$file_wout_extension.seq
+      COMPRESSED_SIZE_COND_COMPRESSION=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)      
+      rm $dataset/$file_wout_extension.seq.*
       
-      #Conditional (referential) exclusive compression C(X||Y)
-      GeCo3 rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -tm 10:200:0:1:0/0:200:0 -tm 15:100:0:1:0/0:100:0 -c 20 -g 0.85 -r ../DS1.fa $dataset/$file
-      COMPRESSED_SIZE_W_REF=$(ls -l $dataset/$file_wout_extension.fa.co | cut -d' ' -f5)      
-      rm $dataset/$file_wout_extension.fa.*
+      #Relative compression (only reference models) C(X||Y)
+      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r ../DS1.fa $dataset/$file_wout_extension.seq
+      COMPRESSED_SIZE_W_REF=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)      
+      rm $dataset/$file_wout_extension.seq.*
             
       FILE_SIZE=$(ls -l $dataset/$file_wout_extension.fa | cut -d' ' -f5)
      
       NCD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
       
-      AUX_MULT=$(echo "$FILE_SIZE * 2.321928" | bc -l )
+      AUX_MULT=$(echo "$FILE_SIZE * 2" | bc -l )
       
       printf "AUX mult -> $AUX_MULT\n\n"
       NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)

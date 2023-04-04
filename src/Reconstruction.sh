@@ -7,8 +7,8 @@ CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 RUN_SHORAH=0;
 RUN_QURE=1;
-RUN_SAVAGE_NOREF=0; #w?
-RUN_SAVAGE_REF=0; #t
+RUN_SAVAGE_NOREF=1; #w?
+RUN_SAVAGE_REF=1; #t
 #RUN_QSDPR=0; 
 RUN_SPADES=1; #t
 RUN_METASPADES=1; #t
@@ -51,8 +51,8 @@ RUN_HAPLOFLOW=0;
 RUN_VIQUF=0;
 
 #declare -a DATASETS=("DS1");
-#declare -a DATASETS=("DS3" "DS4" "DS5");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9");
+declare -a DATASETS=("DS10" "DS11" "DS12");
+#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
 
@@ -554,9 +554,9 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     
     
     cd test_viral_analysis_${dataset}
-    for virus in "${VIRUSES[@]}"
+    for virus in $(ls)
     do
-      if [ -d $virus* ] 
+      if [ -d $virus ] 
       then
         printf "copying $virus\n\n"
         cd $virus*   
@@ -844,6 +844,8 @@ output:
       printf "AT THIS POINT $(ls) \n\n"
       cd ../../
       
+      
+      
       rm -rf references
       mkdir references      
       cd references
@@ -873,7 +875,7 @@ output:
     
     # edit config.yaml and provide samples/ directory
     #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
-      ./vpipe  --cores 2 --conda-frontend conda #missing timer
+      ./vpipe  --cores $NR_THREADS --conda-frontend conda #missing timer
     
     done
   done

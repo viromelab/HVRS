@@ -49,6 +49,9 @@ cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa MT.fa > DS6.fa
 cat B19-3.fa HPV-3.fa VZV-3.fa tmp2.fa MT.fa > DS7.fa
 cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS8.fa
 cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS9.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS10.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS11.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa MT.fa > DS12.fa
 #
 #
 # SIMULATE FASTQ READS:
@@ -62,5 +65,8 @@ art_illumina -rs 11 -i DS6.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS6_
 art_illumina -rs 11 -i DS7.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS7_
 art_illumina -rs 3  -i DS8.fa -p -sam -l 75 -f 20 -m 200 -s 10 -o DS8_
 art_illumina -rs 3  -i DS9.fa -p -sam -l 250 -f 20 -m 400 -s 10 -o DS9_
+art_illumina -rs 3  -i DS10.fa -p -sam -l 150 -f 2 -m 200 -s 10 -o DS10_
+art_illumina -rs 3  -i DS11.fa -p -sam -l 150 -f 5 -m 200 -s 10 -o DS11_
+art_illumina -rs 3  -i DS12.fa -p -sam -l 150 -f 10 -m 200 -s 10 -o DS12_
 rm *.aln *.sam
 #
