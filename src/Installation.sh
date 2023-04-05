@@ -564,7 +564,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   tar -zxvf SANSPANZ.3.tar.gz
   sed -i "1 i #!$(which python)" SANSPANZ.3/runsanspanz.py
   mkdir ~/bin
-  ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py ~/bin/runsanspanz.py
+  ln -sf  $(pwd)/SANSPANZ.3/runsanspanz.py $(pwd)
   
  # cd ..
  # ls

@@ -6,7 +6,7 @@ declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
 declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena");
 #
-declare -a CLASSIFICATION=("tracespipelite" "tracespipe");
+declare -a CLASSIFICATION=("tracespipelite" "tracespipe" "lazypipe");
 declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena");
 #
 D_PATH="reconstructed";
