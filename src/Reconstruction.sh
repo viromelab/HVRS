@@ -3,25 +3,25 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=0;
+CREATE_RECONSTRUCTION_FOLDERS=1;
 #
-RUN_SHORAH=0;
-RUN_QURE=0;
-RUN_SAVAGE_NOREF=0; #w?
-RUN_SAVAGE_REF=0; #t
+#RUN_SHORAH=0;
+RUN_QURE=1; #w
+RUN_SAVAGE_NOREF=0; #rn
+RUN_SAVAGE_REF=0; 
 #RUN_QSDPR=0; 
-RUN_SPADES=0; #t
-RUN_METASPADES=0; #t
-RUN_METAVIRALSPADES=0; #t
-RUN_CORONASPADES=0; #t
+RUN_SPADES=1; #t
+RUN_METASPADES=1; #t
+RUN_METAVIRALSPADES=1; #t
+RUN_CORONASPADES=1; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
+RUN_QVG=1; #t
 RUN_VPIPE=0;
 #RUN_VPIPE_DOCKER=0;
 #RUN_VPIPE_QI=0;
@@ -29,30 +29,30 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0;
 RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #w
+RUN_PEHAPLO=1; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
-RUN_IVA=0; #err
+RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=0; #?nr
+RUN_VIRGENA=1; #w
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0; #w
-#RUN_VIRALFLYE=0; #err
+RUN_SSAKE=1; #w
+#RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
-RUN_HAPLOFLOW=0;
+RUN_HAPLOFLOW=1; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-declare -a DATASETS=("DS1");
+#declare -a DATASETS=("DS1");
 #declare -a DATASETS=("DS10" "DS11" "DS12");
-#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
 
@@ -160,7 +160,7 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
   conda activate base
 fi
 
-#metaviralspades - working, only outputs results for DS3
+#metaviralspades - working
 if [[ "$RUN_METAVIRALSPADES" -eq "1" ]] 
   then
   printf "Reconstructing with metaviralSPAdes\n\n"
@@ -225,10 +225,6 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
     
     ./bin/viaDBG -p $dataset -o res_$dataset -u uni_$dataset -k 5 -t $NR_THREADS #-reference [path to reference] --metaquastpath [path to metaquast.py file] --postprocess [remove duplicates from contigs file]
     
-    
-  
-     
-    
     #cd viadbg_docker
     #rm -rf viadbg_${dataset}
     #mkdir viadbg_${dataset}	
@@ -237,9 +233,7 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
     #/bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" sudo docker run -d viadbg_docker
     
   done
-  
   cd ..
-  
   
 fi
 
@@ -1250,16 +1244,25 @@ fi
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Reconstructing with IVA\n\n"
-  #iva --test outdir
-  rm -rf iva_data
-  mkdir iva_data
+  eval "$(conda shell.bash hook)"
+  conda activate iva
+  rm -rf IVA_reconstruction
+  mkdir IVA_reconstruction
+  cd IVA_reconstruction
   for dataset in "${DATASETS[@]}"
-    do    
-    cp ${dataset}_*.fq iva_data
-    sudo rm -rf ${dataset}_Output_directory 
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" sudo docker run --rm -it -v $(pwd):/iva_data sangerpathogens/iva iva -f /iva_data/${dataset}_1.fq -r /iva_data/${dataset}_2.fq /iva_data/${dataset}_Output_directory    
-  done
+    do
+    rm -rf $dataset
+    mkdir $dataset
+    cd $dataset    
+    cp ../../${dataset}_*.fq .  
+    gzip *.fq
+    iva --threads $NR_THREADS -f ${dataset}_1.fq.gz -r ${dataset}_2.fq.gz results 
+    cd ../
+  done  
+  cd ..
+  conda activate base
 fi
+
 
 #PRICE - did nothing, no errors
 if [[ "$RUN_PRICE" -eq "1" ]] 
@@ -1355,7 +1358,6 @@ if [[ "$RUN_DRVM" -eq "1" ]]
     /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" ./drVM.py -1 ${dataset}_1.fq -2 ${dataset}_2.fq -type illumina -dn off -t $NR_THREADS -ar 0.1 -cl 150
   done
   cd ..
-  #printf "$(env)"
 fi
 
 #SSAKE - running
@@ -1453,8 +1455,14 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   cd haploflow_data
   for dataset in "${DATASETS[@]}"
     do
-    cp ../${dataset}_1.fq .
-    /bin/time -f "TIME\t%e\tMEM\t%M\tCPU_perc\t%P" haploflow --read-file ${dataset}_1.fq --out test --log test/log    
+    printf "Reconstructing $dataset\n"
+    cp ../${dataset}_*.fq .
+    cat ${dataset}_*.fq > ${dataset}_paired.fq
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o haploflow-${dataset}-time.txt haploflow --read-file ${dataset}_paired.fq --out test_$dataset --log test_$dataset/log    
+    mv haploflow-${dataset}-time.txt ../reconstructed/$dataset
+    mv test_$dataset/contigs.fa test_$dataset/haploflow-${dataset}.fa
+    cp test_$dataset/haploflow-${dataset}.fa ../reconstructed/$dataset
+    rm -rf test
   done
   cd ..  
   conda activate base 

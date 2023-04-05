@@ -24,7 +24,7 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t
+RUN_QVG=0; #t
 RUN_VPIPE=0;
 RUN_VPIPE_V3=0;
 RUN_VPIPE_QI=0;
@@ -32,7 +32,7 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #t
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0; 
 RUN_LAZYPIPE=0; #w, needs testing
 #RUN_VIQUAS=0; #np
@@ -52,7 +52,8 @@ RUN_ENSEMBLEASSEMBLER=0; #np
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0; 
 RUN_ARAPANS=0;
-RUN_VIQUF=0; #np
+RUN_VIQUF_DOCKER=1;
+RUN_VIQUF=0; 
 
 install_samtools () {
   wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
@@ -722,8 +723,13 @@ fi
 if [[ "$RUN_IVA" -eq "1" ]] 
   then
   printf "Installing IVA\n\n"
-  install_docker
-  sudo docker pull sangerpathogens/iva
+  #install_docker
+  #sudo docker pull sangerpathogens/iva
+  eval "$(conda shell.bash hook)"
+  conda create -y -n iva
+  conda activate iva
+  conda install iva -y
+  conda activate base
 fi
 
 #PRICE
@@ -985,6 +991,25 @@ if [[ "$RUN_ARAPANS" -eq "1" ]]
   make #err
   su -c "make install" #err
 
+fi
+
+
+#ViQUF- fatal error: sdsl/suffix_arrays.hpp: No such file or directory
+if [[ "$RUN_VIQUF_DOCKER" -eq "1" ]] 
+  then
+  printf "Installing ViQUF\n\n"
+  eval "$(conda shell.bash hook)"
+  
+  git clone https://github.com/borjaf696/ViQUF
+  
+  cd ViQUF
+
+  sudo docker rm viquf
+  sudo docker build -t viquf . --no-cache
+  
+  
+  cd ..
+  
 fi
 
 #ViQUF- fatal error: sdsl/suffix_arrays.hpp: No such file or directory
