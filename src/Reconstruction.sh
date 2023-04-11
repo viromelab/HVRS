@@ -3,25 +3,25 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=1;
+CREATE_RECONSTRUCTION_FOLDERS=0;
 #
 #RUN_SHORAH=0;
-RUN_QURE=1; #w
+RUN_QURE=0; #w
 RUN_SAVAGE_NOREF=0; #rn
 RUN_SAVAGE_REF=0; 
 #RUN_QSDPR=0; 
-RUN_SPADES=1; #t
-RUN_METASPADES=1; #t
-RUN_METAVIRALSPADES=1; #t
-RUN_CORONASPADES=1; #t
+RUN_SPADES=0; #t
+RUN_METASPADES=0; #t
+RUN_METAVIRALSPADES=0; #t
+RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1; #t
-RUN_TRACESPIPE=1; #t
+RUN_TRACESPIPELITE=0; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t
+RUN_QVG=0; #t
 RUN_VPIPE=0;
 #RUN_VPIPE_DOCKER=0;
 #RUN_VPIPE_QI=0;
@@ -29,12 +29,12 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #t
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; #w 
+RUN_LAZYPIPE=0; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=1; #w
+RUN_PEHAPLO=0; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; 
@@ -43,18 +43,21 @@ RUN_VIRGENA=1; #w
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=1; #w
+RUN_SSAKE=0; #w
 #RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
-RUN_HAPLOFLOW=1; #w
+RUN_HAPLOFLOW=0; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
 #declare -a DATASETS=("DS1");
-#declare -a DATASETS=("DS10" "DS11" "DS12");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+declare -a DATASETS=("DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS14");
+#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
+#
+#
+VIRGENA_TIMEOUT=15;
 
 #creates a fasta file for each of the datasets with paired reads
 create_paired_fa_files () { 
@@ -78,8 +81,6 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
     printf "Main folder where the results will be stored exists. Do you wish to remove it and create a new folder? [Y/N]\n"
     
     read char
-    
-    printf "ans was --$char--\n\n"
     
     if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
       printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
@@ -1630,7 +1631,10 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
         <Debug>false</Debug>
     </Postprocessor>
 </config>" > $dataset-conf.xml
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt  java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
+    
+    
+    
+    timeout --signal=SIGINT ${VIRGENA_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
     done
     cd res
