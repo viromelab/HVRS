@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
-declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
+declare -a DATASETS=("DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+declare -a VIRUSES=("B19" "HPV" "VZV" "COV" "MT");
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
 declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena");
@@ -11,21 +11,138 @@ declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspa
 #
 declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa")
 #
+declare -a COVERAGE_2=("DS1" "DS9" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24")
+declare -a COVERAGE_5=("DS2" "DS10" "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32")
+declare -a COVERAGE_10=("DS3" "DS11" "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40")
+declare -a COVERAGE_15=("DS4" "DS12")
+declare -a COVERAGE_20=("DS5" "DS13" "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48" "DS57"  "DS58" "DS61"  "DS62")
+declare -a COVERAGE_25=("DS6" "DS14")
+declare -a COVERAGE_30=("DS7" "DS15" "DS59")
+declare -a COVERAGE_40=("DS8" "DS16" "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56" "DS60")
+#
+declare -a SNP_1=("DS1"  "DS2"  "DS3"  "DS4"  "DS5"  "DS6"  "DS7"  "DS8"  "DS9"  "DS10"  "DS11"  "DS12"  "DS13"  "DS14"  "DS15"  "DS16" "DS57" "DS58" "DS61" "DS62")
+declare -a SNP_0=("DS17"  "DS25"  "DS33"  "DS41" "DS49")
+declare -a SNP_3=("DS18"  "DS26"  "DS34"  "DS42"  "DS50" "DS59")
+declare -a SNP_5=("DS19"  "DS27"  "DS35"  "DS43"  "DS51" "DS60")
+declare -a SNP_7=("DS20"  "DS28"  "DS36"  "DS44"  "DS52" )
+declare -a SNP_9=("DS21"  "DS29"  "DS37"  "DS45"  "DS53")
+declare -a SNP_11=("DS22"  "DS30"  "DS38"  "DS46"  "DS54")
+declare -a SNP_13=("DS23"  "DS31"  "DS39"  "DS47"  "DS55")
+declare -a SNP_15=("DS24"  "DS32"  "DS40"  "DS48"  "DS56")
+#
+count=0
+#
+D_PATH="reconstructed";
+#
+declare coverage
+declare snp_ds
+#
+check_ds_coverage () { 
+  cov_2=$(printf '%s\n' "${COVERAGE_2[@]}" | grep -w -- $dataset)
+  cov_5=$(printf '%s\n' "${COVERAGE_5[@]}" | grep -w -- $dataset)
+  cov_10=$(printf '%s\n' "${COVERAGE_10[@]}" | grep -w -- $dataset)
+  cov_15=$(printf '%s\n' "${COVERAGE_15[@]}" | grep -w -- $dataset)
+  cov_20=$(printf '%s\n' "${COVERAGE_20[@]}" | grep -w -- $dataset)
+  cov_30=$(printf '%s\n' "${COVERAGE_30[@]}" | grep -w -- $dataset)
+  cov_40=$(printf '%s\n' "${COVERAGE_40[@]}" | grep -w -- $dataset)
+
+  if [ ! -z "$cov_2" ]
+    then
+    coverage=2  
+  elif [ ! -z "$cov_5" ]
+    then
+    coverage=5
+  elif [ ! -z "$cov_10" ]
+    then
+    coverage=10
+  elif [ ! -z "$cov_15" ]
+    then
+    coverage=15
+  elif [ ! -z "$cov_20" ]
+    then
+    coverage=20
+  elif [ ! -z "$cov_30" ]
+    then
+    coverage=30 
+  elif [ ! -z "$cov_40" ]
+    then
+    coverage=40
+  else
+    coverage=0 
+  fi
+  
+  printf "cov - $coverage, $cov_2, $cov_5 \n\n\n\n"
+}
+
+
+check_ds_snp () { 
+  snp_0=$(printf '%s\n' "${SNP_0[@]}" | grep -w -- $dataset)
+  snp_1=$(printf '%s\n' "${SNP_1[@]}" | grep -w -- $dataset)
+  snp_3=$(printf '%s\n' "${SNP_3[@]}" | grep -w -- $dataset)
+  snp_5=$(printf '%s\n' "${SNP_5[@]}" | grep -w -- $dataset)
+  snp_7=$(printf '%s\n' "${SNP_7[@]}" | grep -w -- $dataset)
+  snp_9=$(printf '%s\n' "${SNP_9[@]}" | grep -w -- $dataset)
+  snp_11=$(printf '%s\n' "${SNP11[@]}" | grep -w -- $dataset)
+  snp_13=$(printf '%s\n' "${SNP_13[@]}" | grep -w -- $dataset)
+  snp_15=$(printf '%s\n' "${SNP_15[@]}" | grep -w -- $dataset)
+
+  if [ ! -z "$snp_0" ]
+    then
+    snp_ds=0  
+  elif [ ! -z "$snp_1" ]
+    then
+    snp_ds=1
+  elif [ ! -z "$snp_3" ]
+    then
+    snp_ds=3
+  elif [ ! -z "$snp_5" ]
+    then
+    snp_ds=5
+  elif [ ! -z "$snp_7" ]
+    then
+    snp_ds=7
+  elif [ ! -z "$snp_9" ]
+    then
+    snp_ds=9
+  elif [ ! -z "$snp_11" ]
+    then
+    snp_ds=11
+  elif [ ! -z "$snp_13" ]
+    then
+    snp_ds=13
+  elif [ ! -z "$snp_15" ]
+    then
+    snp_ds=15
+  else
+    snp_ds=10000 
+  fi
+  
+  printf "cov - $coverage, $cov_2, $cov_5 \n\n\n\n"
+}
+
 count=0
 #
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification" > total_stats.tsv
+echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   count=0
-  printf "$dataset\n"
-  echo "
+  check_ds_coverage
+  check_ds_snp
+  printf "$dataset - Coverage: $coverage; SNPs : $snp_ds\n"
   
-$dataset
-  
+  echo "\begin{table*}[h!]
+\begin{center}
+\caption{Results obtained for $dataset using the benchmark and applying it to the different databases generated. The execution time was measured in seconds, the RAM usage was measured in GB and the average identity, accuracy and CPU usage are presented as a percentage. The executions were, when possible, capped at 4 threads and 28 GB of RAM.}
+\label{resultstable:$dataset}
+\scriptsize
+\begin{tabular}{| m{7.5em} | m{5em}| m{2.7em} | m{4em} | m{2.5em} | m{2.5em} | m{5em} | m{3em} | m{4em}  | m{6.5em} | m{6.5em} |}
+\hline
+\textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Metagenomic analysis} & \textbf{Metagenomic classification} \\\\\\hline 
+
 " >> total_stats.tex
   for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
   do 	 
@@ -120,8 +237,8 @@ $dataset
       IDEN=$(echo $IDEN |bc -l | xargs printf %.3f)
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
-    #ds	file	exec_time	snps	avg_identity	NCD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification
-    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION" >> total_stats.tsv   
+    #ds	file	exec_time	snps	avg_identity	NCD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds" >> total_stats.tsv   
     
     while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] #add empty lines for the tools that couldn't output results
     do
@@ -139,6 +256,14 @@ $dataset
     do
       echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
       count=$(($count + 1))
-    done    
+    done  
+    
+    echo "
+\end{tabular}
+\end{center}
+\end{table*}
+
+
+" >> total_stats.tex  
 done
 #

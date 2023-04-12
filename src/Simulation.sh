@@ -9,7 +9,7 @@ rm -f DS*.bam
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
 gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
-#gto_fasta_extract_read_by_pattern -p "KF373730.1" < VDB.fa > EBV.fa
+gto_fasta_extract_read_by_pattern -p "NC_045512.2" < VDB.fa > COV.fa
 #
 #
 # MUTATE SEQUENCES:
@@ -44,6 +44,16 @@ gto_fasta_mutate -s 7 -e 0.13 < VZV.fa > VZV-7.fa
 gto_fasta_mutate -s 8 -e 0.15 < VZV.fa > VZV-8.fa
 gto_fasta_mutate -s 9 < VZV.fa > VZV-9.fa
 #
+gto_fasta_mutate -s 1 -e 0.01 < COV.fa > COV-1.fa
+gto_fasta_mutate -s 2 -e 0.03 < COV.fa > COV-2.fa
+gto_fasta_mutate -s 3 -e 0.05 < COV.fa > COV-3.fa
+gto_fasta_mutate -s 4 -e 0.07 < COV.fa > COV-4.fa
+gto_fasta_mutate -s 5 -e 0.09 < COV.fa > COV-5.fa
+gto_fasta_mutate -s 6 -e 0.11 < COV.fa > COV-6.fa
+gto_fasta_mutate -s 7 -e 0.13 < COV.fa > COV-7.fa
+gto_fasta_mutate -s 8 -e 0.15 < COV.fa > COV-8.fa
+gto_fasta_mutate -s 9 < COV.fa > COV-9.fa
+#
 #
 # CREATE RANDOM FASTA SEQUENCES AS CONTAMINATION:
 #
@@ -58,7 +68,7 @@ gto_fasta_extract_read_by_pattern -p "NC_012920.1" < VDB.fa > MT.fa
 # CREATE DATASETS:
 #
 rm -f DS*.fa;
-cat B19-1.fa HPV-1.fa VZV-1.fa > DS1.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa COV-1.fa > DS1.fa
 cp DS1.fa DS2.fa
 cp DS1.fa DS3.fa
 cp DS1.fa DS4.fa
@@ -67,7 +77,7 @@ cp DS1.fa DS6.fa
 cp DS1.fa DS7.fa
 cp DS1.fa DS8.fa
 #
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa > DS9.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa COV-1.fa tmp1.fa > DS9.fa
 cp DS9.fa DS10.fa
 cp DS9.fa DS11.fa
 cp DS9.fa DS12.fa
@@ -77,14 +87,14 @@ cp DS9.fa DS15.fa
 cp DS9.fa DS16.fa
 #
 #
-cat B19-9.fa HPV-9.fa VZV-9.fa tmp1.fa MT.fa > DS17.fa
-cat B19-2.fa HPV-2.fa VZV-2.fa tmp1.fa MT.fa > DS18.fa
-cat B19-3.fa HPV-3.fa VZV-3.fa tmp1.fa MT.fa > DS19.fa
-cat B19-4.fa HPV-4.fa VZV-4.fa tmp1.fa MT.fa > DS20.fa
-cat B19-5.fa HPV-5.fa VZV-5.fa tmp1.fa MT.fa > DS21.fa
-cat B19-6.fa HPV-6.fa VZV-6.fa tmp1.fa MT.fa > DS22.fa
-cat B19-7.fa HPV-7.fa VZV-7.fa tmp1.fa MT.fa > DS23.fa
-cat B19-8.fa HPV-8.fa VZV-8.fa tmp1.fa MT.fa > DS24.fa
+cat B19-9.fa HPV-9.fa VZV-9.fa COV-9.fa tmp1.fa MT.fa > DS17.fa
+cat B19-2.fa HPV-2.fa VZV-2.fa COV-2.fa tmp1.fa MT.fa > DS18.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa COV-3.fa tmp1.fa MT.fa > DS19.fa
+cat B19-4.fa HPV-4.fa VZV-4.fa COV-4.fa tmp1.fa MT.fa > DS20.fa
+cat B19-5.fa HPV-5.fa VZV-5.fa COV-5.fa tmp1.fa MT.fa > DS21.fa
+cat B19-6.fa HPV-6.fa VZV-6.fa COV-6.fa tmp1.fa MT.fa > DS22.fa
+cat B19-7.fa HPV-7.fa VZV-7.fa COV-7.fa tmp1.fa MT.fa > DS23.fa
+cat B19-8.fa HPV-8.fa VZV-8.fa COV-8.fa tmp1.fa MT.fa > DS24.fa
 #
 cp DS17.fa DS25.fa
 cp DS18.fa DS26.fa
@@ -122,13 +132,13 @@ cp DS22.fa DS54.fa
 cp DS23.fa DS55.fa
 cp DS24.fa DS56.fa
 #
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp1.fa > DS57.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa MT.fa > DS58.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa COV-1.fa tmp1.fa > DS57.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa COV-1.fa MT.fa > DS58.fa
 #
-cat B19-2.fa HPV-2.fa VZV-2.fa tmp1.fa MT.fa > DS59.fa
-cat B19-3.fa HPV-3.fa VZV-3.fa tmp2.fa MT.fa > DS60.fa
+cat B19-2.fa HPV-2.fa VZV-2.fa COV-2.fa tmp1.fa MT.fa > DS59.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa COV-3.fa tmp2.fa MT.fa > DS60.fa
 #
-cat B19-1.fa HPV-1.fa VZV-1.fa tmp2.fa MT.fa > DS61.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa COV-1.fa tmp2.fa MT.fa > DS61.fa
 cp DS61.fa DS62.fa
 #
 #

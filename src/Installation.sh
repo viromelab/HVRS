@@ -106,6 +106,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -y -c bioconda alcor 
   printf "Installing GeCo3\n\n"
   conda install -c bioconda -y geco3 
+  printf "Installing gnuplot\n\n"
+  conda install -c conda-forge gnuplot -y
   #printf "Installing Docker\n\n"
   #install_docker
   
