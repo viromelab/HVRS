@@ -21,23 +21,48 @@ list_snp0=($(ls *.snp0))
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Histogram_Identity.pdf"
+    set output "Histogram_Identity_snp1.pdf"
     set datafile separator "\t"
     set yrange [97:100]
     set xrange [0:45]
     set xtics auto
     set ytics auto
     set ylabel "Avg Identity"
+    set xlabel "Coverage"
     set multiplot
+    
     count = 1
     do for [ file in "${list_snp1[@]}"]{   
-      set xlabel file
-      plot file u 13:5 with lines lt count
+      
+      plot file u 13:5 with linespoints linestyle count
+      count = count + 1
+    }
+EOF
+#
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Histogram_Identity_snp0.pdf"
+    set datafile separator "\t"
+    set yrange [97:100]
+    set xrange [0:45]
+    set xtics auto
+    set ytics auto
+    set ylabel "Avg Identity"
+    set xlabel "Coverage"
+    set multiplot
+    
+    count = 1
+    do for [ file in "${list_snp0[@]}"]{   
+      
+      plot file u 13:5 with linespoints linestyle count
       count = count + 1
     }
 EOF
 #set multiplot
-#
+#plot file u 13:5 title file with linespoints linestyle count
 #rm -rf total_stats.tsv
 #, "" u 13:5:5 with labels offset char 0,1
 #plot "total_stats.tsv" using 13:6:(sprintf("(%d, %d)", $1, $2)) with labels notitle
+#set key at 100., 100.

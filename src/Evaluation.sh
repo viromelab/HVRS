@@ -43,6 +43,7 @@ check_ds_coverage () {
   cov_10=$(printf '%s\n' "${COVERAGE_10[@]}" | grep -w -- $dataset)
   cov_15=$(printf '%s\n' "${COVERAGE_15[@]}" | grep -w -- $dataset)
   cov_20=$(printf '%s\n' "${COVERAGE_20[@]}" | grep -w -- $dataset)
+  cov_25=$(printf '%s\n' "${COVERAGE_25[@]}" | grep -w -- $dataset)
   cov_30=$(printf '%s\n' "${COVERAGE_30[@]}" | grep -w -- $dataset)
   cov_40=$(printf '%s\n' "${COVERAGE_40[@]}" | grep -w -- $dataset)
 
@@ -61,6 +62,9 @@ check_ds_coverage () {
   elif [ ! -z "$cov_20" ]
     then
     coverage=20
+    elif [ ! -z "$cov_25" ]
+    then
+    coverage=25
   elif [ ! -z "$cov_30" ]
     then
     coverage=30 
@@ -70,11 +74,8 @@ check_ds_coverage () {
   else
     coverage=0 
   fi
-  
-  printf "cov - $coverage, $cov_2, $cov_5 \n\n\n\n"
 }
-
-
+#
 check_ds_snp () { 
   snp_0=$(printf '%s\n' "${SNP_0[@]}" | grep -w -- $dataset)
   snp_1=$(printf '%s\n' "${SNP_1[@]}" | grep -w -- $dataset)
@@ -82,7 +83,7 @@ check_ds_snp () {
   snp_5=$(printf '%s\n' "${SNP_5[@]}" | grep -w -- $dataset)
   snp_7=$(printf '%s\n' "${SNP_7[@]}" | grep -w -- $dataset)
   snp_9=$(printf '%s\n' "${SNP_9[@]}" | grep -w -- $dataset)
-  snp_11=$(printf '%s\n' "${SNP11[@]}" | grep -w -- $dataset)
+  snp_11=$(printf '%s\n' "${SNP_11[@]}" | grep -w -- $dataset)
   snp_13=$(printf '%s\n' "${SNP_13[@]}" | grep -w -- $dataset)
   snp_15=$(printf '%s\n' "${SNP_15[@]}" | grep -w -- $dataset)
 
