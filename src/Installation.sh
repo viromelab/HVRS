@@ -44,15 +44,15 @@ RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
-RUN_VIP=0;
+RUN_VIP=1;
 RUN_DRVM=0; 
 RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
 RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0; 
-RUN_ARAPANS=0;
-RUN_VIQUF_DOCKER=1;
+#RUN_ARAPANS=0;
+RUN_VIQUF_DOCKER=0;
 RUN_VIQUF=0; 
 
 install_samtools () {
@@ -446,7 +446,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   rm -rf Strainline
   git clone "https://github.com/HaploKit/Strainline.git"
   conda activate base
-  #sudo apt install dazzdb
+  sudo apt install dazzdb
 fi
 
 #HAPHPIPE -

@@ -3,25 +3,25 @@
 NR_THREADS=4;
 MAX_RAM=28;
 #
-CREATE_RECONSTRUCTION_FOLDERS=0;
+CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 #RUN_SHORAH=0;
-RUN_QURE=0; #w
+RUN_QURE=1; #w
 RUN_SAVAGE_NOREF=0; #rn
 RUN_SAVAGE_REF=0; 
 #RUN_QSDPR=0; 
-RUN_SPADES=0; #t
-RUN_METASPADES=0; #t
-RUN_METAVIRALSPADES=0; #t
-RUN_CORONASPADES=0; #t
+RUN_SPADES=1; #t
+RUN_METASPADES=1; #t
+RUN_METAVIRALSPADES=1; #t
+RUN_CORONASPADES=1; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
+RUN_QVG=1; #t
 RUN_VPIPE=0;
 #RUN_VPIPE_DOCKER=0;
 #RUN_VPIPE_QI=0;
@@ -29,12 +29,12 @@ RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; #w 
+RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #w
+RUN_PEHAPLO=1; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; 
@@ -43,18 +43,18 @@ RUN_VIRGENA=1; #w
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0; #w
+RUN_SSAKE=1; #w
 #RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
-RUN_HAPLOFLOW=0; #w
+RUN_HAPLOFLOW=1; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS1");
-declare -a DATASETS=("DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS14");
-#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+#declare -a DATASETS=("DS8");
+#declare -a DATASETS=("DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS14");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
-declare -a VIRUSES=("B19" "HPV" "VZV" "MT");
+declare -a VIRUSES=("B19" "HPV" "VZV" "COV" "MT");
 #
 #
 VIRGENA_TIMEOUT=15;
@@ -609,7 +609,7 @@ if [[ "$RUN_ASPIRE" -eq "1" ]]
   cd ..
 fi
 
-#QVG - working?
+#QVG - working
 if [[ "$RUN_QVG" -eq "1" ]] 
   then
   printf "Reconstructing with QVG\n\n"
@@ -778,6 +778,9 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do 
     
+    for virus in "${VIRUSES[@]}"
+      do 
+    
     echo "general:
   virus_base_config: ''
   
@@ -785,7 +788,7 @@ input:
   read_length: 150
   datadir: samples
   samples_file: $(pwd)/config/samples.tsv
-  reference: $(pwd)/references/B19.fa
+  reference: $(pwd)/references/${virus}.fa
 
 output:
   datadir: $(pwd)/results
@@ -794,9 +797,7 @@ output:
   global: false
   visualization: false
   QA: false" > config/config.yaml 
-    
-    for virus in "${VIRUSES[@]}"
-      do  
+
       
       rm -rf samples
       mkdir samples
@@ -823,10 +824,7 @@ output:
       mv ${dataset}_2.fq ${dataset}_R2.fq
       cd ../../../
       
-      
-      
       cd ..
-      printf "curr path -->   $(pwd)\n\n"
     
       rm -rf resources
       mkdir resources
@@ -834,11 +832,8 @@ output:
       cd resources
       mkdir $virus
       cd $virus
-      printf "curr path vir -->   $(pwd)\n\n"
       cp ../../../$virus.fa .
-      printf "AT THIS POINT $(ls) \n\n"
       cd ../../
-      
       
       
       rm -rf references
@@ -849,11 +844,7 @@ output:
       
       mkdir results
       mv cohort_consensus.fasta results
-      printf "AT THIS POINT2 $(ls) $(pwd)\n\n"
       cd ../
-      
-      
-      printf "curr path2 -->   $(pwd)\n\n"
     
       #rm -rf results
       #mkdir results 
@@ -863,7 +854,6 @@ output:
       
       #cd ..
       
-      printf "curr path 3 -->   $(pwd)\n\n"
       
       
     #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
@@ -871,7 +861,9 @@ output:
     # edit config.yaml and provide samples/ directory
     #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
       ./vpipe  --cores $NR_THREADS --conda-frontend conda #missing timer
-    
+      mv results/$dataset/${dataset}_2/ref_majority.fasta results/$dataset/${dataset}_2/vpipe-${dataset}.fa
+      cp results/$dataset/${dataset}_2/vpipe-${dataset}.fa ../reconstructed/$dataset/
+      
     done
   done
   cd ..
@@ -883,21 +875,26 @@ fi
 if [[ "$RUN_STRAINLINE" -eq "1" ]] 
   then
   printf "Reconstructing with Strainline\n\n"
-  create_paired_fa_files
+  #create_paired_fa_files
   eval "$(conda shell.bash hook)"
   conda activate strainline
-  cd Strainline/src/
+  cd Strainline/
+  srcpath=$(pwd)/src
   rm -rf out/tmp/
-  chmod +x ./strainline.sh
-  cd ..
+  chmod +x src/./strainline.sh
   for dataset in "${DATASETS[@]}"
     do
+    input=$(pwd)/${dataset}/reads.fa
     rm -rf ${dataset}
     mkdir ${dataset} 
     cd ${dataset}    
     cp ../../gen_${dataset}.fasta .
+    mv gen_${dataset}.fasta reads.fa
+    cd ..
     
-    ../src/strainline.sh -i gen_${dataset}.fasta -o out -p ont -k 200 -t $NR_THREADS
+    #$(pwd)/../src/strainline.sh -i gen_${dataset}.fasta -o out -p ont -k 200 -t $NR_THREADS
+    
+    $srcpath/strainline.sh -i $input -o out -p pb --minTrimmedLen 100 --minOvlpLen 20 --minSeedLen 100 -t $NR_THREADS
     
     
     #./strainline.sh -i ../../${dataset}*.fa -o out -p ont
@@ -908,7 +905,6 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
     #rm -rf out
     #../src/strainline.sh -i reads.fa -o out -p pb -k 20 -t 32
     
-    cd ..
     done
   cd ../
   conda activate base
@@ -1177,7 +1173,7 @@ if [[ "$RUN_MLEHAPLO" -eq "1" ]]
     ./multi-dsk/parse_results ${dataset}/paired-reads.solid_kmers_binary.60 > paired-reads.60
     perl construct_graph.pl  ${dataset}/paired-reads.fasta paired-reads.60 0 paired-reads.60.graph "s"
     perl construct_paired_without_bloom.pl -fasta ${dataset}/paired-reads.fasta -kmerfile paired-reads.60 -thresh 0 -wr paired-reads.60.pk.txt
-    perl dg_cover.pl -graph paired-reads.60.graph -kmer paired-reads.60 -paired paired-reads.60.pk.txt -fact 15 -thresh 0 -IS 400 > paired-reads.60.fact15.txt
+    perl dg_cover.pl -graph paired-reads.60.graph -kmer paired-reads.60 -paired paired-reads.60.pk.txt -fact 15 -thresh 20 -IS 400 > paired-reads.60.fact15.txt
     perl process_dg.pl paired-reads.60.fact15.txt > paired-reads.60.fact15.fasta
     perl get_paths_dgcover.pl -f paired-reads.60.fact15.txt -w paired-reads.60.fact15.paths.txt
     perl likelihood_singles_wrapper.pl -condgraph paired-reads.60.cond.graph -compset paired-reads.60.comp.txt -pathsfile paired-reads.60.fact15.paths.txt -back -gl 1200 -slow  > paired-reads.60.smxlik.txt
@@ -1677,6 +1673,6 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
   
 fi
 
-
+./Evaluation.sh
 
  
