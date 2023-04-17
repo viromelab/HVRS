@@ -21,10 +21,10 @@ RUN_VIADBG=0; #np, boost err
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
+RUN_QVG=0; #t--
 RUN_VPIPE=0;
 RUN_VPIPE_V3=0;
 RUN_VPIPE_QI=0;
@@ -44,7 +44,7 @@ RUN_IVA=0;
 RUN_PRICE=0;
 RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
-RUN_VIP=1;
+RUN_VIP=0;
 RUN_DRVM=0; 
 RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
@@ -71,6 +71,8 @@ install_conda() {
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
   chmod +x Miniconda3-latest-Linux-x86_64.sh
   bash Miniconda3-latest-Linux-x86_64.sh
+  printf "Please close and reopen this terminal \n\n"
+  read a
 }
 
 install_docker() {
@@ -87,31 +89,34 @@ fi
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
   printf "Installing tools\n\n"
+  conda update conda 
   conda install -c cobilab -y gto
+  conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
   conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
   printf "Installing git\n\n"
-  sudo apt install git
+  sudo apt -y install git
   printf "Installing G++\n\n"
-  sudo apt-get install g++
+  sudo apt-get -y install g++
   printf "Installing Samtools\n\n"
   #install_samtools
   conda install -c bioconda -y samtools
   printf "Installing make\n\n"
-  sudo apt install make
+  sudo apt -y install make
   printf "Installing Java\n\n"
-  sudo apt install default-jre
+  sudo apt -y install default-jre
   printf "Installing AlcoR\n\n"
-  conda install -y -c bioconda alcor 
+  conda install -n base conda-libmamba-solver -y
+  conda install -c conda-forge libgcc-ng -y
+  conda install -y -c bioconda alcor --solver=libmamba
   printf "Installing GeCo3\n\n"
   conda install -c bioconda -y geco3 
   printf "Installing gnuplot\n\n"
   conda install -c conda-forge gnuplot -y
   #printf "Installing Docker\n\n"
-  #install_docker
-  
-  sudo apt install curl
+  #install_docker  
+  sudo apt -y install curl
   #printf "Installing mamba\n\n"
   #install_mamba   
 fi
@@ -158,8 +163,8 @@ if [[ "$RUN_QSDPR" -eq "1" ]]
   then
   printf "Installing QSdpr\n\n"
   eval "$(conda shell.bash hook)"
-  sudo apt-get update
-  sudo apt-get install libatlas-base-dev
+  sudo apt-get -y update
+  sudo apt-get -y install libatlas-base-dev
   conda create -y -n qsdpr
   conda activate qsdpr
   conda install -c anaconda -y python=2.7 pysam numpy clapack scipy #samtools atlas lapack
@@ -353,7 +358,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
   conda activate base
-  sudo apt-get install libncurses6
+  sudo apt-get -y install libncurses6
   cd ..
 fi
 
@@ -446,7 +451,7 @@ if [[ "$RUN_STRAINLINE" -eq "1" ]]
   rm -rf Strainline
   git clone "https://github.com/HaploKit/Strainline.git"
   conda activate base
-  sudo apt install dazzdb
+  sudo apt -y install dazzdb
 fi
 
 #HAPHPIPE -
@@ -602,8 +607,8 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   cd ..
   conda activate base 
   
-  printf "Please open the R console and type install.packages( c("reshape","openxlsx") )\n\n"
-  
+  printf "Please open the R console and type install.packages( c("reshape","openxlsx") )\n\nPress any button to continue\n\n"
+  read a
 fi
 
 #ViQuaS
@@ -828,9 +833,9 @@ fi
 if [[ "$RUN_DRVM" -eq "1" ]] 
   then
   printf "Installing drVM\n\n"
-  sudo apt install python2
-  sudo apt install gawk
-  sudo apt-get install build-essential python-dev python-numpy python-scipy libatlas-dev libatlas3gf-base python-matplotlib libatlas-base-dev
+  sudo apt -y install python2
+  sudo apt -y install gawk
+  sudo apt-get -y install build-essential python-dev python-numpy python-scipy libatlas-dev libatlas3gf-base python-matplotlib libatlas-base-dev
   
   wget -O drvm "https://sourceforge.net/projects/sb2nhri/files/latest/download"
   rm -rf Tools
@@ -911,9 +916,9 @@ fi
 if [[ "$RUN_ENSEMBLEASSEMBLER" -eq "1" ]] 
   then
   printf "Installing EnsembleAssembler \n\n"
-  sudo apt install python2
-  sudo apt install gawk
-  sudo apt-get install dos2unix
+  sudo apt -y install python2
+  sudo apt -y install gawk
+  sudo apt-get -y install dos2unix
   
   rm -rf ensembleAssembly  
   rm -rf ensembleAssembly_1
