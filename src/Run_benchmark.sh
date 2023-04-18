@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+./Installation.sh
+./Simulation.sh
+./Reconstruction.sh
+./Evaluation.sh
+./Plots.sh
+./Cleaning.sh
+#

@@ -46,27 +46,27 @@ for tool in "${TOOLS[@]}"
   
   cd cvg2 
   $(cat ../total_stats.tsv | tr ',' '.' | grep "${i}-" | awk '{if ($1=="DS9" || $1=="DS17" || $1=="DS18" || $1=="DS19" || $1=="DS20" || $1=="DS21" || $1=="DS22" || $1=="DS23" || $1=="DS24") {print $0}}' > "${tool}")
-  #echo "$(sort -t$'\t' -k14 -n ${tool})" > ${tool}
+  echo "$(sort -t$'\t' -k 14 ${tool})" > ${tool}
   cd ..
   
   cd cvg5 
   $(cat ../total_stats.tsv | tr ',' '.' | grep "${i}-" | awk '{if ($1=="DS10" || $1=="DS25" || $1=="DS26" || $1=="DS27" || $1=="DS28" || $1=="DS29" || $1=="DS30" || $1=="DS31" || $1=="DS32") {print $0}}' > "${tool}")
-  #echo "$(sort -t$'\t' -k14 -n ${tool})" > ${tool}
+   echo "$(sort -t$'\t' -k 14 ${tool})" > ${tool}
   cd ..
   
   cd cvg10
   $(cat ../total_stats.tsv | tr ',' '.' | grep "${i}-" | awk '{if ($1=="DS11" || $1=="DS33" || $1=="DS34" || $1=="DS35" || $1=="DS36" || $1=="DS37" || $1=="DS38" || $1=="DS39" || $1=="DS40") {print $0}}' > "${tool}")
-  #echo "$(sort -t$'\t' -k14 -n ${tool})" > ${tool}
+   echo "$(sort -t$'\t' -k 14 ${tool})" > ${tool}
   cd ..
   
   cd cvg20 
   $(cat ../total_stats.tsv | tr ',' '.' | grep "${i}-" | awk '{if ($1=="DS13" || $1=="DS41" || $1=="DS42" || $1=="DS43" || $1=="DS44" || $1=="DS45" || $1=="DS46" || $1=="DS47" || $1=="DS48") {print $0}}' > "${tool}")
-  #echo "$(sort -t$'\t' -k14 -n ${tool})" > ${tool}
+  echo "$(sort -t$'\t' -k 14 ${tool})" > ${tool}
   cd ..
   
   cd cvg40 
   $(cat ../total_stats.tsv | tr ',' '.' | grep "${i}-" | awk '{if ($1=="DS16" || $1=="DS49" || $1=="DS50" || $1=="DS51" || $1=="DS52" || $1=="DS53" || $1=="DS54" || $1=="DS55" || $1=="DS56") {print $0}}' > "${tool}")
-  #echo "$(sort -t$'\t' -k14 -n ${tool})" > ${tool}
+  echo "$(sort -t$'\t' -k 14 ${tool})" > ${tool}
   cd ..
   
   

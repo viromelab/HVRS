@@ -3,11 +3,11 @@
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 declare -a VIRUSES=("B19" "HPV" "VZV" "COV" "MT");
 #
-declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo");
+declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo" "haploflow");
 declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena");
 #
 declare -a CLASSIFICATION=("tracespipelite" "tracespipe" "lazypipe");
-declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena");
+declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena" "haploflow");
 #
 declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa")
 #
@@ -30,12 +30,17 @@ declare -a SNP_11=("DS22"  "DS30"  "DS38"  "DS46"  "DS54")
 declare -a SNP_13=("DS23"  "DS31"  "DS39"  "DS47"  "DS55")
 declare -a SNP_15=("DS24"  "DS32"  "DS40"  "DS48"  "DS56")
 #
+declare -a CNT_0=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS58")
+declare -a CNT_3=("DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57" "DS59" "DS61"  "DS62")
+declare -a CNT_6=("DS60")
+#
 count=0
 #
 D_PATH="reconstructed";
 #
 declare coverage
 declare snp_ds
+declare cnt_ds
 #
 check_ds_coverage () { 
   cov_2=$(printf '%s\n' "${COVERAGE_2[@]}" | grep -w -- $dataset)
@@ -89,36 +94,55 @@ check_ds_snp () {
 
   if [ ! -z "$snp_0" ]
     then
-    snp_ds=0  
+    snp_ds=0.00  
   elif [ ! -z "$snp_1" ]
     then
-    snp_ds=1
+    snp_ds=0.01
   elif [ ! -z "$snp_3" ]
     then
-    snp_ds=3
+    snp_ds=0.03
   elif [ ! -z "$snp_5" ]
     then
-    snp_ds=5
+    snp_ds=0.05
   elif [ ! -z "$snp_7" ]
     then
-    snp_ds=7
+    snp_ds=0.07
   elif [ ! -z "$snp_9" ]
     then
-    snp_ds=9
+    snp_ds=0.09
   elif [ ! -z "$snp_11" ]
     then
-    snp_ds=11
+    snp_ds=0.11
   elif [ ! -z "$snp_13" ]
     then
-    snp_ds=13
+    snp_ds=0.13
   elif [ ! -z "$snp_15" ]
     then
-    snp_ds=15
+    snp_ds=0.15
   else
     snp_ds=10000 
   fi
   
   printf "cov - $coverage, $cov_2, $cov_5 \n\n\n\n"
+}
+#
+check_ds_cont () { 
+  cnt_0=$(printf '%s\n' "${CNT_0[@]}" | grep -w -- $dataset)
+  cnt_3=$(printf '%s\n' "${CNT_3[@]}" | grep -w -- $dataset)
+  cnt_6=$(printf '%s\n' "${CNT_6[@]}" | grep -w -- $dataset)
+  
+  if [ ! -z "$cnt_0" ]
+    then
+    cnt_ds=0.0  
+  elif [ ! -z "$cnt_3" ]
+    then
+    cnt_ds=0.3
+  elif [ ! -z "$cnt_6" ]
+    then
+    cnt_ds=0.6
+  else
+    cnt_ds=10000 
+  fi
 }
 
 count=0
@@ -126,14 +150,15 @@ count=0
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS" > total_stats.tsv
+echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   count=0
   check_ds_coverage
   check_ds_snp
-  printf "$dataset - Coverage: $coverage; SNPs : $snp_ds\n"
+  check_ds_cont
+  printf "$dataset - Coverage: $coverage; SNPs : $snp_ds; Contamination : $cnt_ds\n"
   
   echo "\begin{table*}[h!]
 \begin{center}
@@ -239,7 +264,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
     #ds	file	exec_time	snps	avg_identity	NCD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
-    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds" >> total_stats.tsv   
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds" >> total_stats.tsv   
     
     while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] #add empty lines for the tools that couldn't output results
     do
