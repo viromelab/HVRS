@@ -6,55 +6,56 @@ MAX_RAM=28;
 CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 #RUN_SHORAH=0;
-RUN_QURE=1; #w
+RUN_QURE=0; #w
 RUN_SAVAGE_NOREF=0; #rn
 RUN_SAVAGE_REF=0; 
 #RUN_QSDPR=0; 
-RUN_SPADES=1; #t
-RUN_METASPADES=1; #t
-RUN_METAVIRALSPADES=1; #t
-RUN_CORONASPADES=1; #t
+RUN_SPADES=0; #t
+RUN_METASPADES=0; #t
+RUN_METAVIRALSPADES=0; #t
+RUN_CORONASPADES=0; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1; #t
-RUN_TRACESPIPE=1; #t
+RUN_TRACESPIPELITE=0; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t
+RUN_QVG=0; #t
 RUN_VPIPE=0;
 #RUN_VPIPE_DOCKER=0;
 #RUN_VPIPE_QI=0;
+RUN_VPIPE_V3=0; #snake
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #t
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; #w 
+RUN_LAZYPIPE=0; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=1; #w
+RUN_PEHAPLO=0; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=1; #w
+RUN_VIRGENA=0; #w
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
 RUN_SSAKE=1; #w
 #RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
-RUN_HAPLOFLOW=1; #w
+RUN_HAPLOFLOW=0; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS8");
+#declare -a DATASETS=("DS62");
 #declare -a DATASETS=("DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS14");
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
-declare -a VIRUSES=("B19" "HPV" "VZV" "COV" "MT");
+declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "HBV" "MT");
 #
 #
 VIRGENA_TIMEOUT=15;
@@ -777,15 +778,15 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
     
   for dataset in "${DATASETS[@]}"
     do 
+    virus="COV"
     
-    for virus in "${VIRUSES[@]}"
-      do 
+    #for virus in "${VIRUSES[@]}"
+    #  do 
     
     echo "general:
-  virus_base_config: ''
+  virus_base_config: 'sars-cov-2'
   
 input:
-  read_length: 150
   datadir: samples
   samples_file: $(pwd)/config/samples.tsv
   reference: $(pwd)/references/${virus}.fa
@@ -797,6 +798,8 @@ output:
   global: false
   visualization: false
   QA: false" > config/config.yaml 
+  
+  echo "$dataset	${dataset}_2" > config/samples.tsv
 
       
       rm -rf samples
@@ -863,7 +866,112 @@ output:
       ./vpipe  --cores $NR_THREADS --conda-frontend conda #missing timer
       mv results/$dataset/${dataset}_2/ref_majority.fasta results/$dataset/${dataset}_2/vpipe-${dataset}.fa
       cp results/$dataset/${dataset}_2/vpipe-${dataset}.fa ../reconstructed/$dataset/
+      read a
+    #done
+  done
+  cd ..
+  conda activate base
+ 
+fi
+
+#V-pipe - err
+if [[ "$RUN_VPIPE_V3" -eq "1" ]]
+  then
+  printf "Reconstructing with V-pipe\n\n"
+  eval "$(conda shell.bash hook)"
+
+  cd vpipe_v2
+    
+  for dataset in "${DATASETS[@]}"
+    do 
+    
+    for virus in "${VIRUSES[@]}"
+      do 
+    
+    echo "general:
+  virus_base_config: ''
+  
+input:
+  datadir: samples
+  samples_file: $(pwd)/config/samples.tsv
+  reference: $(pwd)/references/${virus}.fa
+
+output:
+  datadir: $(pwd)/results
+  snv: false
+  local: false
+  global: false
+  visualization: false
+  QA: false" > config/config.yaml 
+  
+  echo "$dataset	${dataset}_2" > config/samples.tsv
+
       
+      rm -rf samples
+      mkdir samples
+      cd samples
+    
+      mkdir ${dataset}
+      cd ${dataset}
+      
+      mkdir ${dataset}_2
+      cd ${dataset}_2 
+      
+      mkdir raw_data
+      cd raw_data 
+      
+      
+      
+      cp ../../../../../${dataset}_*.fq .
+      sed -i 's/J/I/g' ${dataset}_1.fq  
+      sed -i 's/J/I/g' ${dataset}_2.fq  
+       
+      #sed -r -n 's/[Jj]/I/g' ${dataset}_1.fq   
+      #sed -r -n 's/[Jj]/I/g' ${dataset}_2.fq   
+      mv ${dataset}_1.fq ${dataset}_R1.fq
+      mv ${dataset}_2.fq ${dataset}_R2.fq
+      cd ../../../
+      
+      cd ..
+    
+      rm -rf resources
+      mkdir resources
+      
+      cd resources
+      mkdir $virus
+      cd $virus
+      cp ../../../$virus.fa .
+      cd ../../
+      
+      
+      rm -rf references
+      mkdir references      
+      cd references
+      cp ../../$virus.fa .
+      cp $virus.fa cohort_consensus.fasta
+      
+      mkdir results
+      mv cohort_consensus.fasta results
+      cd ../
+    
+      #rm -rf results
+      #mkdir results 
+      #cd results
+      #cp ../../reconstructed/DS1/tracespipe*.fa .
+      #mv tracespipe*$virus.fa cohort_consensus.fasta
+      
+      #cd ..
+      
+      
+      
+    #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
+    
+    # edit config.yaml and provide samples/ directory
+    #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
+      ./vpipe  --cores $NR_THREADS --conda-frontend conda #missing timer
+      mv results/$dataset/${dataset}_2/ref_majority.fasta results/$dataset/${dataset}_2/vpipe-${dataset}.fa
+      cp results/$dataset/${dataset}_2/vpipe-${dataset}.fa ../reconstructed/$dataset/
+      read a
     done
   done
   cd ..
@@ -1297,10 +1405,14 @@ if [[ "$RUN_TARVIR" -eq "1" ]]
     rm -rf data
     mkdir data
     cp ../gen_${dataset}.fasta data
-    cp ../${dataset}_.sam data
+    #cp ../${dataset}_.sam data
     cd Overlap_extension/
+    
     ./build -f ../data/gen_${dataset}.fasta -o data
-    ./overlap -S data/${dataset}_.sam -x data -f ../data/gen_${dataset}.fasta -c 10 -o virus_recruit.fa
+    ./overlap -S data/${dataset}_.sam -x data -f ../data/gen_${dataset}.fasta -c 50 -o virus_recruit.fa
+    #example
+    #./build -f test_data/virus.fa -o virus
+    #./overlap -S test_data/HIV.sam -x virus -f test_data/virus.fa -c 180 -o virus_recruit.fa
     cd ..
   done 
   cd ../../
@@ -1333,7 +1445,7 @@ if [[ "$RUN_VIP" -eq "1" ]]
       cp ../../gen_${dataset}.fasta .
       cp ../../${virus}.fa .
       .././VIP.sh -z -i gen_${dataset}.fasta -p illumina -f fasta -r ${virus}.fa
-      .././VIP.sh -c gen_DS1.fasta.conf -i gen_DS1.fasta
+      .././VIP.sh -c gen_${dataset}.fasta.conf -i gen_${dataset}.fasta
       cd ..
       
       done

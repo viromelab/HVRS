@@ -3,7 +3,7 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/lx/miniconda3;
+CONDA_PREFIX=/home/x/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
@@ -21,13 +21,13 @@ RUN_VIADBG=0; #np, boost err
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1; #t
-RUN_TRACESPIPE=1; #t
+RUN_TRACESPIPELITE=0; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
 RUN_QVG=0; #t--
 RUN_VPIPE=0;
 RUN_VPIPE_V3=0;
-RUN_VPIPE_QI=0;
+RUN_VPIPE_QI=1;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -365,15 +365,15 @@ fi
 #V-pipe
 if [[ "$RUN_VPIPE_V3" -eq "1" ]]
   then
-  printf "Installing with V-pipe ver 3\n\n"
+  printf "Installing with V-pipe ver snakemake\n\n"
   eval "$(conda shell.bash hook)"  
-  conda create -y -n vpipe
-  conda activate vpipe
-  conda install -c bioconda snakemake -y
+  conda create -y -n snakemake
+  conda activate snakemake
+  conda install -c conda-forge -c bioconda snakemake snakedeploy -y
   rm -rf vpipe_v2
   mkdir vpipe_v2
   cd vpipe_v2
-  git clone https://github.com/cbg-ethz/V-pipe.git
+  snakedeploy deploy-workflow https://github.com/cbg-ethz/V-pipe . --tag v2.99.3
   cd ..
   
   
