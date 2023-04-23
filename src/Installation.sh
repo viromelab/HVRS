@@ -3,17 +3,17 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/x/miniconda3;
+CONDA_PREFIX=/home/lx/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
-INSTALL_TOOLS=0;
+INSTALL_TOOLS=1;
 INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
-RUN_QURE=0; #t
+RUN_QURE=1; #t
 RUN_SAVAGE=0; #
 #RUN_QSDPR=0;
-RUN_SPADES=0; #t
+RUN_SPADES=1; #t
 RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
@@ -21,35 +21,35 @@ RUN_VIADBG=0; #np, boost err
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPELITE=1; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t--
+RUN_QVG=1; #t--
 RUN_VPIPE=0;
 RUN_VPIPE_V3=0;
-RUN_VPIPE_QI=1;
+RUN_VPIPE_QI=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=0; #w, needs testing
+RUN_LAZYPIPE=1; #w, needs testing
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #t
+RUN_PEHAPLO=1; #t
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0; 
 RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=0; #t
+RUN_VIRGENA=1; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0; 
-RUN_SSAKE=0; #t
+RUN_SSAKE=1; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
-RUN_HAPLOFLOW=0;
+RUN_HAPLOFLOW=1;
 #RUN_TENSQR=0; 
 #RUN_ARAPANS=0;
 RUN_VIQUF_DOCKER=0;
@@ -89,14 +89,15 @@ fi
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
   printf "Installing tools\n\n"
-  conda update conda 
+  sudo apt -y install git
+  conda update conda -y
   conda install -c cobilab -y gto
   conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
   conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
   printf "Installing git\n\n"
-  sudo apt -y install git
+  #sudo apt -y install git
   printf "Installing G++\n\n"
   sudo apt-get -y install g++
   printf "Installing Samtools\n\n"
@@ -606,8 +607,9 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   perl perl/install_db.pl --db blastn_vi
   cd ..
   conda activate base 
+  sudo apt install r-base-core -y
   
-  printf "Please open the R console and type install.packages( c("reshape","openxlsx") )\n\nPress any button to continue\n\n"
+  printf "\n\nPlease open the R console and type install.packages( c(\"reshape\",\"openxlsx\") )\n\nPress any button to continue\n\n"
   read a
 fi
 

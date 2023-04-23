@@ -10,7 +10,7 @@ gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
 gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
 #gto_fasta_extract_read_by_pattern -p "NC_045512.2" < VDB.fa > COV.fa
-gto_fasta_extract_read_by_pattern -p "KX827417.1" < VDB.fa > MCPyV.fa
+gto_fasta_extract_read_by_pattern -p "KX827417.1" < VDB.fa | sed 's|/||g' > MCPyV.fa
 gto_fasta_extract_read_by_pattern -p "AB116086.1" < VDB.fa > HBV.fa
 #
 #
