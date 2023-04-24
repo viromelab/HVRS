@@ -19,10 +19,10 @@ RUN_VIADBG=0;
 #RUN_VGFLOW=0; #t
 #RUN_PREDICTHAPLO=0;
 RUN_TRACESPIPELITE=0; #t
-RUN_TRACESPIPE=0; #t
+RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
 RUN_QVG=0; #t
-RUN_VPIPE=1; 
+RUN_VPIPE=0; 
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -49,16 +49,17 @@ RUN_HAPLOFLOW=0; #w
 RUN_VIQUF=0;
 
 #declare -a DATASETS=("DS7");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+declare -a DATASETS=("DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+#declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
-declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "HBV" "MT");
+declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
 #
 VIRGENA_TIMEOUT=15;
 
 #creates a fasta file for each of the datasets with paired reads
 create_paired_fa_files () { 
-  printf "Creating fasta files from .sam files\n\n"
+  printf "Creating fasta files from .fq files\n\n"
   for dataset in "${DATASETS[@]}"
   do	    
     sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > tmp_${dataset}_1.fa
@@ -148,7 +149,7 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
     do
     mkdir metaspades_${dataset}	
     cp ../${dataset}_*.fq metaspades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaspades-${dataset}-time.txt metaspades.py -t 1 -o metaspades_${dataset} -1 metaspades_${dataset}/${dataset}_1.fq -2 metaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaspades-${dataset}-time.txt metaspades.py -t $NR_THREADS -o metaspades_${dataset} -1 metaspades_${dataset}/${dataset}_1.fq -2 metaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     
     mv metaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaspades_${dataset}/scaffolds.fasta metaspades_${dataset}/metaspades-${dataset}.fa
@@ -318,10 +319,10 @@ fi
 #qure - running
 if [[ "$RUN_QURE" -eq "1" ]] 
   then
+  printf "Reconstructing with QuRe\n\n"
   eval "$(conda shell.bash hook)"
   conda activate java-env
-  create_paired_fa_files
-  printf "Reconstructing with QuRe\n\n"
+  create_paired_fa_files  
   cd QuRe_v0.99971/
   for dataset in "${DATASETS[@]}"
     do
@@ -790,7 +791,7 @@ output:
 MEM	$total_mem
 CPU_perc	$total_cpu%" > v-pipe-${dataset}-time.txt
   cp v-pipe-${dataset}-time.txt ../reconstructed/$dataset 
-
+  rm -rf v-pipe-*-time.txt
   cat *.fasta > v-pipe-${dataset}.fa
   rm -rf *.fasta
   cp v-pipe-${dataset}.fa ../reconstructed/$dataset 
