@@ -22,10 +22,7 @@ RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
 RUN_QVG=0; #t
-#RUN_VPIPE=0;
-#RUN_VPIPE_DOCKER=0;
-#RUN_VPIPE_QI=0;
-RUN_VPIPE_V3=1; 
+RUN_VPIPE=1; 
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -675,211 +672,14 @@ CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
   
 fi
 
-#V-pipe - Failed to open source file https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/workflow/rules/scripts/functions.sh
-if [[ "$RUN_VPIPE_QI" -eq "1" ]]
-  then
-  printf "Reconstructing with V-pipe, covid version\n\n"
-  eval "$(conda shell.bash hook)"
-
-  cd V-pipe
-    
-  for dataset in "${DATASETS[@]}"
-    do 
-    
-    echo "general:
-    virus_base_config: 'sars-cov-2'
-
-input:
-    samples_file: samples.tsv
-
-output:
-    trim_primers: false
-    snv: false
-    local: false
-    global: false
-    visualization: false
-    diversity: false
-    QA: false
-    upload: false
-    dehumanized_raw_reads: false" > config.yaml 
-    
-    for virus in "${VIRUSES[@]}"
-      do  
-      
-      rm -rf samples
-      mkdir samples
-      cd samples
-    
-      mkdir ${dataset}
-      cd ${dataset}
-      
-      mkdir ${dataset}_2
-      cd ${dataset}_2 
-      
-      mkdir raw_data
-      cd raw_data 
-      
-      
-      
-      cp ../../../../../${dataset}_*.fq .   
-      mv ${dataset}_1.fq ${dataset}_R1.fq
-      mv ${dataset}_2.fq ${dataset}_R2.fq
-      cd ../../../
-      
-      
-      
-      cd ..
-      printf "curr path -->   $(pwd)\n\n"
-    
-      rm -rf resources
-      mkdir resources
-      
-      cd resources
-      mkdir $virus
-      cd $virus
-      printf "curr path vir -->   $(pwd)\n\n"
-      cp ../../../../$virus.fa .
-      cd ../
-      
-      printf "curr path2 -->   $(pwd)\n\n"
-      cd ..
-      rm -rf results
-      mkdir results 
-      cd results
-      cp ../../$virus.fa .
-      mv $virus.fa cohort_consensus.fasta
-      
-      cd ..
-      
-      printf "curr path 3 -->   $(pwd)\n\n"
-      
-      
-    #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
-    
-    # edit config.yaml and provide samples/ directory
-    #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
-      ./vpipe -p --cores 2 --conda-frontend conda --force-use-threads -T 2 --use-conda  #missing timer
-    
-    done
-  done
-  cd ..
-  conda activate base
- 
-fi
-
-#V-pipe - err
+#V-pipe - working
 if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
   eval "$(conda shell.bash hook)"
 
-  cd V-pipe
-    
-  for dataset in "${DATASETS[@]}"
-    do 
-    virus="COV"
-    
-    #for virus in "${VIRUSES[@]}"
-    #  do 
-    
-    echo "general:
-  virus_base_config: 'sars-cov-2'
-  
-input:
-  datadir: samples
-  samples_file: $(pwd)/config/samples.tsv
-  reference: $(pwd)/references/${virus}.fa
-
-output:
-  datadir: $(pwd)/results
-  snv: false
-  local: false
-  global: false
-  visualization: false
-  QA: false" > config/config.yaml 
-  
-  echo "$dataset	${dataset}_2" > config/samples.tsv
-
-      
-      rm -rf samples
-      mkdir samples
-      cd samples
-    
-      mkdir ${dataset}
-      cd ${dataset}
-      
-      mkdir ${dataset}_2
-      cd ${dataset}_2 
-      
-      mkdir raw_data
-      cd raw_data 
-      
-      
-      
-      cp ../../../../../${dataset}_*.fq .
-      sed -i 's/J/I/g' ${dataset}_1.fq  
-      sed -i 's/J/I/g' ${dataset}_2.fq  
-       
-      #sed -r -n 's/[Jj]/I/g' ${dataset}_1.fq   
-      #sed -r -n 's/[Jj]/I/g' ${dataset}_2.fq   
-      mv ${dataset}_1.fq ${dataset}_R1.fq
-      mv ${dataset}_2.fq ${dataset}_R2.fq
-      cd ../../../
-      
-      cd ..
-    
-      rm -rf resources
-      mkdir resources
-      
-      cd resources
-      mkdir $virus
-      cd $virus
-      cp ../../../$virus.fa .
-      cd ../../
-      
-      
-      rm -rf references
-      mkdir references      
-      cd references
-      cp ../../$virus.fa .
-      cp $virus.fa cohort_consensus.fasta
-      
-      mkdir results
-      mv cohort_consensus.fasta results
-      cd ../
-    
-      #rm -rf results
-      #mkdir results 
-      #cd results
-      #cp ../../reconstructed/DS1/tracespipe*.fa .
-      #mv tracespipe*$virus.fa cohort_consensus.fasta
-      
-      #cd ..
-      
-      
-      
-    #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
-    
-    # edit config.yaml and provide samples/ directory
-    #sudo docker run --rm -it -v $PWD:/work ghcr.io/cbg-ethz/v-pipe:master --jobs 4 --printshellcmds --dry-run
-      ./vpipe  --cores $NR_THREADS --conda-frontend conda #missing timer
-      mv results/$dataset/${dataset}_2/ref_majority.fasta results/$dataset/${dataset}_2/vpipe-${dataset}.fa
-      cp results/$dataset/${dataset}_2/vpipe-${dataset}.fa ../reconstructed/$dataset/
-      read a
-    #done
-  done
-  cd ..
-  conda activate base
- 
-fi
-
-#V-pipe - err
-if [[ "$RUN_VPIPE_V3" -eq "1" ]]
-  then
-  printf "Reconstructing with V-pipe\n\n"
-  eval "$(conda shell.bash hook)"
-
-  cd V-pipe/V-pipe/
+  cd V-pipe/
+  mkdir references
   
   for virus in "${VIRUSES[@]}"
     do 
@@ -900,9 +700,9 @@ lofreq:
     cd ../resources/
     rm -rf $virus
     mkdir $virus
-    cp ../../../$virus.fa $virus
+    cp ../../$virus.fa $virus
     cd ../references/
-    cp ../../../$virus.fa .
+    cp ../../$virus.fa .
     cd ..
     
       
@@ -947,7 +747,7 @@ output:
       mkdir raw_data
       cd raw_data 
       
-      cp ../../../../../../${dataset}_*.fq .
+      cp ../../../../../${dataset}_*.fq .
       sed -i 's/J/I/g' ${dataset}_1.fq  
       sed -i 's/J/I/g' ${dataset}_2.fq  
        
@@ -959,7 +759,7 @@ output:
       
       cd ..
     
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vpipe-$virus-${dataset}-time.txt ./vpipe  --cores $NR_THREADS #--conda-frontend conda
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o v-pipe-$virus-${dataset}-time.txt ./vpipe  --cores $NR_THREADS --conda-frontend conda
       cp results/SRR10903401/20200102/references/ref_majority.fasta .
       mv ref_majority.fasta $virus.fasta
       
@@ -969,7 +769,7 @@ output:
     total_mem=0
     total_cpu=0
     count=0
-    for f in vpipe-*-$dataset-time.txt
+    for f in v-pipe-*-$dataset-time.txt
     do
       echo "Processing $f" 
       TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
@@ -988,16 +788,16 @@ output:
     total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
     echo "TIME	$total_time
 MEM	$total_mem
-CPU_perc	$total_cpu%" > vpipe-${dataset}-time.txt
-  cp vpipe-${dataset}-time.txt ../../reconstructed/$dataset 
+CPU_perc	$total_cpu%" > v-pipe-${dataset}-time.txt
+  cp v-pipe-${dataset}-time.txt ../reconstructed/$dataset 
 
-  cat *.fasta > vpipe-${dataset}.fa
+  cat *.fasta > v-pipe-${dataset}.fa
   rm -rf *.fasta
-  cp vpipe-${dataset}.fa ../../reconstructed/$dataset 
+  cp v-pipe-${dataset}.fa ../reconstructed/$dataset 
   
   done
       
-  cd ../../
+  cd ../
   conda activate base
  
 fi
@@ -1808,6 +1608,6 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
   
 fi
 
-#./Evaluation.sh
+./Evaluation.sh
 
  

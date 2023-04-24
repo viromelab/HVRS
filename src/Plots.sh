@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 cp reconstructed/total_stats.tsv .
-declare -a TOOLS=("coronaSPAdes" "Haploflow" "LAZYPIPE" "metaSPAdes" "metaviralSPAdes" "PEHaplo" "QuRe" "QVG" "SPAdes" "SSAKE" "TRACESPipe" "TRACESPipeLite" "VirGenA" "ViSpA")
+declare -a TOOLS=("coronaSPAdes" "Haploflow" "LAZYPIPE" "metaSPAdes" "metaviralSPAdes" "PEHaplo" "QuRe" "QVG" "SPAdes" "SSAKE" "TRACESPipe" "TRACESPipeLite" "VirGenA" "ViSpA" "V-pipe")
 #declare -a list
 #declare -p list
 #
@@ -92,7 +92,7 @@ gnuplot << EOF
     
     ymax = 100.5
     ymin = 94
-    offset = ( ymax - ymin ) / 14.0    
+    offset = ( ymax - ymin ) / 15.0    
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -122,7 +122,7 @@ gnuplot << EOF
     
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -152,7 +152,7 @@ gnuplot << EOF
     
     ymax = 0.11
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -189,7 +189,7 @@ gnuplot << EOF
     
     ymax = 100.5
     ymin = 94
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -219,7 +219,7 @@ gnuplot << EOF
     
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -248,7 +248,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 0.13
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -283,7 +283,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 85
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -313,7 +313,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -343,7 +343,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 0.13
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -379,7 +379,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 85
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -409,7 +409,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -439,7 +439,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 0.13
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -475,7 +475,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 85
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -505,7 +505,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -535,7 +535,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 0.15
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -571,7 +571,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 88
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -601,7 +601,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -630,7 +630,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 0.17
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -666,7 +666,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 91
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -696,7 +696,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -726,7 +726,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 0.13
     ymin = 0
-    offset = ( ymax - ymin )/14.0   
+    offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top

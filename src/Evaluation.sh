@@ -5,12 +5,12 @@ declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "HBV" "MT");
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo" "haploflow");
-declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena");
+declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena" "v-pipe");
 #
 declare -a CLASSIFICATION=("tracespipelite" "tracespipe" "lazypipe");
-declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena" "haploflow");
+declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena" "haploflow" "v-pipe");
 #
-declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa")
+declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa" "v-pipe")
 #
 declare -a COVERAGE_2=("DS1" "DS9" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24")
 declare -a COVERAGE_5=("DS2" "DS10" "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32")
