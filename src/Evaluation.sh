@@ -5,12 +5,12 @@ declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo" "haploflow");
-declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena" "v-pipe");
+declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena" "v");
 #
 declare -a CLASSIFICATION=("tracespipelite" "tracespipe" "lazypipe");
-declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena" "haploflow" "v-pipe");
+declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena" "haploflow" "v");
 #
-declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa" "v-pipe")
+declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa" "v")
 #
 declare -a COVERAGE_2=("DS1" "DS9" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24")
 declare -a COVERAGE_5=("DS2" "DS10" "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32")
@@ -38,22 +38,6 @@ declare -a CNT_6=("DS60")
 count=0
 #
 D_PATH="reconstructed";
-#
-declare coverage=-1
-declare snp_ds=-1
-declare cnt_ds=-1
-declare dataset=-1
-declare file=-1
-declare TIME=-1
-declare SNPS=-1
-declare IDEN=-1
-declare NCD=-1
-declare NRC=-1
-declare MEM=-1
-declare CPU_P=-1
-declare NR_SPECIES=-1
-declare DOES_ANALYSIS=-1
-declare DOES_CLASSIFICATION=-1
 #
 check_ds_coverage () { 
   cov_2=$(printf '%s\n' "${COVERAGE_2[@]}" | grep -w -- $dataset)
@@ -184,12 +168,34 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 
 " >> total_stats.tex
   for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
-  do 	 
+  do 
+    rm -rf out.report	 
+    TIME=-1
+    SNPS=-1
+    IDEN=1
+    NCD=1
+    NRC=1
+    MEM=-1
+    CPU_P=-1
+    NR_SPECIES=-1
+    DOES_ANALYSIS=-1
+    DOES_CLASSIFICATION=-1
+
     printf "\n\nFile: $file\nDataset: $dataset \n\n"; #print file name, virus and dataset	  
     fst_char=$(cat $dataset/$file | head -c 1)
     if [[ -z "$fst_char" ]]; then
       printf "The result file is empty."    
     else
+      dos2unix $dataset/$file
+      #sed -i 's/_/-/g' $dataset/$file      
+      #sed -i 's/\./-/g' $dataset/$file   
+      awk -i inplace '{ while(sub(/QuRe./,int(rand()*99999999999)+1)); print }' $dataset/$file
+      #awk -i inplace '{ while(sub(/_/,-); print }' $dataset/$file
+      #awk -i inplace '{ while(sub(/100.0/,int(rand()*99999999999)+10)); print }' $dataset/$file
+      awk -i inplace '{ while(sub(/results/,int(rand()*99999999999)+1)); print }' $dataset/$file
+      #cat $dataset/$file | tr 0123456789 abcdefghij > tmp
+      #mv tmp $dataset/$file
+
       dnadiff $dataset/$file ../$dataset.fa ; #run dnadiff
       IDEN=`cat out.report | grep "AvgIdentity " | head -n 1 | awk '{ print $2;}'`;  #retrieve results
       ALBA=`cat out.report | grep "AlignedBases " | head -n 1 | awk '{ print $2;}'`;
