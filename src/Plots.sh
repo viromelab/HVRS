@@ -320,7 +320,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NCD"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -350,7 +350,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NRC"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -416,7 +416,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NCD"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -446,7 +446,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NRC"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -512,7 +512,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NCD"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -542,7 +542,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NRC"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -608,7 +608,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NCD"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -637,7 +637,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NRC"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -703,7 +703,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NCD"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
@@ -733,7 +733,7 @@ gnuplot << EOF
     set xtics auto
     set ytics auto
     set ylabel "NRC"
-    set xlabel "Coverage"
+    set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
