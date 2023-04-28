@@ -264,12 +264,12 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       rm $dataset/$file_wout_extension.seq.*
       
       #Conditional compression C(X|Y) [use reference and target]
-      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 -r ../DS1.fa $dataset/$file_wout_extension.seq
+      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 -r ../$dataset.fa $dataset/$file_wout_extension.seq
       COMPRESSED_SIZE_COND_COMPRESSION=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)      
       rm $dataset/$file_wout_extension.seq.*
       
       #Relative compression (only reference models) C(X||Y)
-      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r ../DS1.fa $dataset/$file_wout_extension.seq
+      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r ../$dataset.fa $dataset/$file_wout_extension.seq
       COMPRESSED_SIZE_W_REF=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)      
       rm $dataset/$file_wout_extension.seq.*            
       FILE_SIZE=$(ls -l $dataset/$file_wout_extension.fa | cut -d' ' -f5)
