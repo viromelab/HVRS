@@ -26,8 +26,6 @@ RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
 RUN_QVG=1; #t--
 RUN_VPIPE=0;
-RUN_VPIPE_V3=0;
-RUN_VPIPE_QI=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -92,8 +90,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt -y install git
   conda update conda -y
   conda install -c cobilab -y gto
+  conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
-  conda install -c conda-forge gsl=2.5 -y
   conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
   printf "Installing git\n\n"
@@ -363,75 +361,218 @@ if [[ "$RUN_QVG" -eq "1" ]]
   cd ..
 fi
 
-#V-pipe
-if [[ "$RUN_VPIPE_V3" -eq "1" ]]
-  then
-  printf "Installing with V-pipe ver snakemake\n\n"
-  eval "$(conda shell.bash hook)"  
-  conda create -y -n snakemake
-  conda activate snakemake
-  conda install -c conda-forge -c bioconda snakemake snakedeploy -y
-  rm -rf vpipe_v2
-  mkdir vpipe_v2
-  cd vpipe_v2
-  snakedeploy deploy-workflow https://github.com/cbg-ethz/V-pipe . --tag v2.99.3
-  cd ..
-  
-  
-  conda activate base
-  
-fi
-
-#V-pipe
-if [[ "$RUN_VPIPE_QI" -eq "1" ]]
+#V-pipe - to test
+if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Installing with V-pipe ver quick install, altered\n\n"
   rm -rf V-Pipe
-  cat quick_install.sh > install_vpipe.sh
-  chmod +x install_vpipe.sh
-  ./install_vpipe.sh -f
+  #cat quick_install.sh > install_vpipe.sh
+  #chmod +x install_vpipe.sh
+  #./install_vpipe.sh -f
+  PREFIX=$(pwd)
+  FORCE=
+  BRANCH=master
+  RELEASE=
+  WORKDIR=
+  MINIMAL=
+  
+  # Helper
+fail() {
+	printf '\e[31;1mArgh: %s\e[0m\n'	"$1"	1>&2
+	[[ -n "$2" ]] && echo "$2" 1>&2
+	exit 1
+}
+
+oops() {
+	printf '\e[33;1mOops:%s\e[0m\n'	"$1"	 1>&2
+}
+
+title() {
+	printf '\e[34;1m======================\n%s\n======================\e[0m\n\n'	"$1"
+}
+
+message() {
+	printf '\e[37;1m%s\t%s\e[0m\n' "$1" "$2"
+}
+
+status() {
+	printf '\e[36;1m%s\e[0m\n'	"$1"
+}
+
+check_directory() {
+	if [[ -d "$1" ]]; then
+		if (( FORCE )); then
+			rm -rf "$1"
+		else
+			fail "${2:-Directory} ${1} already exists" 'check and use -f if needed'
+		fi
+	fi
+}
+
+usage() {
+echo "usage: $0 [options]
+options:
+-f           force overwriting directories
+-p PREFIX    prefix directory under which to install V-pipe
+             [default: current directory]
+-b BRANCH    install specified branch of V-pipe${BRANCH:+
+             [default: $BRANCH]}
+-r RELEASE   install specified release package of V-pipe${RELEASE:+
+             [default: $RELEASE]}
+-w WORKDIR   create and populate working directory
+-m           only minimal working directory
+-h           print this help message and exit"
+}
+
+
+# parameters
+while getopts ":fp:b:r:w:mh" opt; do
+	case ${opt} in
+		f)
+			FORCE=1
+		;;
+		p)
+			PREFIX="${OPTARG}"
+		;;
+		b)
+			BRANCH="${OPTARG}"
+		;;
+		r)
+			RELEASE="${OPTARG}"
+		;;
+		w)
+			WORKDIR="${OPTARG}"
+		;;
+		m)
+			MINIMAL='-m'
+		;;
+		h)
+			usage
+			exit 0
+		;;
+		\?)
+			fail "Invalid option: ${OPTARG}"
+		;;
+		:)
+			fail "Invalid option: ${OPTARG} requires an argument"
+		;;
+	esac
+done
+shift $((OPTIND -1))
+
+[[ -z "${BRANCH}" && -z "${RELEASE}" ]] && fail "Please specify either a branch or a release package, e.g.: '-b master'"
+
+
+###################
+#                 #
+#   Basic stuff   #
+#                 #
+###################
+
+DOWNLOAD=
+if [[ -x $(which wget) ]] || wget --version; then # most Linux distros (Gentoo)
+	DOWNLOAD='wget'
+elif [[ -x $(which curl) ]] || curl --version; then # a few Linux distros (CentOS, Archlinux) and Mac OS X
+	DOWNLOAD='curl -LO'
+else
+	fail 'Please install either wget or curl'
+fi;
+
+
+
+##################
+#                #
+#   Miniconda3   #
+#                #
+##################
+
+
+# set the channel precedence (lowest to highest)
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+# NOTE conda-forge *HAS TO* be higher than bioconda
+
+VPIPEENV=
+if conda install --yes snakemake-minimal; then	# NOTE Mac OS X and some Linux dockers don't have git out of the box
+	: # success!
+else
+	oops 'I cannot install snakemake in base environment. Conflicts ?'
+
+	VPIPEENV=V-pipe
+	# HACK Alternate to consider if we have have version conflicts
+	conda create --yes -n ${VPIPEENV} -c conda-forge -c bioconda snakemake-minimal
+	conda activate ${VPIPEENV}
+fi
+
+# NOTE No need to download and install V-pipe dependencies, snakemake --use-conda handles this.
+
+echo $'\n'
+
+
+
+##############
+#            #
+#   V-pipe   #
+#            #
+##############
+
+title 'installing V-pipe'
+
+if [[ -z "${RELEASE}" ]]; then
+	message 'Using branch:' "${BRANCH}"
+
+	check_directory 'V-pipe' 'V-pipe installation directory'
+	git clone --depth 1 --branch "${BRANCH}" https://github.com/cbg-ethz/V-pipe.git || fail "I cannot install branch ${BRANCH}."
+else
+	message 'Using release:' "${RELEASE}"
+	check_directory "V-pipe-${RELEASE}" 'V-pipe installation directory'
+	${DOWNLOAD} "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/${RELEASE}.tar.gz" || fail "I cannot download package {RELEASE}."
+	tar xvzf "${RELEASE}.tar.gz" || fail "I cannot install package ${RELEASE}."
+fi
+
+echo $'\n'
+
+
+
+###############
+#             #
+#   Working   #
+#             #
+###############
+
+INIT="$(pwd)/V-pipe${RELEASE:+-${RELEASE}}/init_project.sh"
+
+if [[ -z "${WORKDIR}" ]]; then
+	status 'Installation of V-pipe completed'
+	echo "
+To setup working directory:
+	mkdir -p working
+	cd working
+	${INIT}"
+
+fi
+
+title 'Working directory'
+message 'Working directory:' "${WORKDIR}"
+
+check_directory "${WORKDIR}" 'Working directory'
+# shellcheck disable=SC2015
+mkdir -p "${WORKDIR}" && cd "${WORKDIR}" || fail "Could not create directory: ${WORKDIR}"
+"${INIT}" ${MINIMAL} || fail "Populating working directory failed"
+
+echo $'\n'
+status 'Installation of V-pipe completed'
+
+  
+  
+  
+  
+  
   cd V-pipe
   ./init_project.sh 
   cd ..
-fi
-
-
-#V-pipe
-if [[ "$RUN_VPIPE" -eq "1" ]] 
-  then
-  printf "Installing V-pipe\n\n"
-  #curl -O 'https://raw.githubusercontent.com/cbg-ethz/V-pipe/master/utils/quick_install.sh'
-  #chmod +x ./quick_install.sh
-  #./quick_install.sh -w work
-  eval "$(conda shell.bash hook)"  
-  #conda create --yes -n vpipe -c conda-forge -c bioconda -y mamba 
-  #conda activate vpipe
-  #conda install -c bioconda -y snakemake
-  #wget "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.tar.gz"
-  #tar xvzf v2.99.3.tar.gz
-  #conda activate base
-  
-  #sudo docker pull ghcr.io/cbg-ethz/v-pipe:master
-  
-  
-  
-  
-  #tmp comment
-  #install_mamba
-  
-  
-  conda create -y --name snakemake
-  conda activate snakemake
-  #conda install -c free -y python=3.4
-  conda install -c bioconda -c conda-forge -y snakemake 
-  #conda install -c "conda-forge/label/cf202003" -y python
-  conda install -c bioconda -c conda-forge -y snakedeploy
-
-  snakedeploy deploy-workflow https://github.com/cbg-ethz/V-pipe --tag master .
-  conda activate base
-  # edit config/config.yaml and provide samples/ directory
-  #snakemake --use-conda --jobs 4 --printshellcmds --dry-run
-  
 fi
 
 #Strainline - seg. fault; reads.las not present
@@ -596,7 +737,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   
   #sudo apt-get install r-base
   #sudo apt-get install r-base-dev
-  cpan CPAN
+  
   cpan File::Basename File::Temp Getopt::Long YAML::Tiny
   export PERL5LIB="$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/bin/perl:$PERL5LIB"
   echo $PERL5LIB
