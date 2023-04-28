@@ -92,8 +92,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt -y install git
   conda update conda -y
   conda install -c cobilab -y gto
-  conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
+  conda install -c conda-forge gsl=2.5 -y
   conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
   printf "Installing git\n\n"
@@ -596,7 +596,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   
   #sudo apt-get install r-base
   #sudo apt-get install r-base-dev
-  
+  cpan CPAN
   cpan File::Basename File::Temp Getopt::Long YAML::Tiny
   export PERL5LIB="$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/bin/perl:$PERL5LIB"
   echo $PERL5LIB
