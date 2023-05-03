@@ -7,13 +7,13 @@ CONDA_PREFIX=/home/lx/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
-INSTALL_TOOLS=1;
+INSTALL_TOOLS=0;
 INSTALL_MINICONDA=0;
 #RUN_SHORAH=0;
-RUN_QURE=1; #t
+RUN_QURE=0; #t
 RUN_SAVAGE=0; #
 #RUN_QSDPR=0;
-RUN_SPADES=1; #t
+RUN_SPADES=0; #t
 RUN_METASPADES=0; #t
 RUN_METAVIRALSPADES=0; #t
 RUN_CORONASPADES=0; #t
@@ -21,33 +21,33 @@ RUN_VIADBG=0; #np, boost err
 RUN_VIRUSVG=0;
 RUN_VGFLOW=0;
 #RUN_PREDICTHAPLO=0;
-RUN_TRACESPIPELITE=1; #t
-RUN_TRACESPIPE=1; #t
+RUN_TRACESPIPELITE=0; #t
+RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t--
-RUN_VPIPE=0;
+RUN_QVG=0; #t--
+RUN_VPIPE=1;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=1; #t
+RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0; 
-RUN_LAZYPIPE=1; #w, needs testing
+RUN_LAZYPIPE=0; #w, needs testing
 #RUN_VIQUAS=0; #np
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=1; #t
+RUN_PEHAPLO=0; #t
 RUN_REGRESSHAPLO=0;
 RUN_CLIQUESNV=0; 
 RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=1; #t
+RUN_VIRGENA=0; #t
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0; 
-RUN_SSAKE=1; #t
+RUN_SSAKE=0; #t
 RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0; #np
-RUN_HAPLOFLOW=1;
+RUN_HAPLOFLOW=0;
 #RUN_TENSQR=0; 
 #RUN_ARAPANS=0;
 RUN_VIQUF_DOCKER=0;
@@ -312,7 +312,8 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install  
   conda install -c bioconda -y entrez-direct
-  ./TRACESPipe.sh --get-all-aux  
+  ./TRACESPipe.sh --get-all-aux 
+  ./TRACESPipe.sh --build-viral 
   cd ../../  
   conda activate base
   
@@ -737,7 +738,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   
   #sudo apt-get install r-base
   #sudo apt-get install r-base-dev
-  
+  cpan CPAN
   cpan File::Basename File::Temp Getopt::Long YAML::Tiny
   export PERL5LIB="$CONDA_PREFIX/pkgs/perl-5.32.1-2_h7f98852_perl5/bin/perl:$PERL5LIB"
   echo $PERL5LIB
@@ -920,14 +921,14 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n bio2 python=2.7    
   conda activate bio2                 
-  pip install networkx==1.11           
+  #pip install networkx==1.11 
   conda install -y bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
   conda install -c bioconda -y karect
   git clone --recursive https://github.com/chjiao/TAR-VIR.git
   cd TAR-VIR/Overlap_extension/
   make
   cd ../../ 
-  
+  pip install networkx==1.11 
   conda activate base
 
 fi
