@@ -6,14 +6,14 @@ MAX_RAM=28;
 CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 #RUN_SHORAH=0;
-RUN_QURE=0; #w
+RUN_QURE=1; #w
 RUN_SAVAGE_NOREF=0; #rn
 RUN_SAVAGE_REF=0; 
 #RUN_QSDPR=0; 
-RUN_SPADES=0; #t
-RUN_METASPADES=0; #t
-RUN_METAVIRALSPADES=0; #t
-RUN_CORONASPADES=0; #t
+RUN_SPADES=1; #t
+RUN_METASPADES=1; #t
+RUN_METAVIRALSPADES=1; #t
+RUN_CORONASPADES=1; #t
 RUN_VIADBG=0;
 #RUN_VIRUSVG=0; #t
 #RUN_VGFLOW=0; #t
@@ -21,30 +21,30 @@ RUN_VIADBG=0;
 RUN_TRACESPIPELITE=1; #t
 RUN_TRACESPIPE=1; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t
-RUN_VPIPE=0; 
+RUN_QVG=1; #t
+RUN_VPIPE=1; 
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
 #RUN_HAPLOCLIQUE=0;
-RUN_VISPA=0; #t
+RUN_VISPA=1; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=0; #w 
+RUN_LAZYPIPE=1; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
-RUN_PEHAPLO=0; #w
+RUN_PEHAPLO=1; #w
 #RUN_REGRESSHAPLO=0;
 #RUN_CLIQUESNV=0;
 RUN_IVA=0; 
 RUN_PRICE=0;
-RUN_VIRGENA=0; #w
+RUN_VIRGENA=1; #w
 RUN_TARVIR=0;
 RUN_VIP=0;
 RUN_DRVM=0;
-RUN_SSAKE=0; #w
+RUN_SSAKE=1; #w
 #RUN_VIRALFLYE=0;
 RUN_ENSEMBLEASSEMBLER=0;
-RUN_HAPLOFLOW=0; #w
+RUN_HAPLOFLOW=1; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
@@ -64,7 +64,8 @@ create_paired_fa_files () {
     sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > tmp_${dataset}_1.fa
     sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > tmp_${dataset}_2.fa
     cat tmp_${dataset}_*.fa > input.fasta
-    perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d'
+    perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d' > tmp.txt
+    rm tmp.txt
     mv input.fasta gen_$dataset.fasta
   done
 }
@@ -129,9 +130,10 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fa
     #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
     cp spades_${dataset}/spades-${dataset}.fa ../reconstructed/$dataset
- 
+    rm -rf spades_${dataset}
   done
   cd ..
+  rm -rf spades_reconstruction
   conda activate base
 fi
 
@@ -153,8 +155,10 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
     mv metaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaspades_${dataset}/scaffolds.fasta metaspades_${dataset}/metaspades-${dataset}.fa
     cp metaspades_${dataset}/metaspades-${dataset}.fa ../reconstructed/$dataset
+    rm -rf metaspades_${dataset}
   done
   cd ..
+  rm -rf metaspades_reconstruction
   conda activate base
 fi
 
@@ -176,8 +180,10 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
     mv metaviralspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaviralspades_${dataset}/scaffolds.fasta metaviralspades_${dataset}/metaviralspades-${dataset}.fa
     cp metaviralspades_${dataset}/metaviralspades-${dataset}.fa ../reconstructed/$dataset
+    rm -rf metaviralspades_${dataset}
   done
   cd ..
+  rm -rf metaviralspades_reconstruction
   conda activate base
 fi
 
@@ -198,8 +204,10 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
     mv coronaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fa
     cp coronaspades_${dataset}/coronaspades-${dataset}.fa ../reconstructed/$dataset
+    rm -rf coronaspades_${dataset}
   done
   cd ..
+  rm -rf coronaspades_reconstruction
   conda activate base
 fi
 
@@ -326,10 +334,11 @@ if [[ "$RUN_QURE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     for virus in "${VIRUSES[@]}"
-    do
-    cp ../gen_$dataset.fasta ../$virus.fa .
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qure-$virus-${dataset}-time.txt java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe gen_$dataset.fasta $virus.fa 
-    mv gen_${dataset}_reconstructedVariants.txt results_$virus.fa
+      do
+      cp ../gen_$dataset.fasta ../$virus.fa .
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qure-$virus-${dataset}-time.txt java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe gen_$dataset.fasta $virus.fa 
+      mv gen_${dataset}_reconstructedVariants.txt results_$virus.fa
+      rm -rf $virus.fa
     done
     
     cat results_*.fa  >  qure-${dataset}.fa
@@ -361,7 +370,9 @@ if [[ "$RUN_QURE" -eq "1" ]]
 MEM	$total_mem
 CPU_perc	$total_cpu%" > qure-${dataset}-time.txt
     mv qure-${dataset}-time.txt ../reconstructed/$dataset
-    
+    rm -rf qure-*-time.txt
+    rm *.fa
+    rm *.txt
   done
   cd ..
   conda activate base
@@ -560,6 +571,9 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     cat *-consensus.fa > tracespipelite-$dataset.fa
     mv tracespipelite-${dataset}-time.txt ../../reconstructed/$dataset
     cp tracespipelite-$dataset.fa ../../reconstructed/$dataset
+    rm -rf test_viral_analysis_${dataset}
+    rm *$DATASET*    
+    rm -rf *-consensus.fa
   done  
   cd ../../
   conda activate base
@@ -587,8 +601,12 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS
     cp tracespipe-${dataset}-time.txt ../
     cd ../output_data/TRACES_viral_consensus
-    cat *.fa > ../../tracespipe-${dataset}.fa     
+    cat *.fa > ../../tracespipe-${dataset}.fa  
+      
     cd ../../
+    
+    rm -rf output_data
+    mkdir output_data
     
     mv tracespipe-${dataset}.fa ../reconstructed/$dataset
     mv tracespipe-${dataset}-time.txt ../reconstructed/$dataset
@@ -666,6 +684,8 @@ if [[ "$RUN_QVG" -eq "1" ]]
 MEM	$total_mem
 CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
     mv qvg-${dataset}-time.txt ../reconstructed/$dataset
+    rm qvg-*-time.txt
+    rm qvg-*-.fa
   done
   conda activate base 
   cd ..
@@ -789,11 +809,11 @@ output:
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu%" > v-pipe-${dataset}-time.txt
-  cp v-pipe-${dataset}-time.txt ../reconstructed/$dataset 
+  mv v-pipe-${dataset}-time.txt ../reconstructed/$dataset 
   rm -rf v-pipe-*-time.txt
   cat *.fasta > v-pipe-${dataset}.fa
   rm -rf *.fasta
-  cp v-pipe-${dataset}.fa ../reconstructed/$dataset 
+  mv v-pipe-${dataset}.fa ../reconstructed/$dataset 
   
   done
       
