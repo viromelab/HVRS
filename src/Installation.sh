@@ -24,8 +24,8 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=0; #t--
-RUN_VPIPE=1;
+RUN_QVG=1; #t--
+RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
 #RUN_ABAYESQR=0;
@@ -92,6 +92,7 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -c cobilab -y gto
   conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
+  ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
   conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
   printf "Installing git\n\n"
@@ -359,220 +360,6 @@ if [[ "$RUN_QVG" -eq "1" ]]
   conda create -y --name qvg-env --file qvg-env.yaml 
   conda activate base
   sudo apt-get -y install libncurses6
-  cd ..
-fi
-
-#V-pipe - to test
-if [[ "$RUN_VPIPE" -eq "1" ]]
-  then
-  printf "Installing with V-pipe ver quick install, altered\n\n"
-  rm -rf V-Pipe
-  #cat quick_install.sh > install_vpipe.sh
-  #chmod +x install_vpipe.sh
-  #./install_vpipe.sh -f
-  PREFIX=$(pwd)
-  FORCE=
-  BRANCH=master
-  RELEASE=
-  WORKDIR=
-  MINIMAL=
-  
-  # Helper
-fail() {
-	printf '\e[31;1mArgh: %s\e[0m\n'	"$1"	1>&2
-	[[ -n "$2" ]] && echo "$2" 1>&2
-	exit 1
-}
-
-oops() {
-	printf '\e[33;1mOops:%s\e[0m\n'	"$1"	 1>&2
-}
-
-title() {
-	printf '\e[34;1m======================\n%s\n======================\e[0m\n\n'	"$1"
-}
-
-message() {
-	printf '\e[37;1m%s\t%s\e[0m\n' "$1" "$2"
-}
-
-status() {
-	printf '\e[36;1m%s\e[0m\n'	"$1"
-}
-
-check_directory() {
-	if [[ -d "$1" ]]; then
-		if (( FORCE )); then
-			rm -rf "$1"
-		else
-			fail "${2:-Directory} ${1} already exists" 'check and use -f if needed'
-		fi
-	fi
-}
-
-usage() {
-echo "usage: $0 [options]
-options:
--f           force overwriting directories
--p PREFIX    prefix directory under which to install V-pipe
-             [default: current directory]
--b BRANCH    install specified branch of V-pipe${BRANCH:+
-             [default: $BRANCH]}
--r RELEASE   install specified release package of V-pipe${RELEASE:+
-             [default: $RELEASE]}
--w WORKDIR   create and populate working directory
--m           only minimal working directory
--h           print this help message and exit"
-}
-
-
-# parameters
-while getopts ":fp:b:r:w:mh" opt; do
-	case ${opt} in
-		f)
-			FORCE=1
-		;;
-		p)
-			PREFIX="${OPTARG}"
-		;;
-		b)
-			BRANCH="${OPTARG}"
-		;;
-		r)
-			RELEASE="${OPTARG}"
-		;;
-		w)
-			WORKDIR="${OPTARG}"
-		;;
-		m)
-			MINIMAL='-m'
-		;;
-		h)
-			usage
-			exit 0
-		;;
-		\?)
-			fail "Invalid option: ${OPTARG}"
-		;;
-		:)
-			fail "Invalid option: ${OPTARG} requires an argument"
-		;;
-	esac
-done
-shift $((OPTIND -1))
-
-[[ -z "${BRANCH}" && -z "${RELEASE}" ]] && fail "Please specify either a branch or a release package, e.g.: '-b master'"
-
-
-###################
-#                 #
-#   Basic stuff   #
-#                 #
-###################
-
-DOWNLOAD=
-if [[ -x $(which wget) ]] || wget --version; then # most Linux distros (Gentoo)
-	DOWNLOAD='wget'
-elif [[ -x $(which curl) ]] || curl --version; then # a few Linux distros (CentOS, Archlinux) and Mac OS X
-	DOWNLOAD='curl -LO'
-else
-	fail 'Please install either wget or curl'
-fi;
-
-
-
-##################
-#                #
-#   Miniconda3   #
-#                #
-##################
-
-
-# set the channel precedence (lowest to highest)
-conda config --add channels defaults
-conda config --add channels bioconda
-conda config --add channels conda-forge
-conda config --set channel_priority strict
-# NOTE conda-forge *HAS TO* be higher than bioconda
-
-VPIPEENV=
-if conda install --yes snakemake-minimal; then	# NOTE Mac OS X and some Linux dockers don't have git out of the box
-	: # success!
-else
-	oops 'I cannot install snakemake in base environment. Conflicts ?'
-
-	VPIPEENV=V-pipe
-	# HACK Alternate to consider if we have have version conflicts
-	conda create --yes -n ${VPIPEENV} -c conda-forge -c bioconda snakemake-minimal
-	conda activate ${VPIPEENV}
-fi
-
-# NOTE No need to download and install V-pipe dependencies, snakemake --use-conda handles this.
-
-echo $'\n'
-
-
-
-##############
-#            #
-#   V-pipe   #
-#            #
-##############
-
-title 'installing V-pipe'
-
-if [[ -z "${RELEASE}" ]]; then
-	message 'Using branch:' "${BRANCH}"
-
-	check_directory 'V-pipe' 'V-pipe installation directory'
-	git clone --depth 1 --branch "${BRANCH}" https://github.com/cbg-ethz/V-pipe.git || fail "I cannot install branch ${BRANCH}."
-else
-	message 'Using release:' "${RELEASE}"
-	check_directory "V-pipe-${RELEASE}" 'V-pipe installation directory'
-	${DOWNLOAD} "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/${RELEASE}.tar.gz" || fail "I cannot download package {RELEASE}."
-	tar xvzf "${RELEASE}.tar.gz" || fail "I cannot install package ${RELEASE}."
-fi
-
-echo $'\n'
-
-
-
-###############
-#             #
-#   Working   #
-#             #
-###############
-
-INIT="$(pwd)/V-pipe${RELEASE:+-${RELEASE}}/init_project.sh"
-
-if [[ -z "${WORKDIR}" ]]; then
-	status 'Installation of V-pipe completed'
-	echo "
-To setup working directory:
-	mkdir -p working
-	cd working
-	${INIT}"
-
-fi
-
-title 'Working directory'
-message 'Working directory:' "${WORKDIR}"
-
-check_directory "${WORKDIR}" 'Working directory'
-# shellcheck disable=SC2015
-mkdir -p "${WORKDIR}" && cd "${WORKDIR}" || fail "Could not create directory: ${WORKDIR}"
-"${INIT}" ${MINIMAL} || fail "Populating working directory failed"
-
-echo $'\n'
-status 'Installation of V-pipe completed'
-
-  
-  
-  
-  
-  
-  cd V-pipe
-  ./init_project.sh 
   cd ..
 fi
 
@@ -1233,6 +1020,218 @@ pip3 install pandas
 pip install altair
 pip install progressbar
     
+fi
+
+#V-pipe - to test
+if [[ "$RUN_VPIPE" -eq "1" ]]
+  then
+  printf "Installing with V-pipe ver quick install, altered\n\n"
+  rm -rf V-Pipe
+  #cat quick_install.sh > install_vpipe.sh
+  #chmod +x install_vpipe.sh
+  #./install_vpipe.sh -f
+  PREFIX=$(pwd)
+  FORCE=
+  BRANCH=master
+  RELEASE=
+  WORKDIR=
+  MINIMAL=
+  
+  # Helper
+fail() {
+	printf '\e[31;1mArgh: %s\e[0m\n'	"$1"	1>&2
+	[[ -n "$2" ]] && echo "$2" 1>&2
+	exit 1
+}
+
+oops() {
+	printf '\e[33;1mOops:%s\e[0m\n'	"$1"	 1>&2
+}
+
+title() {
+	printf '\e[34;1m======================\n%s\n======================\e[0m\n\n'	"$1"
+}
+
+message() {
+	printf '\e[37;1m%s\t%s\e[0m\n' "$1" "$2"
+}
+
+status() {
+	printf '\e[36;1m%s\e[0m\n'	"$1"
+}
+
+check_directory() {
+	if [[ -d "$1" ]]; then
+		if (( FORCE )); then
+			rm -rf "$1"
+		else
+			fail "${2:-Directory} ${1} already exists" 'check and use -f if needed'
+		fi
+	fi
+}
+
+usage() {
+echo "usage: $0 [options]
+options:
+-f           force overwriting directories
+-p PREFIX    prefix directory under which to install V-pipe
+             [default: current directory]
+-b BRANCH    install specified branch of V-pipe${BRANCH:+
+             [default: $BRANCH]}
+-r RELEASE   install specified release package of V-pipe${RELEASE:+
+             [default: $RELEASE]}
+-w WORKDIR   create and populate working directory
+-m           only minimal working directory
+-h           print this help message and exit"
+}
+
+
+# parameters
+while getopts ":fp:b:r:w:mh" opt; do
+	case ${opt} in
+		f)
+			FORCE=1
+		;;
+		p)
+			PREFIX="${OPTARG}"
+		;;
+		b)
+			BRANCH="${OPTARG}"
+		;;
+		r)
+			RELEASE="${OPTARG}"
+		;;
+		w)
+			WORKDIR="${OPTARG}"
+		;;
+		m)
+			MINIMAL='-m'
+		;;
+		h)
+			usage
+			exit 0
+		;;
+		\?)
+			fail "Invalid option: ${OPTARG}"
+		;;
+		:)
+			fail "Invalid option: ${OPTARG} requires an argument"
+		;;
+	esac
+done
+shift $((OPTIND -1))
+
+[[ -z "${BRANCH}" && -z "${RELEASE}" ]] && fail "Please specify either a branch or a release package, e.g.: '-b master'"
+
+
+###################
+#                 #
+#   Basic stuff   #
+#                 #
+###################
+
+DOWNLOAD=
+if [[ -x $(which wget) ]] || wget --version; then # most Linux distros (Gentoo)
+	DOWNLOAD='wget'
+elif [[ -x $(which curl) ]] || curl --version; then # a few Linux distros (CentOS, Archlinux) and Mac OS X
+	DOWNLOAD='curl -LO'
+else
+	fail 'Please install either wget or curl'
+fi;
+
+
+
+##################
+#                #
+#   Miniconda3   #
+#                #
+##################
+
+
+# set the channel precedence (lowest to highest)
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+# NOTE conda-forge *HAS TO* be higher than bioconda
+
+VPIPEENV=
+if conda install --yes snakemake-minimal; then	# NOTE Mac OS X and some Linux dockers don't have git out of the box
+	: # success!
+else
+	oops 'I cannot install snakemake in base environment. Conflicts ?'
+
+	VPIPEENV=V-pipe
+	# HACK Alternate to consider if we have have version conflicts
+	conda create --yes -n ${VPIPEENV} -c conda-forge -c bioconda snakemake-minimal
+	conda activate ${VPIPEENV}
+fi
+
+# NOTE No need to download and install V-pipe dependencies, snakemake --use-conda handles this.
+
+echo $'\n'
+
+
+
+##############
+#            #
+#   V-pipe   #
+#            #
+##############
+
+title 'installing V-pipe'
+
+if [[ -z "${RELEASE}" ]]; then
+	message 'Using branch:' "${BRANCH}"
+
+	check_directory 'V-pipe' 'V-pipe installation directory'
+	git clone --depth 1 --branch "${BRANCH}" https://github.com/cbg-ethz/V-pipe.git || fail "I cannot install branch ${BRANCH}."
+else
+	message 'Using release:' "${RELEASE}"
+	check_directory "V-pipe-${RELEASE}" 'V-pipe installation directory'
+	${DOWNLOAD} "https://github.com/cbg-ethz/V-pipe/archive/refs/tags/${RELEASE}.tar.gz" || fail "I cannot download package {RELEASE}."
+	tar xvzf "${RELEASE}.tar.gz" || fail "I cannot install package ${RELEASE}."
+fi
+
+echo $'\n'
+
+cd V-pipe
+  ./init_project.sh 
+  cd ..
+
+
+###############
+#             #
+#   Working   #
+#             #
+###############
+
+INIT="$(pwd)/V-pipe${RELEASE:+-${RELEASE}}/init_project.sh"
+
+if [[ -z "${WORKDIR}" ]]; then
+	status 'Installation of V-pipe completed'
+	echo "
+To setup working directory:
+	mkdir -p working
+	cd working
+	${INIT}"
+
+fi
+
+title 'Working directory'
+message 'Working directory:' "${WORKDIR}"
+
+check_directory "${WORKDIR}" 'Working directory'
+# shellcheck disable=SC2015
+mkdir -p "${WORKDIR}" && cd "${WORKDIR}" || fail "Could not create directory: ${WORKDIR}"
+"${INIT}" ${MINIMAL} || fail "Populating working directory failed"
+
+echo $'\n'
+status 'Installation of V-pipe completed'
+
+  #cd V-pipe
+  #./init_project.sh 
+  #cd ..
 fi
 
 

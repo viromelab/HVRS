@@ -24,7 +24,7 @@ gto_fasta_mutate -s 5 -e 0.09 < B19.fa > B19-5.fa
 gto_fasta_mutate -s 6 -e 0.11 < B19.fa > B19-6.fa
 gto_fasta_mutate -s 7 -e 0.13 < B19.fa > B19-7.fa
 gto_fasta_mutate -s 8 -e 0.15 < B19.fa > B19-8.fa
-gto_fasta_mutate -s 9 < B19.fa > B19-9.fa
+gto_fasta_mutate -s 9 -e 0.00 < B19.fa > B19-9.fa
 #
 gto_fasta_mutate -s 1 -e 0.01 < VZV.fa > VZV-1.fa
 gto_fasta_mutate -s 2 -e 0.03 < VZV.fa > VZV-2.fa
@@ -34,7 +34,7 @@ gto_fasta_mutate -s 5 -e 0.09 < VZV.fa > VZV-5.fa
 gto_fasta_mutate -s 6 -e 0.11 < VZV.fa > VZV-6.fa
 gto_fasta_mutate -s 7 -e 0.13 < VZV.fa > VZV-7.fa
 gto_fasta_mutate -s 8 -e 0.15 < VZV.fa > VZV-8.fa
-gto_fasta_mutate -s 9 < VZV.fa > VZV-9.fa
+gto_fasta_mutate -s 9 -e 0.00 < VZV.fa > VZV-9.fa
 #
 gto_fasta_mutate -s 1 -e 0.01 < MCPyV.fa > MCPyV-1.fa
 gto_fasta_mutate -s 2 -e 0.03 < MCPyV.fa > MCPyV-2.fa
@@ -44,8 +44,17 @@ gto_fasta_mutate -s 5 -e 0.09 < MCPyV.fa > MCPyV-5.fa
 gto_fasta_mutate -s 6 -e 0.11 < MCPyV.fa > MCPyV-6.fa
 gto_fasta_mutate -s 7 -e 0.13 < MCPyV.fa > MCPyV-7.fa
 gto_fasta_mutate -s 8 -e 0.15 < MCPyV.fa > MCPyV-8.fa
-gto_fasta_mutate -s 9 < MCPyV.fa > MCPyV-9.fa
+gto_fasta_mutate -s 9 -e 0.00 < MCPyV.fa > MCPyV-9.fa
 #
+gto_fasta_mutate -s 1 -e 0.01 < HPV.fa > HPV-1.fa
+gto_fasta_mutate -s 2 -e 0.03 < HPV.fa > HPV-2.fa
+gto_fasta_mutate -s 3 -e 0.05 < HPV.fa > HPV-3.fa
+gto_fasta_mutate -s 4 -e 0.07 < HPV.fa > HPV-4.fa
+gto_fasta_mutate -s 5 -e 0.09 < HPV.fa > HPV-5.fa
+gto_fasta_mutate -s 6 -e 0.11 < HPV.fa > HPV-6.fa
+gto_fasta_mutate -s 7 -e 0.13 < HPV.fa > HPV-7.fa
+gto_fasta_mutate -s 8 -e 0.15 < HPV.fa > HPV-8.fa
+gto_fasta_mutate -s 9 -e 0.00 < HPV.fa > HPV-9.fa
 #
 # CREATE RANDOM FASTA SEQUENCES AS CONTAMINATION:
 #
