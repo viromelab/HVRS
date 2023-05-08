@@ -314,7 +314,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   ./TRACESPipe.sh --install  
   conda install -c bioconda -y entrez-direct
   ./TRACESPipe.sh --get-all-aux 
-  ./TRACESPipe.sh --build-viral 
+  #./TRACESPipe.sh --build-viral 
   cd ../../  
   conda activate base
   
@@ -353,7 +353,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   conda activate qvg  
   conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk fastp
   conda install -c r -y r
-  conda install -c bioconda -y samtools --force-reinstall
+  conda install samtools=1.17 -y
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/
