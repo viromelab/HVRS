@@ -3,7 +3,7 @@
 #
 #
 PYTHON2_PATH="#!/usr/bin/python2";
-CONDA_PREFIX=/home/lx/miniconda3;
+CONDA_PREFIX=$HOME/miniconda3;
 #
 # INSTALL SIMULATION AND EVALUATION TOOLS:
 #
@@ -24,7 +24,7 @@ RUN_VGFLOW=0;
 RUN_TRACESPIPELITE=0; #t
 RUN_TRACESPIPE=0; #t
 RUN_ASPIRE=0;
-RUN_QVG=1; #t--
+RUN_QVG=0; #t--
 RUN_VPIPE=0;
 RUN_STRAINLINE=0;
 RUN_HAPHPIPE=0;
@@ -52,7 +52,9 @@ RUN_HAPLOFLOW=0;
 #RUN_ARAPANS=0;
 RUN_VIQUF_DOCKER=0;
 RUN_VIQUF=0; 
-
+#
+################################################################################
+#
 install_samtools () {
   wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
   tar xjf samtools-1.16.1.tar.bz2
@@ -78,6 +80,199 @@ install_docker() {
   sudo sh get-docker.sh
 }
 
+SHOW_MENU () {
+  echo " ------------------------------------------------------------------ ";
+  echo "                                                                    ";
+  echo " Installation.sh : Installation script for HVRS                     ";
+  echo "                                                                    ";
+  echo " Script to install all of the tools necesary to run HVRS.           "; 
+  echo "                                                                    ";
+  echo " Program options -------------------------------------------------- ";
+  echo "                                                                    ";
+  echo " -h, --help                    Show this,                           ";
+  echo " --miniconda                   Install Miniconda,                   ";
+  echo " --all                         Install all tools, except Miniconda. ";
+  echo "                                                                    ";
+  echo " --coronaspades                Install coronaSPAdes,                ";
+  echo " --haploflow                   Install Haploflow,                   ";
+  echo " --lazypipe                    Install LAZYPIPE,                    ";
+  echo " --metaspades                  Install metaSPAdes,                  ";
+  echo " --metaviralspades             Install metaviralSPAdes,             ";
+  echo " --pehaplo                     Install PEHaplo,                     ";
+  echo " --qure                        Install QuRe,                        ";
+  echo " --qvg                         Install QVG,                         ";
+  echo " --spades                      Install SPAdes,                      ";
+  echo " --ssake                       Install SSAKE,                       ";
+  echo " --tracespipe                  Install TRACESPipe,                  ";
+  echo " --tracespipelite              Install TRACESPipeLite,              ";
+  echo " --virgena                     Install VirGenA,                     ";
+  echo " --vispa                       Install ViSpA,                       ";
+  echo " --vpipe                       Install V-pipe,                      ";
+  echo " --tools                       Install other tools used in the      ";
+  echo "                               benchmark.                           ";
+  echo "                                                                    ";
+  echo " Examples --------------------------------------------------------- ";
+  echo "                                                                    ";
+  echo " - Install Miniconda                                                ";
+  echo "  ./Installation.sh --miniconda                                     ";
+  echo "                                                                    "; 
+  echo " - Install all tools (except Miniconda)                             ";
+  echo "  ./Installation.sh --all                                           ";
+  echo "                                                                    ";
+  echo " ------------------------------------------------------------------ ";
+  }
+#
+################################################################################
+#
+if [[ "$#" -lt 1 ]];
+  then
+  HELP=1;
+  fi
+#
+POSITIONAL=();
+#
+while [[ $# -gt 0 ]]
+  do
+  i="$1";
+  case $i in
+    -h|--help|?)
+      HELP=1;
+      shift
+    ;;
+    --miniconda)
+      INSTALL_TOOLS=0;
+      RUN_HAPLOFLOW=0;
+      RUN_LAZYPIPE=0;
+      RUN_PEHAPLO=0;
+      RUN_QURE=0;
+      RUN_QVG=0;
+      RUN_SPADES=0;
+      RUN_SSAKE=0;
+      RUN_TRACESPIPE=0;
+      RUN_TRACESPIPELITE=0;
+      RUN_VIRGENA=0;
+      RUN_VISPA=0;
+      RUN_VPIPE=0;
+      INSTALL_MINICONDA=1;      
+      shift
+    ;;
+    --tools)
+      INSTALL_TOOLS=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --coronaspades)
+      RUN_CORONASPADES=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --haploflow)
+      RUN_HAPLOFLOW=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --lazypipe)
+      RUN_LAZYPIPE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --metaspades)
+      RUN_METASPADES=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --metaviralspades)
+      RUN_METAVIRALSPADES=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --pehaplo)
+      RUN_PEHAPLO=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --qure)
+      RUN_QURE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --qvg)
+      RUN_QVG=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --spades)
+      RUN_SPADES=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --ssake)
+      RUN_SSAKE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --tracespipe)
+      RUN_TRACESPIPE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --tracespipelite)
+      RUN_TRACESPIPELITE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --virgena)
+      RUN_VIRGENA=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --vispa)
+      RUN_VISPA=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --vpipe)
+      RUN_VPIPE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    --all)
+      INSTALL_TOOLS=0;
+      RUN_HAPLOFLOW=1;
+      RUN_LAZYPIPE=1;
+      RUN_PEHAPLO=1;
+      RUN_QURE=1;
+      RUN_QVG=1;
+      RUN_SPADES=1;
+      RUN_SSAKE=1;
+      RUN_TRACESPIPE=1;
+      RUN_TRACESPIPELITE=1;
+      RUN_VIRGENA=1;
+      RUN_VISPA=1;
+      RUN_VPIPE=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
+    -*) # unknown option with small
+    echo "Invalid arg ($1)!";
+    echo "For help, try: ./Installation.sh -h"
+    exit 1;
+    ;;
+  esac
+  done
+#
+set -- "${POSITIONAL[@]}" # restore positional parameters
+#
+################################################################################
+#
+if [[ "$HELP" -eq "1" ]];
+  then
+  SHOW_MENU;
+  exit;
+  fi
+#
+################################################################################
+#
 if [[ "$INSTALL_MINICONDA" -eq "1" ]] 
   then
   printf "Installing Miniconda\n\n"
@@ -87,6 +282,9 @@ fi
 if [[ "$INSTALL_TOOLS" -eq "1" ]] 
   then
   printf "Installing tools\n\n"
+  printf "Installing dos2unix\n\n"
+  sudo apt -y install dos2unix
+  printf "Installing git\n\n"
   sudo apt -y install git
   conda update conda -y
   conda install -c cobilab -y gto
@@ -95,8 +293,6 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
   conda install -c bioconda -y mummer4
   #conda install -c bioconda -y quast
-  printf "Installing git\n\n"
-  #sudo apt -y install git
   printf "Installing G++\n\n"
   sudo apt-get -y install g++
   printf "Installing Samtools\n\n"
@@ -132,7 +328,7 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   eval "$(conda shell.bash hook)"
   conda create -y -n spades
   conda activate spades
-  conda install -c bioconda -y spades python=3.8
+  conda install -c bioconda -y spades=3.15.5 python=3.8
   conda activate base
 fi
 

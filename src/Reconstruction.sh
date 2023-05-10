@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-NR_THREADS=4;
-MAX_RAM=28;
+NR_THREADS=1;
+MAX_RAM=4;
 #
-CREATE_RECONSTRUCTION_FOLDERS=0;
+CREATE_RECONSTRUCTION_FOLDERS=1;
 #
 #RUN_SHORAH=0;
 RUN_QURE=0; #w
@@ -29,7 +29,7 @@ RUN_HAPHPIPE=0;
 #RUN_HAPLOCLIQUE=0;
 RUN_VISPA=0; #t
 #RUN_QUASIRECOMB=0;
-RUN_LAZYPIPE=1; #w 
+RUN_LAZYPIPE=0; #w 
 #RUN_VIQUAS=0;
 RUN_MLEHAPLO=0;
 RUN_PEHAPLO=0; #w
@@ -49,7 +49,7 @@ RUN_HAPLOFLOW=0; #w
 RUN_VIQUF=0;
 
 #declare -a DATASETS=("DS_teste");
-declare -a DATASETS=("DS1" "DS2" ) # "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
@@ -68,6 +68,178 @@ create_paired_fa_files () {
     mv input.fasta gen_$dataset.fasta
   done
 }
+
+SHOW_MENU () {
+  echo " ------------------------------------------------------------------ ";
+  echo "                                                                    ";
+  echo " Reconstruction.sh : Reconstruction script for HVRS                 ";
+  echo "                                                                    ";
+  echo " Script to reconstruct all of the datasets contained in HVRS.       "; 
+  echo "                                                                    ";
+  echo " Program options -------------------------------------------------- ";
+  echo "                                                                    ";
+  echo " -h, --help                    Show this,                           ";
+  echo "                                                                    ";
+  echo " --all                         Reconstruction using all tools,      ";
+  echo "                                                                    ";
+  echo " --coronaspades                Reconstruction using coronaSPAdes,   ";
+  echo " --haploflow                   Reconstruction using Haploflow,      ";
+  echo " --lazypipe                    Reconstruction using LAZYPIPE,       ";
+  echo " --metaspades                  Reconstruction using metaSPAdes,     ";
+  echo " --metaviralspades             Reconstruction using metaviralSPAdes,";
+  echo " --pehaplo                     Reconstruction using PEHaplo,        ";
+  echo " --qure                        Reconstruction using QuRe,           ";
+  echo " --qvg                         Reconstruction using QVG,            ";
+  echo " --spades                      Reconstruction using SPAdes,         ";
+  echo " --ssake                       Reconstruction using SSAKE,          ";
+  echo " --tracespipe                  Reconstruction using TRACESPipe,     ";
+  echo " --tracespipelite              Reconstruction using TRACESPipeLite, ";
+  echo " --virgena                     Reconstruction using VirGenA,        ";
+  echo " --vispa                       Reconstruction using ViSpA,          ";
+  echo " --vpipe                       Reconstruction using V-pipe.         ";
+  echo "                                                                    ";
+  echo " -t  <INT>, --threads <INT>    Number of threads,                   ";
+  echo " -m  <INT>, --memory <INT>     Maximum of RAM available,            ";
+  echo " --virgena-timeout             Maximum time used by VirGenA         "; 
+  echo "                               to reconstruct with each reference,  ";
+  echo " Examples --------------------------------------------------------- ";
+  echo "                                                                    ";
+  echo " - Install Miniconda                                                ";
+  echo "  ./Installation.sh --miniconda                                     ";
+  echo "                                                                    "; 
+  echo " - Install all tools (except Miniconda)                             ";
+  echo "  ./Installation.sh --all                                           ";
+  echo "                                                                    ";
+  echo " ------------------------------------------------------------------ ";
+  }
+#
+################################################################################
+#
+if [[ "$#" -lt 1 ]];
+  then
+  HELP=1;
+  fi
+#
+POSITIONAL=();
+#
+while [[ $# -gt 0 ]]
+  do
+  i="$1";
+  case $i in
+    -h|--help|?)
+      HELP=1;
+      shift
+    ;;
+    --coronaspades)
+      RUN_CORONASPADES=1;
+      shift
+    ;;
+    --haploflow)
+      RUN_HAPLOFLOW=1;
+      shift
+    ;;
+    --lazypipe)
+      RUN_LAZYPIPE=1;
+      shift
+    ;;
+    --metaspades)
+      RUN_METASPADES=1;
+      shift
+    ;;
+    --metaviralspades)
+      RUN_METAVIRALSPADES=1;
+      shift
+    ;;
+    --pehaplo)
+      RUN_PEHAPLO=1;
+      shift
+    ;;
+    --qure)
+      RUN_QURE=1;
+      shift
+    ;;
+    --qvg)
+      RUN_QVG=1;
+      shift
+    ;;
+    --spades)
+      RUN_SPADES=1;
+      shift
+    ;;
+    --ssake)
+      RUN_SSAKE=1;
+      shift
+    ;;
+    --tracespipe)
+      RUN_TRACESPIPE=1;
+      shift
+    ;;
+    --tracespipelite)
+      RUN_TRACESPIPELITE=1;
+      shift
+    ;;
+    --virgena)
+      RUN_VIRGENA=1;
+      shift
+    ;;
+    --vispa)
+      RUN_VISPA=1;
+      shift
+    ;;
+    --vpipe)
+      RUN_VPIPE=1;
+      shift
+    ;;
+    --all)
+      RUN_CORONASPADES=1;
+      RUN_HAPLOFLOW=1;
+      RUN_LAZYPIPE=1;
+      RUN_METASPADES=1;
+      RUN_METAVIRALSPADES=1;
+      RUN_PEHAPLO=1;
+      RUN_QURE=1;
+      RUN_QVG=1;
+      RUN_SPADES=1;
+      RUN_SSAKE=1;
+      RUN_TRACESPIPE=1;
+      RUN_TRACESPIPELITE=1;
+      RUN_VIRGENA=1;
+      RUN_VISPA=1;
+      RUN_VPIPE=1;
+      shift
+    ;;
+    --virgena-timeout)
+      VIRGENA_TIMEOUT="$2";
+      shift 2;
+    ;;
+    -t|--threads)
+      NR_THREADS="$2";
+      shift 2;
+    ;;
+    -m|--memory)
+      MAX_RAM="$2";
+      shift 2;
+    ;;
+    -*) # unknown option with small
+    echo "Invalid arg ($1)!";
+    echo "For help, try: ./Reconstruction.sh -h"
+    exit 1;
+    ;;
+  esac
+  done
+#
+set -- "${POSITIONAL[@]}" # restore positional parameters
+#
+################################################################################
+#
+if [[ "$HELP" -eq "1" ]];
+  then
+  SHOW_MENU;
+  exit;
+  fi
+#
+################################################################################
+#
 
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
@@ -116,11 +288,12 @@ if [[ "$RUN_SPADES" -eq "1" ]]
   printf "Reconstructing with SPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda activate spades
-  rm -rf spades_reconstruction
-  mkdir spades_reconstruction
-  cd spades_reconstruction
+
   for dataset in "${DATASETS[@]}"
     do
+    
+    mkdir spades_reconstruction
+    cd spades_reconstruction
     mkdir spades_${dataset}	
     cp ../${dataset}_*.fq spades_${dataset}
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
@@ -129,10 +302,9 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fa
     #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
     cp spades_${dataset}/spades-${dataset}.fa ../reconstructed/$dataset
- 
+    cd ..
+    rm -rf spades_reconstruction
   done
-  cd ..
-  rm -rf spades_reconstruction
   conda activate base
 fi
 
@@ -142,11 +314,11 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
   printf "Reconstructing with metaSPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda activate spades
-  rm -rf metaspades_reconstruction
-  mkdir metaspades_reconstruction
-  cd metaspades_reconstruction
+  
   for dataset in "${DATASETS[@]}"
     do
+    mkdir metaspades_reconstruction
+    cd metaspades_reconstruction
     mkdir metaspades_${dataset}	
     cp ../${dataset}_*.fq metaspades_${dataset}
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaspades-${dataset}-time.txt metaspades.py -t $NR_THREADS -o metaspades_${dataset} -1 metaspades_${dataset}/${dataset}_1.fq -2 metaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
@@ -154,9 +326,10 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
     mv metaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaspades_${dataset}/scaffolds.fasta metaspades_${dataset}/metaspades-${dataset}.fa
     cp metaspades_${dataset}/metaspades-${dataset}.fa ../reconstructed/$dataset
+    cd ..
+    rm -rf metaspades_reconstruction
+    
   done
-  cd ..
-  rm -rf metaspades_reconstruction
   conda activate base
 fi
 
@@ -166,21 +339,22 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
   printf "Reconstructing with metaviralSPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda activate spades
-  rm -rf metaviralspades_reconstruction
-  mkdir metaviralspades_reconstruction
-  cd metaviralspades_reconstruction
+  
   for dataset in "${DATASETS[@]}"
     do
+    mkdir metaviralspades_reconstruction
+    cd metaviralspades_reconstruction
     mkdir metaviralspades_${dataset}	
     cp ../${dataset}_*.fq metaviralspades_${dataset}
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
-    
+  
     mv metaviralspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaviralspades_${dataset}/scaffolds.fasta metaviralspades_${dataset}/metaviralspades-${dataset}.fa
     cp metaviralspades_${dataset}/metaviralspades-${dataset}.fa ../reconstructed/$dataset
+    cd ..
+    rm -rf metaviralspades_reconstruction
   done
-  cd ..
-  rm -rf metaviralspades_reconstruction
+  
   conda activate base
 fi
 
@@ -190,20 +364,21 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
   printf "Reconstructing with coronaSPAdes\n\n"
   eval "$(conda shell.bash hook)"
   conda activate spades
-  rm -rf coronaspades_reconstruction
-  mkdir coronaspades_reconstruction
-  cd coronaspades_reconstruction
+  
   for dataset in "${DATASETS[@]}"
     do
+    mkdir coronaspades_reconstruction
+    cd coronaspades_reconstruction
     mkdir coronaspades_${dataset}	
     cp ../${dataset}_*.fq coronaspades_${dataset}
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o coronaspades-${dataset}-time.txt coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     mv coronaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fa
     cp coronaspades_${dataset}/coronaspades-${dataset}.fa ../reconstructed/$dataset
+    cd ..
+    
+    rm -rf coronaspades_reconstruction  
   done
-  cd ..
-  rm -rf rm -rf coronaspades_reconstruction
   conda activate base
 fi
 
@@ -365,10 +540,10 @@ if [[ "$RUN_QURE" -eq "1" ]]
 MEM	$total_mem
 CPU_perc	$total_cpu%" > qure-${dataset}-time.txt
     mv qure-${dataset}-time.txt ../reconstructed/$dataset
-    
+    rm -rf qure-*-time.txt
+    rm gen_*.fasta
+    rm *.fa
   done
-  #rm qure*
-  #rm *.fa
   cd ..
   conda activate base
 fi
@@ -598,11 +773,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     
     mv tracespipe-${dataset}.fa ../reconstructed/$dataset
     mv tracespipe-${dataset}-time.txt ../reconstructed/$dataset
-    rm -rf output_data
-    cd src
-    rm -rf tracespipe*
-    cd ..
-    done    
+    done
   cd ..   
   conda activate base  
 fi
@@ -678,10 +849,6 @@ CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
     mv qvg-${dataset}-time.txt ../reconstructed/$dataset
   done
   conda activate base 
-  rm -rf reconstruction_files
-  rm -rf *files
-  rm -rf qvg-*.txt
-  rm -rf qvg-*.fa
   cd ..
   
 fi
@@ -886,7 +1053,6 @@ if [[ "$RUN_HAPHPIPE" -eq "1" ]]
       done
     done
   cd ..
-  rm -rf haphpipe_data
   conda activate base 
 fi
 
@@ -1002,11 +1168,9 @@ ${content}" > zz_$f
 MEM	$total_mem
 CPU_perc	$total_cpu%" > vispa-${dataset}-time.txt
     cp vispa-${dataset}-time.txt ../../reconstructed/$dataset
-    rm -rf *
   done
-  
-  cd ../../
-  conda activate base  
+    cd ../../
+    conda activate base  
 fi
 
 #QuasiRecomb -> ParsingException in thread "main" java.lang.reflect.InvocationTargetException
@@ -1625,6 +1789,6 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
   
 fi
 
-./Evaluation.sh
+#./Evaluation.sh
 
  
