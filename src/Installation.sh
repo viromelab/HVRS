@@ -286,13 +286,14 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt -y install dos2unix
   printf "Installing git\n\n"
   sudo apt -y install git
+  sudo apt install gawk
   conda update conda -y
   conda install -c cobilab -y gto
+  #conda install -c bioconda -y quast
+  printf "Installing ART\n\n"
   conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
   ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
-  conda install -c bioconda -y mummer4
-  #conda install -c bioconda -y quast
   printf "Installing G++\n\n"
   sudo apt-get -y install g++
   printf "Installing Samtools\n\n"
@@ -301,13 +302,25 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   printf "Installing make\n\n"
   sudo apt -y install make
   printf "Installing Java\n\n"
-  sudo apt -y install default-jre
+  sudo apt -y install default-jre  
+  #
+  conda create -n evaluation -y
+  conda activate evaluation 
+  conda install -c cobilab -y gto
+  printf "Installing ART\n\n"
+  conda install -c conda-forge -y gsl=2.5
+  conda install -c bioconda -y art
+  ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
+  printf "Installing MUMMER4\n\n"
+  conda install -c bioconda -y mummer4  
   printf "Installing AlcoR\n\n"
   conda install -n base conda-libmamba-solver -y
   conda install -c conda-forge libgcc-ng -y
   conda install -y -c bioconda alcor --solver=libmamba
   printf "Installing GeCo3\n\n"
   conda install -c bioconda -y geco3 
+  conda activate base
+  #
   printf "Installing gnuplot\n\n"
   conda install -c conda-forge gnuplot -y
   #printf "Installing Docker\n\n"

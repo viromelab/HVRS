@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-NR_THREADS=1;
-MAX_RAM=4;
+NR_THREADS=3;
+MAX_RAM=28;
 #
 CREATE_RECONSTRUCTION_FOLDERS=1;
 #
@@ -723,7 +723,9 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   do	
     cp ../../${dataset}_*.fq .
     lzma -d VDB.mfa.lzma
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq --reads2 ${dataset}_2.fq --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots
+    rm *.gz
+    gzip *.fq
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots --cache 10
     
     
     cd test_viral_analysis_${dataset}
@@ -741,6 +743,10 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     cat *-consensus.fa > tracespipelite-$dataset.fa
     mv tracespipelite-${dataset}-time.txt ../../reconstructed/$dataset
     cp tracespipelite-$dataset.fa ../../reconstructed/$dataset
+    rm *-*.fa
+    rm -rf test_viral_analysis*
+    rm *.fq.gz
+    rm *-consensus.fa
   done  
   cd ../../
   conda activate base
@@ -773,6 +779,16 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     
     mv tracespipe-${dataset}.fa ../reconstructed/$dataset
     mv tracespipe-${dataset}-time.txt ../reconstructed/$dataset
+    
+    rm *-time.txt
+    cd output_data 
+    rm -rf *
+    cd ..
+    cd meta_data
+    rm meta_info.txt
+    cd ../input_data
+    rm *
+    cd ..
     done
   cd ..   
   conda activate base  

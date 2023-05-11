@@ -144,6 +144,8 @@ check_ds_cont () {
 
 count=0
 #
+eval "$(conda shell.bash hook)"
+conda activate evaluation
 D_PATH="reconstructed";
 #
 cd $D_PATH
@@ -189,10 +191,10 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       dos2unix $dataset/$file
       #sed -i 's/_/-/g' $dataset/$file      
       #sed -i 's/\./-/g' $dataset/$file   
-      awk -i inplace '{ while(sub(/QuRe./,int(rand()*99999999999)+1)); print }' $dataset/$file
+      gawk -i inplace '{ while(sub(/QuRe./,int(rand()*99999999999)+1)); print }' $dataset/$file
       #awk -i inplace '{ while(sub(/_/,-); print }' $dataset/$file
       #awk -i inplace '{ while(sub(/100.0/,int(rand()*99999999999)+10)); print }' $dataset/$file
-      awk -i inplace '{ while(sub(/results/,int(rand()*99999999999)+1)); print }' $dataset/$file
+      gawk -i inplace '{ while(sub(/results/,int(rand()*99999999999)+1)); print }' $dataset/$file
       #cat $dataset/$file | tr 0123456789 abcdefghij > tmp
       #mv tmp $dataset/$file
 
@@ -321,4 +323,5 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 
 " >> total_stats.tex  
 done
+conda activate base
 #
