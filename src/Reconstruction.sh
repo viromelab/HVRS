@@ -49,7 +49,7 @@ RUN_HAPLOFLOW=0; #w
 RUN_VIQUF=0;
 
 #declare -a DATASETS=("DS_teste");
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
@@ -103,12 +103,9 @@ SHOW_MENU () {
   echo " --virgena-timeout             Maximum time used by VirGenA         "; 
   echo "                               to reconstruct with each reference,  ";
   echo " Examples --------------------------------------------------------- ";
-  echo "                                                                    ";
-  echo " - Install Miniconda                                                ";
-  echo "  ./Installation.sh --miniconda                                     ";
   echo "                                                                    "; 
-  echo " - Install all tools (except Miniconda)                             ";
-  echo "  ./Installation.sh --all                                           ";
+  echo " - Reconstruct using all tools                                      ";
+  echo "  ./Reconstruction.sh --all                                         ";
   echo "                                                                    ";
   echo " ------------------------------------------------------------------ ";
   }
@@ -546,6 +543,7 @@ CPU_perc	$total_cpu%" > qure-${dataset}-time.txt
   done
   cd ..
   conda activate base
+
 fi
 
 #virus-vg - err; Subcommand 'msga' is deprecated and is no longer being actively maintained. Future releases may eliminate it entirely.
@@ -725,7 +723,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     lzma -d VDB.mfa.lzma
     rm *.gz
     gzip *.fq
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots --cache 10
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
     
     
     cd test_viral_analysis_${dataset}
@@ -1805,6 +1803,6 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
   
 fi
 
-#./Evaluation.sh
+./Evaluation.sh
 
  

@@ -78,7 +78,7 @@ cp DS1.fa DS6.fa
 cp DS1.fa DS7.fa
 cp DS1.fa DS8.fa
 #
-cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp1.fa > DS9.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp1.fa MT.fa > DS9.fa
 cp DS9.fa DS10.fa
 cp DS9.fa DS11.fa
 cp DS9.fa DS12.fa
