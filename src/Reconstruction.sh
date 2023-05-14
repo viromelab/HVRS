@@ -767,6 +767,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     cd ../meta_data/
     echo "x:${dataset}_1.fq.gz:${dataset}_2.fq.gz" > meta_info.txt
     cd ../src/
+    rm tracespipe-*-time.txt
     cp ../../VDB.fa .
 
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS
@@ -988,7 +989,8 @@ CPU_perc	$total_cpu%" > v-pipe-${dataset}-time.txt
   rm -rf v-pipe-*-time.txt
   cat *.fasta > v-pipe-${dataset}.fa
   rm -rf *.fasta
-  cp v-pipe-${dataset}.fa ../reconstructed/$dataset 
+  mv v-pipe-${dataset}.fa ../reconstructed/$dataset 
+  rm v-pipe-*.fa
   
   done
       
@@ -1156,7 +1158,7 @@ ${content}" > zz_$f
         done
           
       cat zz_tmp_*-$dataset.fa > vispa-$dataset.fa
-      cp vispa-$dataset.fa ../../reconstructed/$dataset
+      mv vispa-$dataset.fa ../../reconstructed/$dataset
       
       total_time=0
       total_mem=0
@@ -1181,7 +1183,8 @@ ${content}" > zz_$f
     echo "TIME	$total_time
 MEM	$total_mem
 CPU_perc	$total_cpu%" > vispa-${dataset}-time.txt
-    cp vispa-${dataset}-time.txt ../../reconstructed/$dataset
+    mv vispa-${dataset}-time.txt ../../reconstructed/$dataset
+    rm *
   done
     cd ../../
     conda activate base  
@@ -1227,6 +1230,11 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
     mv results/$dataset/contigs.fa results/$dataset/lazypipe-$dataset.fa
     cp results/$dataset/lazypipe-$dataset.fa ../reconstructed/${dataset}
     mv lazypipe-${dataset}-time.txt ../reconstructed/${dataset}
+    rm ${dataset}_*.fq
+    rm -rf results_${dataset}
+    cd results
+    rm -rf ${dataset}
+    cd ..
   done
   cd ..
   conda activate base 
@@ -1316,11 +1324,12 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda activate bio2
   cd TAR-VIR/PEHaplo/  
-  rm -rf assembly
-  mkdir assembly  
-  cd assembly  
+   
   for dataset in "${DATASETS[@]}"
-    do	    
+    do	
+      rm -rf assembly
+      mkdir assembly  
+      cd assembly     
       cp ../../../${dataset}_*.fq .
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > ${dataset}_1.fa
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa      
@@ -1329,8 +1338,11 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
       mv Contigs.fa pehaplo-${dataset}.fa
       cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
       rm -rf Contigs.fa
+      
+      cd ..
+      rm -rf assembly
   done
-  cd ../../../
+  cd ../../
   conda activate base  
 fi
 
@@ -1497,8 +1509,9 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
     cp ../../${dataset}_*.fq .
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o ssake-${dataset}-time.txt ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
     mv ${dataset}_assembly_scaffolds.fa ssake-${dataset}.fa
-    cp ssake-${dataset}.fa ../../reconstructed/${dataset}
+    mv ssake-${dataset}.fa ../../reconstructed/${dataset}
     mv ssake-${dataset}-time.txt ../../reconstructed/$dataset
+    rm ${dataset}*
   done
   cd ../../
 fi
@@ -1577,12 +1590,12 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   printf "Reconstructing with Haploflow\n\n"
   eval "$(conda shell.bash hook)"
   conda activate haploflow
-  rm -rf haploflow_data
-  mkdir haploflow_data
-  cd haploflow_data
   for dataset in "${DATASETS[@]}"
     do
     printf "Reconstructing $dataset\n"
+    rm -rf haploflow_data
+    mkdir haploflow_data
+    cd haploflow_data
     cp ../${dataset}_*.fq .
     cat ${dataset}_*.fq > ${dataset}_paired.fq
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o haploflow-${dataset}-time.txt haploflow --read-file ${dataset}_paired.fq --out test_$dataset --log test_$dataset/log    
@@ -1590,8 +1603,9 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
     mv test_$dataset/contigs.fa test_$dataset/haploflow-${dataset}.fa
     cp test_$dataset/haploflow-${dataset}.fa ../reconstructed/$dataset
     rm -rf test
-  done
-  cd ..  
+    cd ..
+    rm -rf haploflow_data
+  done 
   conda activate base 
 fi
 
