@@ -9,9 +9,12 @@ rm -f DS*.bam
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
 gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
-#gto_fasta_extract_read_by_pattern -p "NC_045512.2" < VDB.fa > COV.fa
 gto_fasta_extract_read_by_pattern -p "KX827417.1" < VDB.fa | sed 's|/||g' > MCPyV.fa
 gto_fasta_extract_read_by_pattern -p "AB116086.1" < VDB.fa > HBV.fa
+gto_fasta_extract_read_by_pattern -p "NC_000898.1" < VDB.fa > HHV6B.fa
+gto_fasta_extract_read_by_pattern -p "NC_014407.1" < VDB.fa > POLY7.fa
+gto_fasta_extract_read_by_pattern -p "NC_009334.1" < VDB.fa > EBV.fa
+gto_fasta_extract_read_by_pattern -p "KP745701.1" < VDB.fa > CMV.fa
 #
 #
 # MUTATE SEQUENCES:
@@ -70,41 +73,73 @@ gto_fasta_extract_read_by_pattern -p "NC_012920.1" < VDB.fa > MT.fa
 #
 rm -f DS*.fa;
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa > DS1.fa
+cp DS1.fa DS1-clean.fa
 cp DS1.fa DS2.fa
+cp DS2.fa DS2-clean.fa
 cp DS1.fa DS3.fa
+cp DS3.fa DS3-clean.fa
 cp DS1.fa DS4.fa
+cp DS4.fa DS4-clean.fa
 cp DS1.fa DS5.fa
+cp DS5.fa DS5-clean.fa
 cp DS1.fa DS6.fa
+cp DS6.fa DS6-clean.fa
 cp DS1.fa DS7.fa
+cp DS7.fa DS7-clean.fa
 cp DS1.fa DS8.fa
+cp DS8.fa DS8-clean.fa
 #
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp1.fa MT.fa > DS9.fa
+cp DS1-clean.fa DS9-clean.fa
 cp DS9.fa DS10.fa
+cp DS2-clean.fa DS10-clean.fa
 cp DS9.fa DS11.fa
+cp DS3-clean.fa DS11-clean.fa
 cp DS9.fa DS12.fa
+cp DS4-clean.fa DS12-clean.fa
 cp DS9.fa DS13.fa
+cp DS5-clean.fa DS13-clean.fa
 cp DS9.fa DS14.fa
+cp DS6-clean.fa DS14-clean.fa
 cp DS9.fa DS15.fa
+cp DS7-clean.fa DS15-clean.fa
 cp DS9.fa DS16.fa
+cp DS8-clean.fa DS16-clean.fa
 #
 #
 cat B19-9.fa HPV-9.fa VZV-9.fa MCPyV-9.fa tmp1.fa MT.fa > DS17.fa
+cat B19-9.fa HPV-9.fa VZV-9.fa MCPyV-9.fa > DS17-clean.fa
 cat B19-2.fa HPV-2.fa VZV-2.fa MCPyV-2.fa tmp1.fa MT.fa > DS18.fa
+cat B19-2.fa HPV-2.fa VZV-2.fa MCPyV-2.fa > DS18-clean.fa
 cat B19-3.fa HPV-3.fa VZV-3.fa MCPyV-3.fa tmp1.fa MT.fa > DS19.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa MCPyV-3.fa > DS19-clean.fa
 cat B19-4.fa HPV-4.fa VZV-4.fa MCPyV-4.fa tmp1.fa MT.fa > DS20.fa
+cat B19-4.fa HPV-4.fa VZV-4.fa MCPyV-4.fa > DS20-clean.fa
 cat B19-5.fa HPV-5.fa VZV-5.fa MCPyV-5.fa tmp1.fa MT.fa > DS21.fa
+cat B19-5.fa HPV-5.fa VZV-5.fa MCPyV-5.fa > DS21-clean.fa
 cat B19-6.fa HPV-6.fa VZV-6.fa MCPyV-6.fa tmp1.fa MT.fa > DS22.fa
+cat B19-6.fa HPV-6.fa VZV-6.fa MCPyV-6.fa > DS22-clean.fa
 cat B19-7.fa HPV-7.fa VZV-7.fa MCPyV-7.fa tmp1.fa MT.fa > DS23.fa
+cat B19-7.fa HPV-7.fa VZV-7.fa MCPyV-7.fa > DS23-clean.fa
 cat B19-8.fa HPV-8.fa VZV-8.fa MCPyV-8.fa tmp1.fa MT.fa > DS24.fa
+cat B19-8.fa HPV-8.fa VZV-8.fa MCPyV-8.fa > DS24-clean.fa
 #
 cp DS17.fa DS25.fa
+cp DS17-clean.fa DS25-clean.fa
 cp DS18.fa DS26.fa
+cp DS18-clean.fa DS26-clean.fa
 cp DS19.fa DS27.fa
+cp DS19-clean.fa DS27-clean.fa
 cp DS20.fa DS28.fa
+cp DS20-clean.fa DS28-clean.fa
 cp DS21.fa DS29.fa
+cp DS21-clean.fa DS29-clean.fa
 cp DS22.fa DS30.fa
+cp DS22-clean.fa DS30-clean.fa
 cp DS23.fa DS31.fa
+cp DS23-clean.fa DS31-clean.fa
 cp DS24.fa DS32.fa
+cp DS24-clean.fa DS32-clean.fa
 #
 cp DS17.fa DS33.fa
 cp DS18.fa DS34.fa
@@ -114,6 +149,14 @@ cp DS21.fa DS37.fa
 cp DS22.fa DS38.fa
 cp DS23.fa DS39.fa
 cp DS24.fa DS40.fa
+cp DS17-clean.fa DS33-clean.fa
+cp DS18-clean.fa DS34-clean.fa
+cp DS19-clean.fa DS35-clean.fa
+cp DS20-clean.fa DS36-clean.fa
+cp DS21-clean.fa DS37-clean.fa
+cp DS22-clean.fa DS38-clean.fa
+cp DS23-clean.fa DS29-clean.fa
+cp DS24-clean.fa DS40-clean.fa
 #
 cp DS17.fa DS41.fa
 cp DS18.fa DS42.fa
@@ -123,6 +166,14 @@ cp DS21.fa DS45.fa
 cp DS22.fa DS46.fa
 cp DS23.fa DS47.fa
 cp DS24.fa DS48.fa
+cp DS17-clean.fa DS41-clean.fa
+cp DS18-clean.fa DS42-clean.fa
+cp DS19-clean.fa DS43-clean.fa
+cp DS20-clean.fa DS44-clean.fa
+cp DS21-clean.fa DS45-clean.fa
+cp DS22-clean.fa DS46-clean.fa
+cp DS23-clean.fa DS47-clean.fa
+cp DS24-clean.fa DS48-clean.fa
 #
 cp DS17.fa DS49.fa
 cp DS18.fa DS50.fa
@@ -132,15 +183,36 @@ cp DS21.fa DS53.fa
 cp DS22.fa DS54.fa
 cp DS23.fa DS55.fa
 cp DS24.fa DS56.fa
+cp DS17-clean.fa DS49-clean.fa
+cp DS18-clean.fa DS50-clean.fa
+cp DS19-clean.fa DS51-clean.fa
+cp DS20-clean.fa DS52-clean.fa
+cp DS21-clean.fa DS53-clean.fa
+cp DS22-clean.fa DS54-clean.fa
+cp DS23-clean.fa DS55-clean.fa
+cp DS24-clean.fa DS56-clean.fa
 #
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp1.fa > DS57.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa > DS57-clean.fa
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa MT.fa > DS58.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa > DS58-clean.fa
 #
 cat B19-2.fa HPV-2.fa VZV-2.fa MCPyV-2.fa tmp1.fa MT.fa > DS59.fa
+cat B19-2.fa HPV-2.fa VZV-2.fa MCPyV-2.fa > DS59-clean.fa
 cat B19-3.fa HPV-3.fa VZV-3.fa MCPyV-3.fa tmp2.fa MT.fa > DS60.fa
+cat B19-3.fa HPV-3.fa VZV-3.fa MCPyV-3.fa > DS60-clean.fa
 #
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp2.fa MT.fa > DS61.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa > DS61-clean.fa
 cp DS61.fa DS62.fa
+cp DS61-clean.fa DS62-clean.fa
+#
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa HHV6B.fa tmp1.fa MT.fa > DS63.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa HHV6B.fa > DS63.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa POLY7.fa EBV.fa tmp1.fa MT.fa > DS64.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa POLY7.fa EBV.fa > DS64.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV.fa tmp1.fa MT.fa > DS65.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV.fa > DS65.fa
 #
 #
 # SIMULATE FASTQ READS:
@@ -217,6 +289,10 @@ art_illumina -rs 60  -i DS60.fa -p -sam -l 150 -f 40 -m 200 -s 10 -o DS60_
 #
 art_illumina -rs 61  -i DS61.fa -p -sam -l 75 -f 20 -m 200 -s 10 -o DS61_
 art_illumina -rs 62  -i DS62.fa -p -sam -l 250 -f 20 -m 400 -s 10 -o DS62_
+#
+art_illumina -rs 63  -i DS63.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS63_
+art_illumina -rs 64  -i DS64.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS64_
+art_illumina -rs 65  -i DS65.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS65_
 #
 rm *.aln *.sam
 #

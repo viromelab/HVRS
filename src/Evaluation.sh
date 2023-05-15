@@ -259,23 +259,25 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       NR_SPECIES=$(grep '>' $dataset/$file -c)
       gto_fasta_rand_extra_chars < $dataset/$file > tmp.fa
       gto_fasta_to_seq < tmp.fa > $dataset/$file_wout_extension.seq
+      gto_fasta_to_seq < ../$dataset-clean.fa > ../$dataset-clean.fa.seq
+      
       
       #Compressing sequences C(X) or C(X,Y)
-      GeCo3 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 $dataset/$file_wout_extension.seq   
-      COMPRESSED_SIZE_WOUT_REF=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)
-      rm $dataset/$file_wout_extension.seq.*
-      
+      GeCo3 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 ../$dataset-clean.fa.seq  
+      COMPRESSED_SIZE_WOUT_REF=$(ls -l ../$dataset-clean.fa.seq.co | cut -d' ' -f5)
+      rm ../$dataset-clean.fa.seq.*
       #Conditional compression C(X|Y) [use reference and target]
-      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 -r ../$dataset.fa $dataset/$file_wout_extension.seq
-      COMPRESSED_SIZE_COND_COMPRESSION=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)      
-      rm $dataset/$file_wout_extension.seq.*
+      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -tm 1:1:0:1:0.9/0:0:0 -tm 7:10:0:1:0/0:0:0 -tm 16:100:1:10:0/3:10:0.9 -lr 0.03 -hs 64 -r $dataset/$file_wout_extension.seq ../$dataset-clean.fa.seq
+      COMPRESSED_SIZE_COND_COMPRESSION=$(ls -l ../$dataset-clean.fa.seq.co | cut -d' ' -f5)  
+      rm ../$dataset-clean.fa.seq.*
       
       #Relative compression (only reference models) C(X||Y)
-      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r ../$dataset.fa $dataset/$file_wout_extension.seq
-      COMPRESSED_SIZE_W_REF=$(ls -l $dataset/$file_wout_extension.seq.co | cut -d' ' -f5)      
-      rm $dataset/$file_wout_extension.seq.*            
+      GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r $dataset/$file_wout_extension.seq ../$dataset-clean.fa.seq
+      COMPRESSED_SIZE_W_REF=$(ls -l ../$dataset-clean.fa.seq.co | cut -d' ' -f5)      
+      rm ../$dataset-clean.fa.seq.*            
       FILE_SIZE=$(ls -l $dataset/$file_wout_extension.fa | cut -d' ' -f5)
      
+      printf "NCD -> $COMPRESSED_SIZE_COND_COMPRESSION " # . $COMPRESSED_SIZE_WOUT_REF"
       NCD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
       
       #max_val=1       
@@ -289,6 +291,8 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       #fi
            
       AUX_MULT=$(echo "$FILE_SIZE * 2" | bc -l )
+      printf "aux_mult   . $AUX_MULT\n\n"
+      printf "NRC -> $COMPRESSED_SIZE_W_REF . $AUX_MULT"
       NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)      
       
       IDEN=$(echo $IDEN |bc -l | xargs printf %.3f)
