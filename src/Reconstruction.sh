@@ -48,7 +48,7 @@ RUN_HAPLOFLOW=0; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 
-#declare -a DATASETS=("DS_teste");
+#declare -a DATASETS=("DS7");
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 #declare -a VIRUSES=( "B19" );
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
@@ -770,7 +770,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     rm tracespipe-*-time.txt
     cp ../../VDB.fa .
 
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS --cache 10
     cp tracespipe-${dataset}-time.txt ../
     cd ../output_data/TRACES_viral_consensus
     cat *.fa > ../../tracespipe-${dataset}.fa     
@@ -835,7 +835,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
     done
     cat *.fasta > qvg-${dataset}.fa
     rm -rf *.fasta
-    cp qvg-${dataset}.fa ../reconstructed/$dataset 
+    mv qvg-${dataset}.fa ../reconstructed/$dataset 
     
     total_time=0
     total_mem=0
@@ -862,6 +862,9 @@ if [[ "$RUN_QVG" -eq "1" ]]
 MEM	$total_mem
 CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
     mv qvg-${dataset}-time.txt ../reconstructed/$dataset
+    
+    rm -rf ${dataset}_files
+    rm qvg-*-time.txt
   done
   conda activate base 
   cd ..
@@ -1776,6 +1779,8 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
     
     timeout --signal=SIGINT ${VIRGENA_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
+    rm $virus*
+    
     done
     cd res
     cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
@@ -1808,8 +1813,11 @@ MEM	$total_mem
 CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
         
     mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
-    cp virgena-$dataset.fa ../../reconstructed/$dataset 
+    mv virgena-$dataset.fa ../../reconstructed/$dataset 
+    rm -rf *
     cd ..
+    rm virgena-*-$dataset-time.txt
+    
     
   done
   cd ..
