@@ -59,6 +59,10 @@ gto_fasta_mutate -s 7 -e 0.13 < HPV.fa > HPV-7.fa
 gto_fasta_mutate -s 8 -e 0.15 < HPV.fa > HPV-8.fa
 gto_fasta_mutate -s 9 -e 0.00 < HPV.fa > HPV-9.fa
 #
+gto_fasta_mutate -s 1 -e 0.01 < HHV6B.fa > HHV6B-1.fa
+gto_fasta_mutate -s 1 -e 0.01 < POLY7.fa > POLY7-1.fa
+gto_fasta_mutate -s 1 -e 0.01 < EBV.fa > EBV-1.fa
+gto_fasta_mutate -s 1 -e 0.01 < CMV.fa > CMV-1.fa
 # CREATE RANDOM FASTA SEQUENCES AS CONTAMINATION:
 #
 AlcoR simulation --rand-segment 50000:0:1:0.3:0.0:0.0 > tmp1.fa
@@ -155,7 +159,7 @@ cp DS19-clean.fa DS35-clean.fa
 cp DS20-clean.fa DS36-clean.fa
 cp DS21-clean.fa DS37-clean.fa
 cp DS22-clean.fa DS38-clean.fa
-cp DS23-clean.fa DS39-clean.fa
+cp DS23-clean.fa DS29-clean.fa
 cp DS24-clean.fa DS40-clean.fa
 #
 cp DS17.fa DS41.fa
@@ -207,12 +211,12 @@ cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa > DS61-clean.fa
 cp DS61.fa DS62.fa
 cp DS61-clean.fa DS62-clean.fa
 #
-cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa HHV6B.fa tmp1.fa MT.fa > DS63.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa HHV6B.fa > DS63_clean.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa POLY7.fa EBV.fa tmp1.fa MT.fa > DS64.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa POLY7.fa EBV.fa > DS64_clean.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV.fa tmp1.fa MT.fa > DS65.fa
-cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV.fa > DS65_clean.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa HHV6B-1.fa tmp1.fa MT.fa > DS63.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa HHV6B-1.fa > DS63-clean.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa POLY7-1.fa EBV-1.fa tmp1.fa MT.fa > DS64.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa POLY7-1.fa EBV-1.fa > DS64-clean.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV-1.fa tmp1.fa MT.fa > DS65.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV-1.fa > DS65-clean.fa
 #
 #
 # SIMULATE FASTQ READS:

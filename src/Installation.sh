@@ -919,9 +919,7 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   conda activate bio2                 
   #pip install networkx==1.11 
   conda install -y bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
-  conda install -y python=2.7 numpy scipy networkx=1.11 karect genometools-genometools sga samtools bowtie2 apsp
   conda install -c bioconda -y karect
-  pip install networkx
   git clone --recursive https://github.com/chjiao/TAR-VIR.git
   cd TAR-VIR/Overlap_extension/
   make
