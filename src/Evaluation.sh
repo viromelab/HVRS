@@ -150,7 +150,7 @@ conda activate evaluation
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds" > total_stats.tsv
+echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCSD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
@@ -167,7 +167,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 \scriptsize
 \begin{tabular}{| m{7.5em} | m{5em}| m{2.7em} | m{4em} | m{2.5em} | m{2.5em} | m{5em} | m{3em} | m{4em}  | m{6.5em} | m{6.5em} |}
 \hline
-\textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Metagenomic analysis} & \textbf{Metagenomic classification} \\\\\\hline 
+\textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCSD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Metagenomic analysis} & \textbf{Metagenomic classification} \\\\\\hline 
 
 " >> total_stats.tex
   for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
@@ -176,7 +176,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
     TIME=-1
     SNPS=-1
     IDEN=1
-    NCD=1
+    NCSD=1
     NRC=1
     MEM=-1
     CPU_P=-1
@@ -199,7 +199,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       #cat $dataset/$file | tr 0123456789 abcdefghij > tmp
       #mv tmp $dataset/$file
 
-      dnadiff $dataset/$file ../$dataset.fa ; #run dnadiff
+      dnadiff ../$dataset.fa $dataset/$file; #run dnadiff
       IDEN=`cat out.report | grep "AvgIdentity " | head -n 1 | awk '{ print $2;}'`;  #retrieve results
       ALBA=`cat out.report | grep "AlignedBases " | head -n 1 | awk '{ print $2;}'`;
       SNPS=`cat out.report | grep TotalSNPs | awk '{ print $2;}'`;
@@ -276,20 +276,10 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r $dataset/$file_wout_extension.seq ../$dataset-clean.fa.seq
       COMPRESSED_SIZE_W_REF=$(ls -l ../$dataset-clean.fa.seq.co | cut -d' ' -f5)      
       rm ../$dataset-clean.fa.seq.*            
-      FILE_SIZE=$(ls -l $dataset/$file_wout_extension.fa | cut -d' ' -f5)
+      FILE_SIZE=$(ls -l ../$dataset-clean.fa.seq | cut -d' ' -f5)
      
-      printf "NCD -> $COMPRESSED_SIZE_COND_COMPRESSION " # . $COMPRESSED_SIZE_WOUT_REF"
-      NCD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
-      
-      #max_val=1       
-      #result=$( echo "$NCD>$max_value" | bc)
-      #printf "$result......    \n\n"
-      
-      #if [ $( echo "2.101>3.004" | bc) == "1" ]
-      #  then
-      #  printf "NCD - Correcting value from $NCD to $max_val\n\n"
-      #  NCD=$max_val   
-      #fi
+      printf "NCSD -> $COMPRESSED_SIZE_COND_COMPRESSION " # . $COMPRESSED_SIZE_WOUT_REF"
+      NCSD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
            
       AUX_MULT=$(echo "$FILE_SIZE * 2" | bc -l )
       printf "aux_mult   . $AUX_MULT\n\n"
@@ -299,8 +289,8 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       IDEN=$(echo $IDEN |bc -l | xargs printf %.3f)
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
-    #ds	file	exec_time	snps	avg_identity	NCD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
-    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds" >> total_stats.tsv   
+    #ds	file	exec_time	snps	avg_identity	NCSD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds" >> total_stats.tsv   
     
     while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] #add empty lines for the tools that couldn't output results
     do
@@ -308,7 +298,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       count=$(($count + 1))
     done
     CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
-    echo "$NAME_TOOL & $TIME & $SNPS & $IDEN & $NCD & $NRC & $MEM & $CPU & $NR_SPECIES & $DOES_ANALYSIS & $DOES_CLASSIFICATION \\\\\\hline" >> total_stats.tex
+    echo "$NAME_TOOL & $TIME & $SNPS & $IDEN & $NCSD & $NRC & $MEM & $CPU & $NR_SPECIES & $DOES_ANALYSIS & $DOES_CLASSIFICATION \\\\\\hline" >> total_stats.tex
     count=$(($count + 1))
     #printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     fi

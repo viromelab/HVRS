@@ -70,7 +70,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_vir.pdf"
+    set output "NCSD_vir.pdf"
     set datafile separator "\t"
     
     ymax = 1.05
@@ -81,7 +81,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30

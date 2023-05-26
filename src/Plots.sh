@@ -117,7 +117,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cnt0.pdf"
+    set output "NCSD_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 1.05
@@ -128,7 +128,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -214,7 +214,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cnt3.pdf"
+    set output "NCSD_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 1.05
@@ -225,7 +225,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -309,7 +309,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cvg2.pdf"
+    set output "NCSD_cvg2.pdf"
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
@@ -319,7 +319,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -405,7 +405,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cvg5.pdf"
+    set output "NCSD_cvg5.pdf"
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
@@ -415,7 +415,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -501,7 +501,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cvg10.pdf"
+    set output "NCSD_cvg10.pdf"
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
@@ -511,7 +511,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -597,7 +597,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cvg20.pdf"
+    set output "NCSD_cvg20.pdf"
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
@@ -607,7 +607,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -692,7 +692,7 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "NCD_cvg40.pdf"
+    set output "NCSD_cvg40.pdf"
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
@@ -702,7 +702,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "NCD"
+    set ylabel "NCSD"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
