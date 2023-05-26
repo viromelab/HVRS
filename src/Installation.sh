@@ -237,7 +237,7 @@ while [[ $# -gt 0 ]]
       shift
     ;;
     --all)
-      INSTALL_TOOLS=0;
+      INSTALL_TOOLS=1;
       RUN_HAPLOFLOW=1;
       RUN_LAZYPIPE=1;
       RUN_PEHAPLO=1;
@@ -286,7 +286,7 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt -y install dos2unix
   printf "Installing git\n\n"
   sudo apt -y install git
-  sudo apt install gawk
+  sudo apt install gawk -y
   conda update conda -y
   conda install -c cobilab -y gto
   #conda install -c bioconda -y quast
@@ -304,6 +304,7 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   printf "Installing Java\n\n"
   sudo apt -y install default-jre  
   #
+  eval "$(conda shell.bash hook)"
   conda create -n evaluation -y
   conda activate evaluation 
   conda install -c cobilab -y gto
@@ -561,6 +562,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   conda create -y -n qvg
   conda activate qvg  
   conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk fastp
+  conda install -c conda-forge -y ncurses
   conda install -c r -y r
   conda install samtools=1.17 -y
   rm -rf QVG/
@@ -917,7 +919,7 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n bio2 python=2.7    
   conda activate bio2                 
-  #pip install networkx==1.11 
+  pip install networkx==1.11 
   conda install -y bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
   conda install -c bioconda -y karect
   git clone --recursive https://github.com/chjiao/TAR-VIR.git
