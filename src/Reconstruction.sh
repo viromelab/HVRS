@@ -1688,7 +1688,7 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
     for virus in "${VIRUSES[@]}"
     do
       rm -rf ${dataset}_*.fq
-      rm -rf ${virus}.fa
+      #rm -rf ${virus}.fa
       rm -rf *.gz
       
       cp ../${dataset}_*.fq .
@@ -1779,7 +1779,7 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
     
     timeout --signal=SIGINT ${VIRGENA_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
-    rm $virus*
+    #rm $virus*
     
     done
     cd res
@@ -1814,9 +1814,14 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
         
     mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
     mv virgena-$dataset.fa ../../reconstructed/$dataset 
-    rm -rf *
+    #rm -rf *
     cd ..
     rm virgena-*-$dataset-time.txt
+    rm $dataset*
+    rm *.fa
+    cd res
+    rm -rf *
+    cd ..
     
     
   done
