@@ -294,6 +294,10 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -c conda-forge -y gsl=2.5
   conda install -c bioconda -y art
   ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
+  printf "Installing AlcoR\n\n"
+  conda install -n base conda-libmamba-solver -y
+  conda install -c conda-forge libgcc-ng -y
+  conda install -y -c bioconda alcor --solver=libmamba
   printf "Installing G++\n\n"
   sudo apt-get -y install g++
   printf "Installing Samtools\n\n"
@@ -314,10 +318,6 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
   printf "Installing MUMMER4\n\n"
   conda install -c bioconda -y mummer4  
-  printf "Installing AlcoR\n\n"
-  conda install -n base conda-libmamba-solver -y
-  conda install -c conda-forge libgcc-ng -y
-  conda install -y -c bioconda alcor --solver=libmamba
   printf "Installing GeCo3\n\n"
   conda install -c bioconda -y geco3 
   conda activate base
@@ -343,6 +343,7 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   conda create -y -n spades
   conda activate spades
   conda install -c bioconda -y spades=3.15.5 python=3.8
+  conda install spades=3.15 -y
   conda activate base
 fi
 
