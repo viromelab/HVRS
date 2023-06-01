@@ -199,7 +199,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       #cat $dataset/$file | tr 0123456789 abcdefghij > tmp
       #mv tmp $dataset/$file
 
-      dnadiff ../$dataset.fa $dataset/$file; #run dnadiff
+      dnadiff $dataset/$file ../$dataset-clean.fa; #run dnadiff
       IDEN=`cat out.report | grep "AvgIdentity " | head -n 1 | awk '{ print $2;}'`;  #retrieve results
       ALBA=`cat out.report | grep "AlignedBases " | head -n 1 | awk '{ print $2;}'`;
       SNPS=`cat out.report | grep TotalSNPs | awk '{ print $2;}'`;
@@ -274,7 +274,8 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       
       #Relative compression (only reference models) C(X||Y)
       GeCo3 -rm 20:500:1:12:0.9/3:100:0.9 -rm 13:200:1:1:0.9/0:0:0 -lr 0.03 -hs 64 -r $dataset/$file_wout_extension.seq ../$dataset-clean.fa.seq
-      COMPRESSED_SIZE_W_REF=$(ls -l ../$dataset-clean.fa.seq.co | cut -d' ' -f5)      
+      COMPRESSED_SIZE_W_REF_BYTES=$(ls -l ../$dataset-clean.fa.seq.co | cut -d' ' -f5)   
+      COMPRESSED_SIZE_W_REF=$(echo "$COMPRESSED_SIZE_W_REF_BYTES * 8.0" | bc -l )  
       rm ../$dataset-clean.fa.seq.*            
       FILE_SIZE=$(ls -l ../$dataset-clean.fa.seq | cut -d' ' -f5)
      

@@ -159,7 +159,7 @@ cp DS19-clean.fa DS35-clean.fa
 cp DS20-clean.fa DS36-clean.fa
 cp DS21-clean.fa DS37-clean.fa
 cp DS22-clean.fa DS38-clean.fa
-cp DS23-clean.fa DS29-clean.fa
+cp DS23-clean.fa DS39-clean.fa
 cp DS24-clean.fa DS40-clean.fa
 #
 cp DS17.fa DS41.fa
