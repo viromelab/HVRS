@@ -47,7 +47,7 @@ gnuplot << EOF
     ymin = 94
     offset = ( ymax - ymin ) / 15.0    
     set yrange [ymin:ymax]
-    set xrange [62:66]
+    set xrange [62.9:65.1]
     set key outside right top
     set xtics auto
     set ytics auto
@@ -59,9 +59,12 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_vir[@]}"]{  
-      set key at 68, ymax
+      set key at 66.25, ymax
       plot file u 1:5 title file with linespoints linestyle count
       count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
       ymax = ymax - offset
     }
 EOF
@@ -77,7 +80,7 @@ gnuplot << EOF
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
-    set xrange [62:66]
+    set xrange [62.9:65.1]
     set key outside right top
     set xtics auto
     set ytics auto
@@ -89,9 +92,12 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_vir[@]}"]{  
-      set key at 68, ymax
+      set key at 66.25, ymax
       plot file u 1:6 title file with linespoints linestyle count
       count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
       ymax = ymax - offset
     }
 EOF
@@ -103,11 +109,11 @@ gnuplot << EOF
     set output "NRC_vir.pdf"
     set datafile separator "\t"
     
-    ymax = 0.11
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
-    set xrange [62:66]
+    set xrange [62.9:65.1]
     set key outside right top
     set xtics auto
     set ytics auto
@@ -119,9 +125,12 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_vir[@]}"]{  
-      set key at 68, ymax
+      set key at 66.25, ymax
       plot file u 1:7 title file with linespoints linestyle count
       count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
       ymax = ymax - offset
       
     }
