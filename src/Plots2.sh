@@ -59,7 +59,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_vir[@]}"]{  
-      set key at 66.25, ymax
+      set key at 66, ymax
       plot file u 1:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -92,7 +92,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_vir[@]}"]{  
-      set key at 66.25, ymax
+      set key at 66, ymax
       plot file u 1:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -125,7 +125,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_vir[@]}"]{  
-      set key at 66.25, ymax
+      set key at 66, ymax
       plot file u 1:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){

@@ -199,7 +199,8 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       cat $dataset/$file | tr [:lower:] [:upper:] > tmp.txt
       mv tmp.txt $dataset/$file
 
-      dnadiff $dataset/$file ../$dataset-clean.fa; #run dnadiff
+      #dnadiff $dataset/$file ../$dataset-clean.fa; #run dnadiff
+      dnadiff $dataset/$file ../$dataset.fa; #run dnadiff
       IDEN=`cat out.report | grep "AvgIdentity " | head -n 1 | awk '{ print $2;}'`;  #retrieve results
       ALBA=`cat out.report | grep "AlignedBases " | head -n 1 | awk '{ print $2;}'`;
       SNPS=`cat out.report | grep TotalSNPs | awk '{ print $2;}'`;

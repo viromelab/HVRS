@@ -106,7 +106,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cnt0[@]}"]{  
-      set key at 64, ymax
+      set key at 61, ymax
       plot file u 13:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -139,7 +139,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cnt0[@]}"]{  
-      set key at 64, ymax
+      set key at 61, ymax
       plot file u 13:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -156,7 +156,7 @@ gnuplot << EOF
     set output "NRC_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -172,7 +172,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cnt0[@]}"]{  
-      set key at 64, ymax
+      set key at 61, ymax
       plot file u 13:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -212,7 +212,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cnt3[@]}"]{  
-      set key at 64, ymax
+      set key at 61, ymax
       plot file u 13:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -245,7 +245,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cnt3[@]}"]{  
-      set key at 64, ymax
+      set key at 61, ymax
       plot file u 13:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -261,7 +261,7 @@ gnuplot << EOF
     set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "NRC_cnt3.pdf"
     set datafile separator "\t"
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -277,7 +277,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cnt3[@]}"]{  
-      set key at 64, ymax
+      set key at 61, ymax
       plot file u 13:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -300,7 +300,7 @@ gnuplot << EOF
     set output "Identity_cvg2.pdf"
     set datafile separator "\t"
     ymax = 100.5
-    ymin = 85
+    ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
@@ -315,9 +315,8 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg2[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:5 title file with linespoints linetype count 
-      print count
       count = count + 1
       if(count == 9){
         count = count + 1
@@ -351,7 +350,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg2[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -368,7 +367,7 @@ gnuplot << EOF
     set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "NRC_cvg2.pdf"
     set datafile separator "\t"
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -384,7 +383,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg2[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -423,7 +422,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg5[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -456,7 +455,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg5[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -473,7 +472,7 @@ gnuplot << EOF
     set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "NRC_cvg5.pdf"
     set datafile separator "\t"
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -489,7 +488,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg5[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -528,7 +527,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg10[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -561,7 +560,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg10[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -578,7 +577,7 @@ gnuplot << EOF
     set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "NRC_cvg10.pdf"
     set datafile separator "\t"
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -594,7 +593,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg10[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -633,7 +632,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg20[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -666,7 +665,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg20[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -682,7 +681,7 @@ gnuplot << EOF
     set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "NRC_cvg20.pdf"
     set datafile separator "\t"
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -698,7 +697,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg20[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -737,7 +736,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg40[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:5 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -770,7 +769,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg40[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:6 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
@@ -787,7 +786,7 @@ gnuplot << EOF
     set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "NRC_cvg40.pdf"
     set datafile separator "\t"
-    ymax = 1
+    ymax = 1.05
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -803,7 +802,7 @@ gnuplot << EOF
     
     count = 1
     do for [ file in "${list_cvg40[@]}"]{  
-      set key at 0.24, ymax
+      set key at 0.23, ymax
       plot file u 14:7 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
