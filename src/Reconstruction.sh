@@ -88,6 +88,7 @@ check_installation () {
   else
     RESULT=0
   fi
+  #yprintf "$NAME_TOOL      $RESULT\n"
 }
 #
 #

@@ -217,7 +217,7 @@ PROGRAM_EXISTS () {
   
 PROGRAM_EXISTS_V2 () {
   printf "Checking $3 ... ";
-  if ! [ -x "$(find . -name $1)" ];
+  if ! [ -e "$(find . -name $1)" ];
     then
     echo -e "\e[41mERROR\e[49m: $3 is not installed." >&2;
     echo -e "\e[42mTIP\e[49m: Try to reinstall $3 using ./Installation.sh --$2" >&2;
