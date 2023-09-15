@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-./Installation.sh
+./Installation.sh --all
 ./Simulation.sh
-./Reconstruction.sh
+./Reconstruction.sh --all
 ./Evaluation.sh
 ./Plots.sh
 ./Cleaning.sh

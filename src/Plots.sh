@@ -815,6 +815,7 @@ EOF
 #
 cp *.pdf ../Graphs
 cd ..
+./Plots2.sh
 #
 #
 #

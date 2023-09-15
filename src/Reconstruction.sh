@@ -48,6 +48,8 @@ RUN_HAPLOFLOW=0; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
 #
+RESULT=0
+#
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
@@ -74,7 +76,21 @@ create_paired_fa_files () {
     mv input.fasta gen_$dataset.fasta
   done
 }
-
+#
+#
+check_installation () { 
+  NAME_TOOL=$1
+  RESULT=0
+  ./Verification.sh --$NAME_TOOL > verif.txt
+  if [[ $(wc -l < verif.txt ) -eq "1" ]] 
+    then
+    RESULT=1
+  else
+    RESULT=0
+  fi
+}
+#
+#
 SHOW_MENU () {
   echo " ------------------------------------------------------------------ ";
   echo "                                                                    ";
@@ -134,81 +150,111 @@ while [[ $# -gt 0 ]]
       shift
     ;;
     --coronaspades)
-      RUN_CORONASPADES=1;
+      check_installation coronaspades;
+      RUN_CORONASPADES=$RESULT;
       shift
     ;;
     --haploflow)
-      RUN_HAPLOFLOW=1;
+      check_installation haploflow;
+      RUN_HAPLOFLOW=$RESULT;
       shift
     ;;
     --lazypipe)
-      RUN_LAZYPIPE=1;
+      check_installation lazypipe;
+      RUN_LAZYPIPE=$RESULT;
       shift
     ;;
     --metaspades)
-      RUN_METASPADES=1;
+      check_installation metaspades;
+      RUN_METASPADES=$RESULT;
       shift
     ;;
     --metaviralspades)
-      RUN_METAVIRALSPADES=1;
+      check_installation metaviralspades;
+      RUN_METAVIRALSPADES=$RESULT;
       shift
     ;;
     --pehaplo)
-      RUN_PEHAPLO=1;
+      check_installation pehaplo;
+      RUN_PEHAPLO=$RESULT;
       shift
     ;;
     --qure)
-      RUN_QURE=1;
+      check_installation qure;
+      RUN_QURE=$RESULT;
       shift
     ;;
     --qvg)
-      RUN_QVG=1;
+      check_installation qvg;
+      RUN_QVG=$RESULT;
       shift
     ;;
-    --spades)
-      RUN_SPADES=1;
+    --spades)      
+      check_installation spades;
+      RUN_SPADES=$RESULT;
       shift
     ;;
     --ssake)
-      RUN_SSAKE=1;
+      check_installation ssake;
+      RUN_SSAKE=$RESULT;
       shift
     ;;
     --tracespipe)
-      RUN_TRACESPIPE=1;
+      check_installation tracespipe;
+      RUN_TRACESPIPE=$RESULT;
       shift
     ;;
     --tracespipelite)
-      RUN_TRACESPIPELITE=1;
+      check_installation tracespipelite;
+      RUN_TRACESPIPELITE=$RESULT;
       shift
     ;;
     --virgena)
-      RUN_VIRGENA=1;
+      check_installation virgena;
+      RUN_VIRGENA=$RESULT;
       shift
     ;;
     --vispa)
-      RUN_VISPA=1;
+      check_installation vispa;
+      RUN_VISPA=$RESULT;
       shift
     ;;
     --vpipe)
-      RUN_VPIPE=1;
+      check_installation vpipe;
+      RUN_VPIPE=$RESULT;
       shift
     ;;
     --all)
-      RUN_CORONASPADES=1;
-      RUN_HAPLOFLOW=1;
-      RUN_LAZYPIPE=1;
-      RUN_METASPADES=1;
-      RUN_METAVIRALSPADES=1;
-      RUN_PEHAPLO=1;
-      RUN_QURE=1;
-      RUN_QVG=1;
-      RUN_SPADES=1;
-      RUN_SSAKE=1;
-      RUN_TRACESPIPE=1;
-      RUN_TRACESPIPELITE=1;
-      RUN_VIRGENA=1;
-      RUN_VISPA=1;
-      RUN_VPIPE=1;
+      check_installation coronaspades;
+      RUN_CORONASPADES=$RESULT;
+      check_installation haploflow;
+      RUN_HAPLOFLOW=$RESULT;
+      check_installation lazypipe;
+      RUN_LAZYPIPE=$RESULT;
+      check_installation metaspades;
+      RUN_METASPADES=$RESULT;
+      check_installation metaviralspades;
+      RUN_METAVIRALSPADES=$RESULT;
+      check_installation pehaplo;
+      RUN_PEHAPLO=$RESULT;
+      check_installation qure;
+      RUN_QURE=$RESULT;
+      check_installation qvg;
+      RUN_QVG=$RESULT;
+      check_installation spades;
+      RUN_SPADES=$RESULT;
+      check_installation ssake;
+      RUN_SSAKE=$RESULT;
+      check_installation tracespipe;
+      RUN_TRACESPIPE=$RESULT;
+      check_installation tracespipelite;
+      RUN_TRACESPIPELITE=$RESULT;
+      check_installation virgena;
+      RUN_VIRGENA=$RESULT;
+      check_installation vispa;
+      RUN_VISPA=$RESULT;
+      check_installation vpipe;
+      RUN_VPIPE=$RESULT;
       shift
     ;;
     --virgena-timeout)
@@ -729,7 +775,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     lzma -d VDB.mfa.lzma
     rm *.gz
     gzip *.fq
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 50 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
+    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 5 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
     
     
     cd test_viral_analysis_${dataset}
@@ -1616,9 +1662,10 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
     cat ${dataset}_*.fq > ${dataset}_paired.fq
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o haploflow-${dataset}-time.txt haploflow --read-file ${dataset}_paired.fq --out test_$dataset --log test_$dataset/log    
     mv haploflow-${dataset}-time.txt ../reconstructed/$dataset
+    #read a
     mv test_$dataset/contigs.fa test_$dataset/haploflow-${dataset}.fa
     cp test_$dataset/haploflow-${dataset}.fa ../reconstructed/$dataset
-    rm -rf test
+    
     cd ..
     rm -rf haploflow_data
   done 
@@ -1745,7 +1792,7 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
         <Graph>
             <MinReadNumber>5</MinReadNumber>
             <VertexWeight>10</VertexWeight>
-			<SimilarityThreshold>0.5</SimilarityThreshold>
+			<SimilarityThreshold>0.05</SimilarityThreshold>
 			<Debug>false</Debug>
         </Graph>
         <Debug>false</Debug>

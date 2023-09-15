@@ -31,7 +31,7 @@ for tool in "${TOOLS[@]}"
    
 done
 #
-list_vir=($(ls vir))  
+list_tools=($(ls vir))  
 #  
 #printf "${list[*]} \n\n"
 #
@@ -47,9 +47,9 @@ gnuplot << EOF
     ymin = 94
     offset = ( ymax - ymin ) / 15.0    
     set yrange [ymin:ymax]
-    set xrange [62.9:65.1]
+    set xrange [-0.2:3.2]
     set key outside right top
-    set xtics auto
+    set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
     set ylabel "Average Identity"
     set xlabel "Dataset"
@@ -58,9 +58,9 @@ gnuplot << EOF
     set key at screen 1, graph 1  
     
     count = 1
-    do for [ file in "${list_vir[@]}"]{  
-      set key at 66, ymax
-      plot file u 1:5 title file with linespoints linestyle count
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 4.75, ymax
+      plot file u 0:5:1 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
         count = count + 1
@@ -80,9 +80,9 @@ gnuplot << EOF
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
-    set xrange [62.9:65.1]
+    set xrange [-0.2:3.2]
     set key outside right top
-    set xtics auto
+    set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
     set ylabel "NCSD"
     set xlabel "Dataset"
@@ -91,9 +91,9 @@ gnuplot << EOF
     set key at screen 1, graph 1  
     
     count = 1
-    do for [ file in "${list_vir[@]}"]{  
-      set key at 66, ymax
-      plot file u 1:6 title file with linespoints linestyle count
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 4.75, ymax
+      plot file u 0:6:1 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
         count = count + 1
@@ -113,9 +113,9 @@ gnuplot << EOF
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
-    set xrange [62.9:65.1]
+    set xrange [-0.2:3.2]
     set key outside right top
-    set xtics auto
+    set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
     set ylabel "NRC"
     set xlabel "Dataset"
@@ -124,9 +124,9 @@ gnuplot << EOF
     set key at screen 1, graph 1  
     
     count = 1
-    do for [ file in "${list_vir[@]}"]{  
-      set key at 66, ymax
-      plot file u 1:7 title file with linespoints linestyle count
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 4.75, ymax
+      plot file u 0:7:1 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
         count = count + 1
