@@ -217,7 +217,7 @@ PROGRAM_EXISTS () {
   
 PROGRAM_EXISTS_V2 () {
   printf "Checking $3 ... ";
-  if ! [ -e "$(find . -name $1)" ];
+  if ! [ -e "$(find . -name $1 | head -n 1)" ];
     then
     echo -e "\e[41mERROR\e[49m: $3 is not installed." >&2;
     echo -e "\e[42mTIP\e[49m: Try to reinstall $3 using ./Installation.sh --$2" >&2;
@@ -283,7 +283,7 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]];
     #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate bio2
-    PROGRAM_EXISTS "pehaplo.py" pehaplo PEHaplo;
+    PROGRAM_EXISTS_V2 "pehaplo.p*" pehaplo PEHaplo;
 fi
 #    
 if [[ "$RUN_QURE" -eq "1" ]];
@@ -307,7 +307,7 @@ if [[ "$RUN_SSAKE" -eq "1" ]];
     #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate base
-    PROGRAM_EXISTS "runSSAKE.sh" ssake SSAKE;
+    PROGRAM_EXISTS_V2 "runSSAKE.sh" ssake SSAKE;
 fi    
 #
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]];
