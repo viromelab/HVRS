@@ -562,10 +562,10 @@ if [[ "$RUN_QVG" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n qvg
   conda activate qvg  
+  conda install samtools=1.17 -y
   conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk fastp
   conda install -c conda-forge -y ncurses
   conda install -c r -y r
-  conda install samtools=1.17 -y
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/
@@ -686,8 +686,11 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   then
   printf "Installing Lazypipe\n\n"  
   eval "$(conda shell.bash hook)"  
-  rm -rf lazypipe  
-  git clone https://plyusnin@bitbucket.org/plyusnin/lazypipe.git
+  rm -rf lazypipe 
+  rm 277fafc.tar.gz 
+  wget https://bitbucket.com/plyusnin/lazypipe/get/277fafc.tar.gz
+  tar -xf 277fafc.tar.gz 
+  mv plyusnin-lazypipe-277fafc63631/ lazypipe
   cd lazypipe
   
   #mkdir data
