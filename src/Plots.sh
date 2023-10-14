@@ -407,7 +407,7 @@ gnuplot << EOF
     set output "Identity_cvg5.pdf"
     set datafile separator "\t"
     ymax = 100.5
-    ymin = 85
+    ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
@@ -512,7 +512,7 @@ gnuplot << EOF
     set output "Identity_cvg10.pdf"
     set datafile separator "\t"
     ymax = 100.5
-    ymin = 85
+    ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
@@ -617,7 +617,7 @@ gnuplot << EOF
     set output "Identity_cvg20.pdf"
     set datafile separator "\t"
     ymax = 100.5
-    ymin = 88
+    ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]
@@ -721,7 +721,7 @@ gnuplot << EOF
     set output "Identity_cvg40.pdf"
     set datafile separator "\t"
     ymax = 100.5
-    ymin = 91
+    ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
     set xrange [0:0.16]

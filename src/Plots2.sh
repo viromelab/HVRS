@@ -12,21 +12,31 @@ mkdir Graphs
 i=""
 declare ans
 
+mkdir vir
 for tool in "${TOOLS[@]}" 
   do
   
   i=$(echo "$tool" | tr '[:upper:]' '[:lower:]' )
   
-  cd vir  
-  content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk '{if ($1=="DS13" || $1=="DS63" || $1=="DS64" || $1=="DS65") {print $0}}' | cut --complement -d'S' -f1 > $tool)
- 
-  #aux=$(cat "${tool}" | awk -F"," '{print $1}' | cut -d'S' -f2 | cut -d'	' -f1 )
-  #content= echo "$content
-#	$aux"
-  #echo $content > $tool
-  #tool+="\n"
-  #tool+=$aux
-  echo "$(sort -t$'\t' -k1 -n ${tool})" > ${tool}
+  cd vir 
+  
+  declare -a DATASETS=("13" "63" "64" "65")
+  printf "" > $tool
+  
+  for ds in "${DATASETS[@]}" 
+    do 
+    content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk -v data=DS$ds '{if ($1==data) {print $0}}')       
+    
+    if [ -z "$content" ]
+      then      
+      printf "\t \t \t \t \t \t \t \t \t \t \t \t \t \t \n" >> $tool     
+    else
+      printf "$content\n\n"
+      content=${content:2}
+      printf "$content\n" >> $tool
+      content=""
+    fi    
+  done
   cd ..
    
 done
@@ -37,16 +47,25 @@ for tool in "${TOOLS[@]}"
   
   i=$(echo "$tool" | tr '[:upper:]' '[:lower:]' )
   
-  cd vir_2  
-  content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk '{if ($1=="DS5" || $1=="DS13" || $1=="DS57" || $1=="DS58") {print $0}}' | cut --complement -d'S' -f1 > $tool)
- 
-  #aux=$(cat "${tool}" | awk -F"," '{print $1}' | cut -d'S' -f2 | cut -d'	' -f1 )
-  #content= echo "$content
-#	$aux"
-  #echo $content > $tool
-  #tool+="\n"
-  #tool+=$aux
-  echo "$(sort -t$'\t' -k1 -n ${tool})" > ${tool}
+  cd vir_2 
+  
+  declare -a DATASETS=("5" "13" "57" "58")
+  printf "" > $tool
+  
+  for ds in "${DATASETS[@]}" 
+    do 
+    content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk -v data=DS$ds '{if ($1==data) {print $0}}')       
+    
+    if [ -z "$content" ]
+      then      
+      printf "\t \t \t \t \t \t \t \t \t \t \t \t \t \t \n" >> $tool     
+    else
+      printf "$content\n\n"
+      content=${content:2}
+      printf "$content\n" >> $tool
+      content=""
+    fi    
+  done
   cd ..
    
 done
@@ -57,16 +76,25 @@ for tool in "${TOOLS[@]}"
   
   i=$(echo "$tool" | tr '[:upper:]' '[:lower:]' )
   
-  cd vir_3  
-  content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk '{if ($1=="DS13" || $1=="DS61" || $1=="DS62") {print $0}}' | cut --complement -d'S' -f1 > $tool)
- 
-  #aux=$(cat "${tool}" | awk -F"," '{print $1}' | cut -d'S' -f2 | cut -d'	' -f1 )
-  #content= echo "$content
-#	$aux"
-  #echo $content > $tool
-  #tool+="\n"
-  #tool+=$aux
-  echo "$(sort -t$'\t' -k1 -n ${tool})" > ${tool}
+  cd vir_3 
+  
+  declare -a DATASETS=("61" "13" "62")
+  printf "" > $tool
+  
+  for ds in "${DATASETS[@]}" 
+    do 
+    content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk -v data=DS$ds '{if ($1==data) {print $0}}')       
+    
+    if [ -z "$content" ]
+      then      
+      printf "\t \t \t \t \t \t \t \t \t \t \t \t \t \t \n" >> $tool     
+    else
+      printf "$content\n\n"
+      content=${content:2}
+      printf "$content\n" >> $tool
+      content=""
+    fi    
+  done
   cd ..
    
 done
@@ -85,8 +113,8 @@ gnuplot << EOF
     set output "Identity_vir.pdf"
     set datafile separator "\t"
     
-    ymax = 100.5
-    ymin = 94
+    ymax = 100.1
+    ymin = 98.8
     offset = ( ymax - ymin ) / 15.0    
     set yrange [ymin:ymax]
     set xrange [-0.2:3.2]
@@ -187,8 +215,8 @@ gnuplot << EOF
     set output "Identity_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 100.5
-    ymin = 94
+    ymax = 100.1
+    ymin = 98.8
     offset = ( ymax - ymin ) / 15.0    
     set yrange [ymin:ymax]
     set xrange [-0.2:3.2]
@@ -291,12 +319,12 @@ gnuplot << EOF
     set datafile separator "\t"
     
     ymax = 100.5
-    ymin = 94
+    ymin = 0
     offset = ( ymax - ymin ) / 15.0    
     set yrange [ymin:ymax]
     set xrange [-0.2:2.2]
     set key outside right top
-    set xtics ("13" 0, "61" 1, "62" 2)
+    set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
     set ylabel "Average Identity"
     set xlabel "Dataset"
@@ -329,7 +357,7 @@ gnuplot << EOF
     set yrange [ymin:ymax]
     set xrange [-0.2:2.2]
     set key outside right top
-    set xtics ("13" 0, "61" 1, "62" 2)
+    set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
     set ylabel "NCSD"
     set xlabel "Dataset"
@@ -362,7 +390,7 @@ gnuplot << EOF
     set yrange [ymin:ymax]
     set xrange [-0.2:2.2]
     set key outside right top
-    set xtics ("13" 0, "61" 1, "62" 2)
+    set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
     set ylabel "NRC"
     set xlabel "Dataset"
