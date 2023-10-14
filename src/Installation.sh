@@ -328,7 +328,14 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   #install_docker  
   sudo apt -y install curl
   #printf "Installing mamba\n\n"
-  #install_mamba   
+  #install_mamba 
+  #FALCON-meta
+  conda create -n falcon -y
+  conda activate falcon 
+  conda install -c cobilab -y gto
+  conda install -c cobilab falcon -y
+  conda activate base  
+  conda install -c bioconda sra-tools -y
 fi
 #
 #

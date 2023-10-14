@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+eval "$(conda shell.bash hook)"
+#
 NR_THREADS=3;
 MAX_RAM=28;
 #
@@ -50,7 +52,9 @@ RUN_VIQUF=0;
 #
 RESULT=0
 #
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+TOP="150";
+#
+declare -a DATASETS=("DS4") # "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
 #declare -a DATASETS=("DS63")
@@ -63,7 +67,17 @@ declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "CMV" "MT");
 #
 VIRGENA_TIMEOUT=15;
-
+#
+declare -a VIRUSES_AVAILABLE=("B19V" "BuV" "CuV" "HBoV" "AAV" "BKPyV" "JCPyV" "KIPyV"
+                    "WUPyV" "MCPyV" "HPyV6" "HPyV7" "TSPyV" "HPyV9" "MWPyV"
+                    "STLPyV" "HPyV12" "NJPyV" "LIPyV" "SV40" "TTV" "TTVmid"
+                    "TTVmin" "HAV" "HBV" "HCV" "HDV" "HEV" "SENV" "HPV2"
+                    "HPV6" "HPV11" "HPV16" "HPV18" "HPV31" "HPV39" "HPV45"
+                    "HPV51" "HPV56" "HPV58" "HPV59" "HPV68" "HPV77" "HSV-1"
+                    "HSV-2" "VZV" "EBV" "HCMV" "HHV6" "HHV7" "KSHV" "ReDoV"
+                    "VARV" "MPXV" "EV" "SARS2" "HERV" "MT");
+#
+#
 #creates a fasta file for each of the datasets with paired reads
 create_paired_fa_files () { 
   printf "Creating fasta files from .fq files\n\n"
@@ -91,6 +105,76 @@ check_installation () {
   #yprintf "$NAME_TOOL      $RESULT\n"
 }
 #
+CREATE_PAIRED_FALCON () { 
+  printf "Creating fasta files from .fq files\n\n"	    
+  sed -n '1~4s/^@/>/p;2~4p' ${DATASETS[0]}_1.fq > tmp_new_1.fa
+  sed -n '1~4s/^@/>/p;2~4p' ${DATASETS[0]}_2.fq > tmp_new_2.fa
+  cat tmp_new_*.fa > input.fasta
+  perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d' > tmp.txt
+    rm tmp.txt
+  mv input.fasta paired.fa
+}
+#
+generate_references () { 
+    printf "Classifying with FALCON-meta.\n\n"
+    OUTPUT_DIR="refs"
+    conda activate falcon
+  
+    #lzma -d $DATABASE.lzma
+    lzma -d VDB.fa.lzma
+      
+    CREATE_PAIRED_FALCON;
+  
+    FALCON -v -n $NR_THREADS -t $TOP -F -m 6:1:1:0/0 -m 13:50:1:0/0 -m 19:500:1:5/10 -g 0.85 -c 10 -x top-metagenomics.csv paired.fa "VDB.fa"
+    #
+    ## GET HIGHEST SIMILAR REFERENCE =============================================
+    #
+    rm -f best-viral-metagenomics.txt
+    for VIRUS in "${VIRUSES_AVAILABLE[@]}"
+      do
+      printf "%s\t" "$VIRUS" >> best-viral-metagenomics.txt;
+      #
+      RESULT=`cat top-metagenomics.csv | grep -a -f IDS/ID-$VIRUS.ids \
+      | awk '{ if($3 > 0 && $2 > 200 && $2 < 9000000) print $3"\t"$4; }' \
+      | head -n 1 \
+      | awk '{ print $1"\t"$2;}' \
+      | sed "s/NC\_/NC-/" \
+      | tr '_' '\t' \
+      | awk '{ print $1"\t"$2;}'`;
+      if [ -z "$RESULT" ]
+        then
+        echo -e "-\t-" >> best-viral-metagenomics.txt
+        else
+        echo "$RESULT" | sed "s/NC-/NC\_/" >> best-viral-metagenomics.txt
+        fi
+      done
+  
+    rm -rf $OUTPUT_DIR
+    mkdir $OUTPUT_DIR
+    while IFS= read -r line
+    do
+      PERC="$(cut -d'	' -f2 <<< $line)"
+      if [ "$PERC" != "-" ];
+        then
+        NAME="$(cut -d'	' -f1 <<< $line)"
+        ID="$(cut -d'	' -f3 <<< $line)"
+        gto_fasta_extract_read_by_pattern -p $ID < VDB.fa | sed 's|/||g' > $NAME.fa
+        mv $NAME.fa $OUTPUT_DIR
+      fi 
+    done < best-viral-metagenomics.txt
+   
+    mv best-viral-metagenomics.txt $OUTPUT_DIR
+    mv top-metagenomics.csv $OUTPUT_DIR
+    conda activate base
+    cd refs 
+    rm *.csv  
+    rm *.txt
+    VIRUSES=($(ls -1 | sed -e 's/\.fa$//'))
+    printf "$VIRUSES \n\n"
+    printf "$(ls -1 | sed -e 's/\.fa$//')\n\n"
+    cp * ..
+    cd ..
+}
 #
 SHOW_MENU () {
   echo " ------------------------------------------------------------------ ";
@@ -125,6 +209,16 @@ SHOW_MENU () {
   echo " -m  <INT>, --memory <INT>     Maximum of RAM available,            ";
   echo " --virgena-timeout             Maximum time used by VirGenA         "; 
   echo "                               to reconstruct with each reference,  ";
+  echo "                                                                    ";
+  echo " -r <STR>, --reads <STR>       FASTQ reads file name. The string    ";
+  echo "                               must be the name before _1 and _2.fq.";
+  echo "                               The references are retrieved using   ";
+  echo "                               FALCON-meta.                         ";
+  echo "                                                                    ";
+  echo " --top_falcon  <INT>           Maximum number of references retrived";
+  echo "                               by FALCON-meta,                      ";
+  echo "                                                                    ";
+  echo "                                                                    ";
   echo " Examples --------------------------------------------------------- ";
   echo "                                                                    "; 
   echo " - Reconstruct using all tools                                      ";
@@ -268,6 +362,21 @@ while [[ $# -gt 0 ]]
     ;;
     -m|--memory)
       MAX_RAM="$2";
+      shift 2;
+    ;;
+    --top_falcon)
+      TOP="$2";
+      shift 2;
+    ;;
+    -r|--input|--reads)
+      declare -a DATASETS=("$2");
+      printf "This process may erase data present in the current directory. Do you wish to continue?[Y/N]\n\n"
+      read char
+      if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
+        generate_references;
+      else
+        printf "Not a valid option. Skipping ... \n\n"
+      fi
       shift 2;
     ;;
     -*) # unknown option with small
@@ -556,7 +665,8 @@ if [[ "$RUN_QURE" -eq "1" ]]
     do
     for virus in "${VIRUSES[@]}"
     do
-    cp ../gen_$dataset.fasta ../$virus.fa .
+    printf "$virus\n\n\n\n\n\n"
+    cp ../gen_$dataset.fasta ../${virus}.fa .
     /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qure-$virus-${dataset}-time.txt java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe gen_$dataset.fasta $virus.fa 
     mv gen_${dataset}_reconstructedVariants.txt results_$virus.fa
     done
