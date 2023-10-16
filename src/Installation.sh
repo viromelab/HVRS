@@ -335,7 +335,9 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -c cobilab -y gto
   conda install -c cobilab falcon -y
   conda activate base  
-  conda install -c bioconda sra-tools -y
+  #SRA tools
+  wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.7/sratoolkit.3.0.7-ubuntu64.tar.gz
+  tar -xf sratoolkit.3.0.7-ubuntu64.tar.gz
 fi
 #
 #

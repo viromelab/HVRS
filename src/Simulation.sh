@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+declare -a DATASETS_SRA=("SRR12175231" "SRR12175232" "SRR12175233")
+#
 lzma -k -f -d VDB.fa.lzma
 #
 rm -f DS*_*.fq
@@ -15,6 +17,17 @@ gto_fasta_extract_read_by_pattern -p "NC_000898.1" < VDB.fa > HHV6B.fa
 gto_fasta_extract_read_by_pattern -p "NC_014407.1" < VDB.fa > POLY7.fa
 gto_fasta_extract_read_by_pattern -p "NC_009334.1" < VDB.fa > EBV.fa
 gto_fasta_extract_read_by_pattern -p "KP745701.1" < VDB.fa > CMV.fa
+#
+#Get real sequences
+for dataset in "${DATASETS_SRA[@]}"
+  do
+  ./sratoolkit.3.0.7-ubuntu64/bin/prefetch $dataset
+  ./sratoolkit.3.0.7-ubuntu64/bin/fastq-dump --split-3 $dataset/$dataset.sra
+  mv ${dataset}_1.fastq ${dataset}_1.fq
+  mv ${dataset}_2.fastq ${dataset}_2.fq
+  rm -rf $dataset
+done
+read a
 #
 #
 # MUTATE SEQUENCES:
