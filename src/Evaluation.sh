@@ -148,7 +148,7 @@ conda activate evaluation
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCSD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds" > total_stats.tsv
+echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCSD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds	Reconstructed bases	Minimum contig length	Maximum contig length	Average contig length" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
@@ -160,12 +160,13 @@ for dataset in "${DATASETS[@]}" #analyse each virus
   
   echo "\begin{table*}[h!]
 \begin{center}
-\caption{Results obtained for $dataset using the benchmark and applying it to the different databases generated. The execution time was measured in seconds, the RAM usage was measured in GB and the average identity, accuracy and CPU usage are presented as a percentage. The executions were, when possible, capped at 4 threads and 28 GB of RAM.}
+\caption{Results obtained for $dataset using the benchmark and applying it to the different databases generated. The execution time was measured in seconds, the RAM usage was measured in GB and the average identity, accuracy and CPU usage are presented as a percentage. The executions were, when possible, capped at 6 threads and 48 GB of RAM.}
 \label{resultstable:$dataset}
 \scriptsize
-\begin{tabular}{| m{7.5em} | m{5em}| m{2.7em} | m{4em} | m{2.5em} | m{2.5em} | m{5em} | m{3em} | m{4em}  | m{6.5em} | m{6.5em} |}
+\begin{tabular}{| m{7em} | m{4em}| m{2.5em} | m{4em} | m{2.5em} | m{2.5em} | m{3em} | m{3em} | m{4.5em} | m{5.5em} | m{3.8em}  | m{3.8em} | m{3.8em} |}
 \hline
-\textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCSD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Metagenomic analysis} & \textbf{Metagenomic classification} \\\\\\hline 
+%\textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCSD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Metagenomic analysis} & \textbf{Metagenomic classification} & \textbf{Reconstructed bases} & \textbf{Minimum contig length} & \textbf{Maximum contig length} & \textbf{Average contig length} \\\\\\hline 
+\textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCSD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Reconstructed bases} & \textbf{Minimum contig length} & \textbf{Maximum contig length} & \textbf{Average contig length} \\\\\\hline 
 
 " >> total_stats.tex
   for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
@@ -199,8 +200,8 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       cat $dataset/$file | tr [:lower:] [:upper:] > tmp.txt
       mv tmp.txt $dataset/$file
 
-      #dnadiff $dataset/$file ../$dataset-clean.fa; #run dnadiff
-      dnadiff $dataset/$file ../$dataset.fa; #run dnadiff
+      dnadiff $dataset/$file ../$dataset-clean.fa; #run dnadiff
+      #dnadiff $dataset/$file ../$dataset.fa; #run dnadiff
       IDEN=`cat out.report | grep "AvgIdentity " | head -n 1 | awk '{ print $2;}'`;  #retrieve results
       ALBA=`cat out.report | grep "AlignedBases " | head -n 1 | awk '{ print $2;}'`;
       SNPS=`cat out.report | grep TotalSNPs | awk '{ print $2;}'`;
@@ -258,7 +259,17 @@ for dataset in "${DATASETS[@]}" #analyse each virus
         done
       fi
       
-      NR_SPECIES=$(grep '>' $dataset/$file -c)
+      #NR_SPECIES=$(grep '>' $dataset/$file -c)
+      NR_SPECIES=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f4)
+      SUM_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
+      MIN_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
+      MAX_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f8)
+      AVG_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f7)
+      
+      
+      
+      #printf "$NR_SPECIES $SUM_LEN  $MIN_LEN  $AVG_LEN  $MAX_LEN  \n\n"
+   
       gto_fasta_rand_extra_chars < $dataset/$file > tmp.fa
       gto_fasta_to_seq < tmp.fa > $dataset/$file_wout_extension.seq
       gto_fasta_to_seq < ../$dataset-clean.fa > ../$dataset-clean.fa.seq
@@ -292,15 +303,15 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
     #ds	file	exec_time	snps	avg_identity	NCSD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
-    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds" >> total_stats.tsv   
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds	$SUM_LEN	$MIN_LEN	$MAX_LEN	$AVG_LEN" >> total_stats.tsv   
     
     while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] #add empty lines for the tools that couldn't output results
     do
-      echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
+      echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
       count=$(($count + 1))
     done
     CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
-    echo "$NAME_TOOL & $TIME & $SNPS & $IDEN & $NCSD & $NRC & $MEM & $CPU & $NR_SPECIES & $DOES_ANALYSIS & $DOES_CLASSIFICATION \\\\\\hline" >> total_stats.tex
+    echo "$NAME_TOOL & $TIME & $SNPS & $IDEN & $NCSD & $NRC & $MEM & $CPU & $NR_SPECIES & $SUM_LEN & $MIN_LEN & $MAX_LEN & $AVG_LEN \\\\\\hline" >> total_stats.tex
     count=$(($count + 1))
     #printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     fi
@@ -308,7 +319,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
   
   while [ ${#ORDER_TOOLS[@]} -gt $count ] #add empty lines for the tools that couldn't output results
     do
-      echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
+      echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
       count=$(($count + 1))
     done  
     
