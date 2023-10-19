@@ -367,17 +367,12 @@ while [[ $# -gt 0 ]]
     ;;
     --top_falcon)
       TOP="$2";
+      printf "$TOP \n\n"
       shift 2;
     ;;
     -r|--input|--reads)
       declare -a DATASETS=("$2");
-      printf "This process may erase data present in the current directory. Do you wish to continue?[Y/N]\n\n"
-      read char
-      if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
-        generate_references;
-      else
-        printf "Not a valid option. Skipping ... \n\n"
-      fi
+      RUN_CLASSIFICATION="1";
       shift 2;
     ;;
     -*) # unknown option with small
@@ -440,6 +435,20 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
     cd ..
   fi
   
+fi
+
+
+
+#Generates the references with FALCON-meta
+if [[ "$RUN_CLASSIFICATION" -eq "1" ]] 
+  then 
+  printf "This process may erase data present in the current directory. Do you wish to continue?[Y/N]\n\n"
+  read char
+  if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
+  generate_references;
+  else
+    printf "Not a valid option. Skipping ... \n\n"
+  fi
 fi
 
 #spades - working
