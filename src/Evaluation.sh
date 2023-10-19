@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS63" "DS64" "DS65")
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS63" "DS64" "DS65" "SRR12175231" "SRR12175232" "SRR12175233")
 #declare -a DATASETS=("DS63" "DS64" "DS65")
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo" "haploflow");
@@ -9,7 +9,7 @@ declare -a NO_ANALYSIS=("qvg" "qure" "vispa" "virgena" "v");
 declare -a CLASSIFICATION=("tracespipelite" "tracespipe" "lazypipe");
 declare -a NO_CLASSIFICATION=("spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "pehaplo" "qvg" "qure" "vispa" "virgena" "haploflow" "v");
 #
-declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "virgena" "vispa" "v")
+declare -a ORDER_TOOLS=("coronaspades" "haploflow" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "v" "virgena" "vispa")
 #
 declare -a COVERAGE_2=("DS1" "DS9" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24")
 declare -a COVERAGE_5=("DS2" "DS10" "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32")
@@ -140,7 +140,29 @@ check_ds_cont () {
     cnt_ds=10000 
   fi
 }
+#
+transform_vispa () {
 
+  FILE="$1"
+  
+  printf "$FILE\n\n"
+  
+  printf "" > tmp_vispa
+  
+  cat $FILE | sed '/^>/d' > aux
+  
+  while read line; do
+    
+    echo ">header_$(shuf -i 1-9999999999999 -n 1)" >> tmp_vispa
+    echo $line >> tmp_vispa  
+    
+  done < aux
+
+  mv tmp_vispa $FILE
+  rm aux
+
+}
+#
 count=0
 #
 eval "$(conda shell.bash hook)"
@@ -157,6 +179,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
   check_ds_snp
   check_ds_cont
   printf "$dataset - Coverage: $coverage; SNPs : $snp_ds; Contamination : $cnt_ds\n"
+  printf "$(pwd)\n\n"
   
   echo "\begin{table*}[h!]
 \begin{center}
@@ -169,7 +192,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 \textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCSD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Reconstructed bases} & \textbf{Minimum contig length} & \textbf{Maximum contig length} & \textbf{Average contig length} \\\\\\hline 
 
 " >> total_stats.tex
-  for file in `cd ${dataset};ls -1 *.fa*` #for each fasta file in curr dir
+  for file in `cd ${dataset};ls -1 *.fa* | sort -t- -k1,1 -k2n` #for each fasta file in curr dir
   do 
     rm -rf out.report	 
     TIME=-1
@@ -183,7 +206,14 @@ for dataset in "${DATASETS[@]}" #analyse each virus
     DOES_ANALYSIS=-1
     DOES_CLASSIFICATION=-1
 
-    printf "\n\nFile: $file\nDataset: $dataset \n\n"; #print file name, virus and dataset	  
+    printf "\n\nFile: $file\nDataset: $dataset \n\n"; #print file name, virus and dataset	
+    
+    if [[ "${ORDER_TOOLS[$count]}" = "vispa" ]];then
+    
+      transform_vispa $dataset/$file
+    fi
+    
+      
     fst_char=$(cat $dataset/$file | head -c 1)
     if [[ -z "$fst_char" ]]; then
       printf "The result file is empty."    
@@ -260,6 +290,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       fi
       
       #NR_SPECIES=$(grep '>' $dataset/$file -c)
+      printf "$(seqkit stats $dataset/$file | tail -1)"
       NR_SPECIES=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f4)
       SUM_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
       MIN_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
@@ -295,9 +326,17 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       NCSD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
            
       AUX_MULT=$(echo "$FILE_SIZE * 2" | bc -l )
-      printf "aux_mult   . $AUX_MULT\n\n"
-      printf "NRC -> $COMPRESSED_SIZE_W_REF . $AUX_MULT"
-      NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)      
+      if [ -z "$AUX_MULT" ]
+        then
+        printf "Skipping compression metrics, no reference.\n\n"
+      else
+        printf "aux_mult   . $AUX_MULT\n\n"
+        #printf "NRC -> $COMPRESSED_SIZE_W_REF . $AUX_MULT"
+        NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)      
+      fi
+      
+      printf "me\n\n"
+
       
       IDEN=$(echo $IDEN |bc -l | xargs printf %.3f)
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
@@ -305,8 +344,9 @@ for dataset in "${DATASETS[@]}" #analyse each virus
     #ds	file	exec_time	snps	avg_identity	NCSD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
     echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds	$SUM_LEN	$MIN_LEN	$MAX_LEN	$AVG_LEN" >> total_stats.tsv   
     
-    while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] #add empty lines for the tools that couldn't output results
+    while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] && [ "$count" -lt 15 ] #add empty lines for the tools that couldn't output results
     do
+      printf "TOOLS -> ${ORDER_TOOLS[$count]}		$NAME_TOOL\n\n" 
       echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
       count=$(($count + 1))
     done
