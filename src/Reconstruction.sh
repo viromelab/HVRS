@@ -2,8 +2,8 @@
 #
 eval "$(conda shell.bash hook)"
 #
-NR_THREADS=3;
-MAX_RAM=28;
+NR_THREADS=6;
+MAX_RAM=48;
 #
 CREATE_RECONSTRUCTION_FOLDERS=1;
 #
@@ -68,6 +68,9 @@ declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "CMV" "MT");
 #
 VIRGENA_TIMEOUT=15;
+OVERALL_TIMEOUT=360;
+#
+ASSUME_YES="0";
 #
 declare -a VIRUSES_AVAILABLE=("B19V" "BuV" "CuV" "HBoV" "AAV" "BKPyV" "JCPyV" "KIPyV"
                     "WUPyV" "MCPyV" "HPyV6" "HPyV7" "TSPyV" "HPyV9" "MWPyV"
@@ -209,16 +212,21 @@ SHOW_MENU () {
   echo "                                                                    ";
   echo " -t  <INT>, --threads <INT>    Number of threads,                   ";
   echo " -m  <INT>, --memory <INT>     Maximum of RAM available,            ";
-  echo " --virgena-timeout             Maximum time used by VirGenA         "; 
+  echo "                                                                    ";
+  echo " --virgena-timeout <INT>       Maximum time used by VirGenA         "; 
   echo "                               to reconstruct with each reference,  ";
+  echo " --timeout <INT>               Maximum time used by a reconstruction";
+  echo "                               program to reconstruct a genome.     ";
   echo "                                                                    ";
   echo " -r <STR>, --reads <STR>       FASTQ reads file name. The string    ";
   echo "                               must be the name before _1 and _2.fq.";
   echo "                               The references are retrieved using   ";
   echo "                               FALCON-meta.                         ";
   echo "                                                                    ";
+  echo " -y, --yes                     Assume the answer to all prompts is yes.";
+  echo "                                                                    ";
   echo " --top_falcon  <INT>           Maximum number of references retrived";
-  echo "                               by FALCON-meta,                      ";
+  echo "                               by FALCON-meta.                      ";
   echo "                                                                    ";
   echo "                                                                    ";
   echo " Examples --------------------------------------------------------- ";
@@ -244,6 +252,10 @@ while [[ $# -gt 0 ]]
   case $i in
     -h|--help|?)
       HELP=1;
+      shift
+    ;;
+    -y|--yes)
+      ASSUME_YES="1";
       shift
     ;;
     --coronaspades)
@@ -358,6 +370,13 @@ while [[ $# -gt 0 ]]
       VIRGENA_TIMEOUT="$2";
       shift 2;
     ;;
+    --timeout)
+      OVERALL_TIMEOUT="$2";
+      if [ "$OVERALL_TIMEOUT" -gt "$VIRGENA_TIMEOUT" ]; then
+        VIRGENA_TIMEOUT=$OVERALL_TIMEOUT
+      fi
+      shift 2;
+    ;;
     -t|--threads)
       NR_THREADS="$2";
       shift 2;
@@ -399,15 +418,34 @@ if [[ "$HELP" -eq "1" ]];
 
 #Creates a folder for each dataset
 if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]] 
-  then   
+  then 
   
-  if [[ -d "$(pwd)/reconstructed" ]]
+  if [[ "$ASSUME_YES" -eq "0" ]] 
   then
-    printf "Main folder where the results will be stored exists. Do you wish to remove it and create a new folder? [Y/N]\n"
+    if [[ -d "$(pwd)/reconstructed" ]]
+    then
+      printf "Main folder where the results will be stored exists. Do you wish to remove it and create a new folder? [Y/N]\n"
     
-    read char
+      read char
     
-    if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
+      if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
+        printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
+        rm -rf reconstructed
+        mkdir reconstructed
+        cd reconstructed
+        for dataset in "${DATASETS[@]}"
+        do
+          mkdir $dataset  
+        done
+        cd ..
+   
+        elif [ "$char" = "N" ] || [ "$char" = "n" ]; then 
+          printf "Skipping ...\n\n"
+        else
+          printf "Not a valid option. Skipping ... \n\n"
+      fi
+    
+    else
       printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
       rm -rf reconstructed
       mkdir reconstructed
@@ -417,14 +455,9 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
         mkdir $dataset  
       done
       cd ..
-    
-    elif [ "$char" = "N" ] || [ "$char" = "n" ]; then 
-      printf "Skipping ...\n\n"
-    else
-      printf "Not a valid option. Skipping ... \n\n"
     fi
-    
-  else
+  
+  else #assume_yes = 1
     printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
     rm -rf reconstructed
     mkdir reconstructed
@@ -443,12 +476,18 @@ fi
 #Generates the references with FALCON-meta
 if [[ "$RUN_CLASSIFICATION" -eq "1" ]] 
   then 
-  printf "This process may erase data present in the current directory. Do you wish to continue?[Y/N]\n\n"
-  read char
-  if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
-  generate_references;
+  
+  if [[ "$ASSUME_YES" -eq "0" ]] 
+  then
+    printf "This process may erase data present in the current directory. Do you wish to continue?[Y/N]\n\n"
+    read char
+    if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
+      generate_references;
+    else
+      printf "Not a valid option. Skipping ... \n\n"
+    fi
   else
-    printf "Not a valid option. Skipping ... \n\n"
+    generate_references;
   fi
 fi
 
@@ -466,7 +505,7 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     cd spades_reconstruction
     mkdir spades_${dataset}	
     cp ../${dataset}_*.fq spades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o spades-${dataset}-time.txt spades.py -o spades_${dataset} -1 spades_${dataset}/${dataset}_1.fq -2 spades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     
     mv spades-${dataset}-time.txt ../reconstructed/$dataset
     mv spades_${dataset}/scaffolds.fasta spades_${dataset}/spades-${dataset}.fa
@@ -491,7 +530,7 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
     cd metaspades_reconstruction
     mkdir metaspades_${dataset}	
     cp ../${dataset}_*.fq metaspades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaspades-${dataset}-time.txt metaspades.py -t $NR_THREADS -o metaspades_${dataset} -1 metaspades_${dataset}/${dataset}_1.fq -2 metaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaspades-${dataset}-time.txt metaspades.py -t $NR_THREADS -o metaspades_${dataset} -1 metaspades_${dataset}/${dataset}_1.fq -2 metaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     
     mv metaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaspades_${dataset}/scaffolds.fasta metaspades_${dataset}/metaspades-${dataset}.fa
@@ -516,7 +555,7 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
     cd metaviralspades_reconstruction
     mkdir metaviralspades_${dataset}	
     cp ../${dataset}_*.fq metaviralspades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
   
     mv metaviralspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaviralspades_${dataset}/scaffolds.fasta metaviralspades_${dataset}/metaviralspades-${dataset}.fa
@@ -541,7 +580,7 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
     cd coronaspades_reconstruction
     mkdir coronaspades_${dataset}	
     cp ../${dataset}_*.fq coronaspades_${dataset}
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o coronaspades-${dataset}-time.txt coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o coronaspades-${dataset}-time.txt coronaspades.py -o coronaspades_${dataset} -1 coronaspades_${dataset}/${dataset}_1.fq -2 coronaspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
     mv coronaspades-${dataset}-time.txt ../reconstructed/$dataset
     mv coronaspades_${dataset}/raw_scaffolds.fasta coronaspades_${dataset}/coronaspades-${dataset}.fa
     cp coronaspades_${dataset}/coronaspades-${dataset}.fa ../reconstructed/$dataset
@@ -678,7 +717,7 @@ if [[ "$RUN_QURE" -eq "1" ]]
     do
     printf "$virus\n\n\n\n\n\n"
     cp ../gen_$dataset.fasta ../${virus}.fa .
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qure-$virus-${dataset}-time.txt java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe gen_$dataset.fasta $virus.fa 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qure-$virus-${dataset}-time.txt java -Xmx${MAX_RAM}G -XX:MaxRAM=${MAX_RAM}G QuRe gen_$dataset.fasta $virus.fa 
     mv gen_${dataset}_reconstructedVariants.txt results_$virus.fa
     done
     
@@ -897,7 +936,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     lzma -d VDB.mfa.lzma
     rm *.gz
     gzip *.fq
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 5 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 5 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
     
     
     cd test_viral_analysis_${dataset}
@@ -945,7 +984,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     rm tracespipe-*-time.txt
     cp ../../VDB.fa .
 
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS --cache 10
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS --cache 10
     cp tracespipe-${dataset}-time.txt ../
     printf "$(pwd)\n\n"
     cd ..
@@ -1006,7 +1045,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
       cd ..
       cp ../${virus}.fa reconstruction_files
     
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-$virus-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes -np $NR_THREADS
+      timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o qvg-$virus-${dataset}-time.txt ./QVG.sh -r ./reconstruction_files/${virus}.fa -samples-list ./${dataset}_files/samples -s ./${dataset}_files -o ./${dataset}_files/output -annot yes -np $NR_THREADS
       #rm -rf ${dataset}_files/output/samples_multifasta_masked*
       cat ${dataset}_files/output/samples_multifasta_* > ${dataset}_files/output/qvg-${virus}-${dataset}.fasta      
       cp ${dataset}_files/output/qvg-${virus}-${dataset}.fasta .
@@ -1136,7 +1175,7 @@ output:
       
       cd ..
     
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o v-pipe-$virus-${dataset}-time.txt ./vpipe  --cores $NR_THREADS --conda-frontend conda
+      timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o v-pipe-$virus-${dataset}-time.txt ./vpipe  --cores $NR_THREADS --conda-frontend conda
       cp results/SRR10903401/20200102/references/ref_majority.fasta .
       mv ref_majority.fasta $virus.fasta
       
@@ -1326,7 +1365,7 @@ if [[ "$RUN_VISPA" -eq "1" ]]
      
       echo "" >> ${dataset}.txt
     
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vispa-$virus-${dataset}-time.txt  ../code/vispa_mosaik/./main_mosaik.bash gen_${dataset}.fasta $virus.fa $NR_THREADS 100 120
+      timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o vispa-$virus-${dataset}-time.txt  ../code/vispa_mosaik/./main_mosaik.bash gen_${dataset}.fasta $virus.fa $NR_THREADS 100 120
       mv gen_${dataset}_I_*_*_CNTGS_DIST0.txt tmp_$virus-$dataset.fa
       done
       
@@ -1410,7 +1449,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
     cp ../${dataset}_*.fq .
     rm -rf results_$dataset
     mkdir results_$dataset
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o lazypipe-${dataset}-time.txt perl lazypipe.pl -1 ${dataset}_1.fq -2 ${dataset}_2.fq --pipe all,rep -v -t $NR_THREADS   
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o lazypipe-${dataset}-time.txt perl lazypipe.pl -1 ${dataset}_1.fq -2 ${dataset}_2.fq --pipe all,rep -v -t $NR_THREADS   
     mv results/$dataset/contigs.fa results/$dataset/lazypipe-$dataset.fa
     cp results/$dataset/lazypipe-$dataset.fa ../reconstructed/${dataset}
     mv lazypipe-${dataset}-time.txt ../reconstructed/${dataset}
@@ -1517,7 +1556,7 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
       cp ../../../${dataset}_*.fq .
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_1.fq > ${dataset}_1.fa
       sed -n '1~4s/^@/>/p;2~4p' ${dataset}_2.fq > ${dataset}_2.fa      
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 -t $NR_THREADS -m ${MAX_RAM}GB -correct yes 
+      timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o pehaplo-${dataset}-time.txt python ../pehaplo.py -f1 ${dataset}_1.fa -f2 ${dataset}_2.fa -l 10 -r 150 -t $NR_THREADS -m ${MAX_RAM}GB -correct yes 
       cp pehaplo-${dataset}-time.txt ../../../reconstructed/$dataset
       mv Contigs.fa pehaplo-${dataset}.fa
       cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
@@ -1691,7 +1730,7 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../../${dataset}_*.fq .
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o ssake-${dataset}-time.txt ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o ssake-${dataset}-time.txt ./runSSAKE.sh ${dataset}_1.fq ${dataset}_2.fq 10 ${dataset}_assembly
     mv ${dataset}_assembly_scaffolds.fa ssake-${dataset}.fa
     mv ssake-${dataset}.fa ../../reconstructed/${dataset}
     mv ssake-${dataset}-time.txt ../../reconstructed/$dataset
@@ -1782,7 +1821,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
     cd haploflow_data
     cp ../${dataset}_*.fq .
     cat ${dataset}_*.fq > ${dataset}_paired.fq
-    /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o haploflow-${dataset}-time.txt haploflow --read-file ${dataset}_paired.fq --out test_$dataset --log test_$dataset/log    
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o haploflow-${dataset}-time.txt haploflow --read-file ${dataset}_paired.fq --out test_$dataset --log test_$dataset/log    
     mv haploflow-${dataset}-time.txt ../reconstructed/$dataset
     #read a
     mv test_$dataset/contigs.fa test_$dataset/haploflow-${dataset}.fa

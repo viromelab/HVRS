@@ -291,11 +291,12 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       
       #NR_SPECIES=$(grep '>' $dataset/$file -c)
       printf "$(seqkit stats $dataset/$file | tail -1)"
-      NR_SPECIES=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f4)
-      SUM_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
-      MIN_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
-      MAX_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f8)
-      AVG_LEN=$(seqkit stats $dataset/$file | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f7)
+      cat $dataset/$file | tr -d 'nN,' > tmp
+      NR_SPECIES=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f4)
+      SUM_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
+      MIN_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
+      MAX_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f8)
+      AVG_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f7)
       
       
       
