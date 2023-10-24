@@ -170,7 +170,7 @@ conda activate evaluation
 D_PATH="reconstructed";
 #
 cd $D_PATH
-echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCSD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds	Reconstructed bases	Minimum contig length	Maximum contig length	Average contig length" > total_stats.tsv
+echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCSD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds	Reconstructed bases	Minimum contig length	Maximum contig length	Average contig length	Reconstructed bases without N	Minimum contig length without N	Maximum contig length without N	Average contig length without N" > total_stats.tsv
 rm -rf total_stats.tex
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
@@ -291,12 +291,25 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       
       #NR_SPECIES=$(grep '>' $dataset/$file -c)
       printf "$(seqkit stats $dataset/$file | tail -1)"
-      cat $dataset/$file | tr -d 'nN,' > tmp
-      NR_SPECIES=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f4)
-      SUM_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
-      MIN_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
-      MAX_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f8)
-      AVG_LEN=$(seqkit stats tmp | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f7)
+      NR_SPECIES=$(seqkit stats $dataset/$file  | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f4)
+      SUM_LEN=$(seqkit stats $dataset/$file  | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
+      MIN_LEN=$(seqkit stats $dataset/$file  | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
+      MAX_LEN=$(seqkit stats $dataset/$file  | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f8)
+      AVG_LEN=$(seqkit stats $dataset/$file  | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f7)
+      
+      
+      
+      cat $dataset/$file | tr -d 'N' | sed '/^$/d' > seqfile
+      SUM_LEN_WOUT_N=$(seqkit stats seqfile | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f5)
+      MIN_LEN_WOUT_N=$(seqkit stats seqfile | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f6)
+      MAX_LEN_WOUT_N=$(seqkit stats seqfile | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f8)
+      AVG_LEN_WOUT_N=$(seqkit stats seqfile | tail -1 | sed 's/ \+ /\t/g' | sed 's/,//g' | cut -d'	' -f7)
+      
+      rm seqfile
+      
+      
+      
+      
       
       
       
@@ -343,7 +356,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
     #ds	file	exec_time	snps	avg_identity	NCSD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
-    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds	$SUM_LEN	$MIN_LEN	$MAX_LEN	$AVG_LEN" >> total_stats.tsv   
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds	$SUM_LEN	$MIN_LEN	$MAX_LEN	$AVG_LEN	$SUM_LEN_WOUT_N	$MIN_LEN_WOUT_N	$MAX_LEN_WOUT_N	$AVG_LEN_WOUT_N" >> total_stats.tsv   
     
     while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] && [ "$count" -lt 15 ] #add empty lines for the tools that couldn't output results
     do
