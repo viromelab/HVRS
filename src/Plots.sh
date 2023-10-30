@@ -183,6 +183,336 @@ gnuplot << EOF
     }
 EOF
 #
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cnt0.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt0[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:25 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
 cp *.pdf ../Graphs
 cd ..
 #
@@ -287,6 +617,337 @@ gnuplot << EOF
       
     }
 EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cnt3.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:42]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "Coverage"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cnt3[@]}"]{  
+      set key at 61, ymax
+      plot file u 13:25 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
 #
 cp *.pdf ../Graphs
 cd ..
@@ -394,6 +1055,337 @@ gnuplot << EOF
     }
 EOF
 #
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cvg2.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg2[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:25 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+#
 cp *.pdf ../Graphs
 cd ..
 #
@@ -499,6 +1491,337 @@ gnuplot << EOF
     }
 EOF
 #
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cvg5.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg5[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:25 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+#
 cp *.pdf ../Graphs
 cd ..
 #
@@ -595,6 +1918,337 @@ gnuplot << EOF
     do for [ file in "${list_cvg10[@]}"]{  
       set key at 0.23, ymax
       plot file u 14:7 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cvg10.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg10[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:25 title file with linespoints linestyle count
       count = count + 1
       if(count == 9){
         count = count + 1
@@ -708,6 +2362,337 @@ gnuplot << EOF
     }
 EOF
 #
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cvg20.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg20[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:25 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+#
 cp *.pdf ../Graphs
 cd ..
 #
@@ -812,6 +2797,337 @@ gnuplot << EOF
       
     }
 EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:16 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:17 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:18 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:19 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Recon_bases_wout_n_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 4000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:20 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Min_contig_wout_n_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 6000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:21 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Max_contig_wout_n_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 150000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:22 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "Avg_contig_wout_n_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 60000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:23 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:24 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "ratio_snps_wout_n_cvg40.pdf"
+    set datafile separator "\t"
+    
+    ymax = 0.025
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [0:0.16]
+    set key outside right top
+    set xtics auto
+    set ytics auto
+    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set xlabel "SNPs"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_cvg40[@]}"]{  
+      set key at 0.23, ymax
+      plot file u 14:25 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
 #
 cp *.pdf ../Graphs
 cd ..
