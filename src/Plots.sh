@@ -255,7 +255,7 @@ gnuplot << EOF
     set output "Max_contig_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -387,7 +387,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -453,7 +453,7 @@ gnuplot << EOF
     set output "ratio_snps_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.022
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -461,7 +461,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -486,7 +486,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.022
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -494,7 +494,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -624,7 +624,7 @@ gnuplot << EOF
     set output "Recon_bases_cnt3.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 5000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -690,7 +690,7 @@ gnuplot << EOF
     set output "Max_contig_cnt3.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -756,7 +756,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cnt3.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 5000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -822,7 +822,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cnt3.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -896,7 +896,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -929,7 +929,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -1061,7 +1061,7 @@ gnuplot << EOF
     set output "Recon_bases_cvg2.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 3000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1127,7 +1127,7 @@ gnuplot << EOF
     set output "Max_contig_cvg2.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1193,7 +1193,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cvg2.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 3000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1259,7 +1259,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cvg2.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1325,7 +1325,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg2.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1333,7 +1333,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1358,7 +1358,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg2.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1366,7 +1366,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1497,7 +1497,7 @@ gnuplot << EOF
     set output "Recon_bases_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 6000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1563,7 +1563,7 @@ gnuplot << EOF
     set output "Max_contig_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1629,7 +1629,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 6000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1695,7 +1695,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1761,7 +1761,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1769,7 +1769,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1794,7 +1794,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1802,7 +1802,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1934,7 +1934,7 @@ gnuplot << EOF
     set output "Recon_bases_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 5500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2000,7 +2000,7 @@ gnuplot << EOF
     set output "Max_contig_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2066,7 +2066,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 5500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2132,7 +2132,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2198,7 +2198,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2206,7 +2206,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2231,7 +2231,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2239,7 +2239,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2368,7 +2368,7 @@ gnuplot << EOF
     set output "Recon_bases_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 7000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2434,7 +2434,7 @@ gnuplot << EOF
     set output "Max_contig_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 1100000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2467,7 +2467,7 @@ gnuplot << EOF
     set output "Avg_contig_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 60000
+    ymax = 250000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2500,7 +2500,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 7000000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2566,7 +2566,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 1100000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2599,7 +2599,7 @@ gnuplot << EOF
     set output "Avg_contig_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 60000
+    ymax = 250000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2632,7 +2632,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2640,7 +2640,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2665,7 +2665,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2673,7 +2673,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2804,7 +2804,7 @@ gnuplot << EOF
     set output "Recon_bases_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 7500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2870,7 +2870,7 @@ gnuplot << EOF
     set output "Max_contig_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 2500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2903,7 +2903,7 @@ gnuplot << EOF
     set output "Avg_contig_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 60000
+    ymax = 520000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -2936,7 +2936,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 4000000
+    ymax = 7500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -3002,7 +3002,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 150000
+    ymax = 2500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -3035,7 +3035,7 @@ gnuplot << EOF
     set output "Avg_contig_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 60000
+    ymax = 520000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -3068,7 +3068,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -3076,7 +3076,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -3101,7 +3101,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 0.025
+    ymax = 0.16
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -3109,7 +3109,7 @@ gnuplot << EOF
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Ration between the number of SNPs\nand the number of bases reconstructed (excluding N)"
+    set ylabel "Ratio between the number of SNPs\nand the number of bases reconstructed (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30

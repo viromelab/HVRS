@@ -349,7 +349,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
-    set ylabel "Number of bases reconstructed"
+    set ylabel "Number of bases reconstructed (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -382,7 +382,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -415,7 +415,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -448,7 +448,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -473,7 +473,7 @@ gnuplot << EOF
     set output "ratio_snps_vir.pdf"
     set datafile separator "\t"
     
-    ymax = 0.1
+    ymax = 0.01
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -506,7 +506,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_vir.pdf"
     set datafile separator "\t"
     
-    ymax = 0.1
+    ymax = 0.01
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -643,7 +643,7 @@ gnuplot << EOF
     set output "Recon_bases_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 1000000
+    ymax = 300000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -709,7 +709,7 @@ gnuplot << EOF
     set output "Max_contig_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 250000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -742,7 +742,7 @@ gnuplot << EOF
     set output "Avg_contig_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 100000
+    ymax = 60000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -776,7 +776,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 1000000
+    ymax = 300000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -784,7 +784,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("5" 0, "13" 1, "57" 2, "58" 3)
     set ytics auto
-    set ylabel "Number of bases reconstructed"
+    set ylabel "Number of bases reconstructed (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -817,7 +817,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("5" 0, "13" 1, "57" 2, "58" 3)
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -842,7 +842,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 250000
+    ymax = 140000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -850,7 +850,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("5" 0, "13" 1, "57" 2, "58" 3)
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -875,7 +875,7 @@ gnuplot << EOF
     set output "Avg_contig_wout_n_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 100000
+    ymax = 60000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -883,7 +883,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("5" 0, "13" 1, "57" 2, "58" 3)
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -908,7 +908,7 @@ gnuplot << EOF
     set output "ratio_snps_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 0.1
+    ymax = 0.01
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -941,7 +941,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cont.pdf"
     set datafile separator "\t"
     
-    ymax = 0.1
+    ymax = 0.01
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1080,7 +1080,7 @@ gnuplot << EOF
     set output "Recon_bases_length.pdf"
     set datafile separator "\t"
     
-    ymax = 1000000
+    ymax = 500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1146,7 +1146,7 @@ gnuplot << EOF
     set output "Max_contig_length.pdf"
     set datafile separator "\t"
     
-    ymax = 250000
+    ymax = 420000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1213,7 +1213,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_length.pdf"
     set datafile separator "\t"
     
-    ymax = 1000000
+    ymax = 500000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1221,7 +1221,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
-    set ylabel "Number of bases reconstructed"
+    set ylabel "Number of bases reconstructed (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -1254,7 +1254,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -1279,7 +1279,7 @@ gnuplot << EOF
     set output "Max_contig_wout_n_length.pdf"
     set datafile separator "\t"
     
-    ymax = 250000
+    ymax = 420000
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1287,7 +1287,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -1320,7 +1320,7 @@ gnuplot << EOF
     set key outside right top
     set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average contig length (excluding N)"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
@@ -1345,7 +1345,7 @@ gnuplot << EOF
     set output "ratio_snps_length.pdf"
     set datafile separator "\t"
     
-    ymax = 0.1
+    ymax = 0.01
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
@@ -1378,7 +1378,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_length.pdf"
     set datafile separator "\t"
     
-    ymax = 0.1
+    ymax = 0.01
     ymin = 0
     offset = ( ymax - ymin )/15.0   
     set yrange [ymin:ymax]
