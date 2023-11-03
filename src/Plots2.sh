@@ -25,7 +25,7 @@ for tool in "${TOOLS[@]}"
   
   for ds in "${DATASETS[@]}" 
     do 
-    content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk -v data=DS$ds '{if ($1==data) {print $0}}')       
+    content=$(cat ../total_stats.tsv | tr ',' '.' | tr -d '%' | grep -w "${i}-*" | awk -v data=DS$ds '{if ($1==data) {print $0}}')       
     
     if [ -z "$content" ]
       then      
@@ -96,9 +96,38 @@ for tool in "${TOOLS[@]}"
    
 done
 #
+mkdir vir_4
+for tool in "${TOOLS[@]}" 
+  do
+  
+  i=$(echo "$tool" | tr '[:upper:]' '[:lower:]' )
+  
+  cd vir_4
+  
+  declare -a DATASETS=("SRR23101281" "SRR23101235" "SRR23101259" "SRR23101276" "SRR23101228" "SRR12175231")
+  printf "" > $tool
+  
+ for ds in "${DATASETS[@]}" 
+    do 
+    content=$(cat ../total_stats.tsv | tr ',' '.' | grep -w "${i}-*" | awk -v data=$ds '{if ($1==data) {print $0}}')       
+    
+    if [ -z "$content" ]
+      then      
+      printf "\t \t \t \t \t \t \t \t \t \t \t \t \t \t \n" >> $tool     
+    else
+      content=${content:3}
+      printf "$content\n" >> $tool
+      content=""
+    fi    
+  done
+  cd ..
+   
+done
+#
 list_tools=($(ls vir)) 
 list_tools_2=($(ls vir_2)) 
 list_tools_3=($(ls vir_3))  
+list_tools_4=($(ls vir_4))  
 #  
 #printf "${list[*]} \n\n"
 #
@@ -1404,6 +1433,277 @@ gnuplot << EOF
       
     }
 EOF
+#
+cp *.pdf ../Graphs
+#
+cd ../vir_4
+#
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Recon_bases_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 15000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Number of bases reconstructed"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:16:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Min_contig_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 162000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Minimum contig length"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:17:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Max_contig_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 250000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Maximum contig length"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:18:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Avg_contig_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 180000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Average contig length"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:19:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Recon_bases_wout_n_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 15000000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Number of bases reconstructed (excluding N)"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:20:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Min_contig_wout_n_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 162000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Minimum contig length (excluding N)"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:21:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Max_contig_wout_n_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 250000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Maximum contig length (excluding N)"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:22:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,7'
+    set output "Avg_contig_wout_n_real_ds.pdf"
+    set datafile separator "\t"
+    
+    ymax = 180000
+    ymin = 0
+    offset = ( ymax - ymin )/15.0   
+    set yrange [ymin:ymax]
+    set xrange [-0.2:5.2]
+    set key outside right top
+    set xtics ("SRR23101281" 0, "SRR23101235" 1, "SRR23101259" 2, "SRR23101276" 3, "SRR23101228" 4, "SRR12175231" 5)
+    set ytics auto
+    set ylabel "Average contig length (excluding N)"
+    set xlabel "Dataset"
+    set multiplot layout 1,1
+    set rmargin 30
+    set key at screen 1, graph 1  
+    
+    count = 1
+    do for [ file in "${list_tools[@]}"]{  
+      set key at 6.85, ymax
+      plot file u 0:23:1 title file with linespoints linestyle count
+      count = count + 1
+      if(count == 9){
+        count = count + 1
+      }
+      ymax = ymax - offset
+      
+    }
+EOF
+#
 #
 cp *.pdf ../Graphs
 #
