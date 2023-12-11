@@ -100,6 +100,29 @@ def calculate_nr_genomes_reconstructed (dictionary, name_file): #writes to file 
     file.close()
 
 
+'''def normalize_values(dictionary):
+
+    list_vals = []
+
+    for i in dictionary:
+        list_vals.append(dictionary[i][0])
+
+    min_val = min(list_vals)
+    max_val = max(list_vals)
+
+    count = 0
+    for i in dictionary:
+
+        #TODO
+        normalized_val =
+
+        normalized_val = (list_vals[count] - min_val) / (max_val - min_val)
+        dictionary[i] = [normalized_val / dictionary[i][1]]
+        count += 1'''
+
+
+
+
 def import_files_in_dir(file_name): #adds the values contained in the input .tsv file to a dictionary and averages the values added
 
     is_first_line = True
@@ -133,6 +156,27 @@ def import_files_in_dir(file_name): #adds the values contained in the input .tsv
 
     avg_dicts(dict_snps_nr_bases_w_n, "snps_nr_bases_w_n.tsv")
     avg_dicts(dict_snps_nr_bases_wout_n, "snps_nr_bases_wout_n.tsv")
+
+    file_ncsd_cpu = open("ncsd_cpu.tsv", "w")
+    file_ncsd_ram = open("ncsd_ram.tsv", "w")
+    file_ncsd_time = open("ncsd_time.tsv", "w")
+
+
+    for i in dict_ncd:
+
+        avg_ncsd = (dict_ncd[i][0] / dict_ncd[i][1])
+        avg_cpu = dict_cpu[i][0] / dict_cpu[i][1]
+        avg_ram = dict_mem[i][0] / dict_mem[i][1]
+        avg_time = dict_time[i][0] / dict_time[i][1]
+
+        file_ncsd_cpu.write(name_converter(i) + "\t" + str(round(avg_cpu * avg_ncsd, cases)) + "\n")
+        file_ncsd_ram.write(name_converter(i) + "\t" + str(round(avg_ram * avg_ncsd, cases)) + "\n")
+        file_ncsd_time.write(name_converter(i) + "\t" + str(round(avg_time * avg_ncsd, cases)) + "\n")
+
+    file_ncsd_cpu.close()
+    file_ncsd_ram.close()
+    file_ncsd_time.close()
+
 
 
     calculate_nr_genomes_reconstructed(dict_ncd, "reconstructed.tsv")
