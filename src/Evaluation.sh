@@ -119,7 +119,7 @@ check_ds_snp () {
     snp_ds=10000 
   fi
   
-  printf "cov - $coverage, $cov_2, $cov_5 \n\n\n\n"
+  #printf "cov - $coverage, $cov_2, $cov_5 \n\n\n\n"
 }
 #
 check_ds_cont () { 
@@ -172,6 +172,8 @@ D_PATH="reconstructed";
 cd $D_PATH
 echo "Dataset	File	Time(s)	SNPs	AvgIdentity	NCSD	NRC	Mem(GB)	%CPU	Nr contigs	Metagenomic_analysis	Metagenomic_classification	Coverage	SNP_mutations_DS	Contamination_ds	Reconstructed bases	Minimum contig length	Maximum contig length	Average contig length	Reconstructed bases without N	Minimum contig length without N	Maximum contig length without N	Average contig length without N" > total_stats.tsv
 rm -rf total_stats.tex
+rm -rf dnadiff_stats.tex
+echo "Dataset	 File	Total seqs	Aligned seqs	Aligned seqs(%)	Aligned bases	Aligned bases(%)	Unaligned bases	Unaligned bases (%)	Avg length	Average identity	SNPs" > dnadiff_stats.tsv 
 for dataset in "${DATASETS[@]}" #analyse each virus
   do
   count=0
@@ -192,6 +194,20 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 \textbf{Reconstruction tool} & \textbf{Execution time} & \textbf{SNPs} & \textbf{Avg Identity} & \textbf{NCSD} & \textbf{NRC} & \textbf{RAM usage} & \textbf{CPU usage} & \textbf{Number of contigs} & \textbf{Reconstructed bases} & \textbf{Minimum contig length} & \textbf{Maximum contig length} & \textbf{Average contig length} \\\\\\hline 
 
 " >> total_stats.tex
+
+
+echo "Dataset	 File	Total seqs	Aligned seqs	Aligned seqs(%)	Aligned bases	Aligned bases(%)	Unaligned bases	Unaligned bases (%)	Avg length	Average identity	SNPs" > dnadiff_stats.tsv 
+
+  echo "\begin{table*}[h!]
+\begin{center}
+\caption{Results obtained by dnadiff \cite{kurtz2004versatile} when analysing the reconstruction of $dataset.  Only one excution of HVRS is represented.}
+\label{dnadiff_table:$dataset}
+\scriptsize
+\begin{tabular}{| m{7em} | m{3em}| m{3em} | m{3em} | m{3em} | m{4em} | m{4em} | m{3.5em} | m{3em} | m{4em} | } 
+\textbf{Reconstruction tool} & \textbf{Total seqs} & \textbf{Aligned seqs} & \textbf{Aligned bases} & \textbf{Aligned bases (\%)} & \textbf{Unaligned bases} & \textbf{Unaligned bases (\%)} & \textbf{Avg length} & \textbf{SNPs} & \textbf{Average identity} \\\\\\hline 
+
+" >> dnadiff_stats.tex
+
   for file in `cd ${dataset};ls -1 *.fa* | sort -t- -k1,1 -k2n` #for each fasta file in curr dir
   do 
     rm -rf out.report	 
@@ -336,7 +352,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       rm ../$dataset-clean.fa.seq.*            
       FILE_SIZE=$(ls -l ../$dataset-clean.fa.seq | cut -d' ' -f5)
      
-      printf "NCSD -> $COMPRESSED_SIZE_COND_COMPRESSION " # . $COMPRESSED_SIZE_WOUT_REF"
+      #printf "NCSD -> $COMPRESSED_SIZE_COND_COMPRESSION " # . $COMPRESSED_SIZE_WOUT_REF"
       NCSD=$(echo $COMPRESSED_SIZE_COND_COMPRESSION \/ $COMPRESSED_SIZE_WOUT_REF |bc -l | xargs printf %.3f)
            
       AUX_MULT=$(echo "$FILE_SIZE * 2" | bc -l )
@@ -344,28 +360,59 @@ for dataset in "${DATASETS[@]}" #analyse each virus
         then
         printf "Skipping compression metrics, no reference.\n\n"
       else
-        printf "aux_mult   . $AUX_MULT\n\n"
+        #printf "aux_mult   . $AUX_MULT\n\n"
         #printf "NRC -> $COMPRESSED_SIZE_W_REF . $AUX_MULT"
         NRC=$(echo $COMPRESSED_SIZE_W_REF \/ $AUX_MULT|bc -l | xargs printf %.3f)      
       fi
-      
-      printf "me\n\n"
-
-      
+            
       IDEN=$(echo $IDEN |bc -l | xargs printf %.3f)
       MEM=$(echo $MEM \/ 1048576 |bc -l | xargs printf %.3f)
       
     #ds	file	exec_time	snps	avg_identity	NCSD	NRC	max_mem	cpu_avg	nr_contigs_reconstructed	metagenomic_analysis	metagenomic_classification	coverage	snp_dataset
-    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds	$SUM_LEN	$MIN_LEN	$MAX_LEN	$AVG_LEN	$SUM_LEN_WOUT_N	$MIN_LEN_WOUT_N	$MAX_LEN_WOUT_N	$AVG_LEN_WOUT_N" >> total_stats.tsv   
+    echo "$dataset	$file	$TIME	$SNPS	$IDEN	$NCSD	$NRC	$MEM	$CPU_P	$NR_SPECIES	$DOES_ANALYSIS	$DOES_CLASSIFICATION	$coverage	$snp_ds	$cnt_ds	$SUM_LEN	$MIN_LEN	$MAX_LEN	$AVG_LEN	$SUM_LEN_WOUT_N	$MIN_LEN_WOUT_N	$MAX_LEN_WOUT_N	$AVG_LEN_WOUT_N" >> total_stats.tsv  
     
+    #retrieve additional results dnadiff
+    TOTAL_SEQS=`cat out.report | grep "TotalSeqs " | head -n 1 | awk '{ print $2;}'`;
+    
+    ALIGNED_SEQS=`cat out.report | grep "AlignedSeqs " | head -n 1 | awk '{ print $2;}'`;  
+    AUX="$(cut -d')' -f1 <<< "$ALIGNED_SEQS")"
+    ALIGNED_SEQS_PERC="$(cut -d'(' -f2 <<< "$AUX")"
+    ALIGNED_SEQS_PERC="$(cut -d'%' -f1 <<< "$ALIGNED_SEQS_PERC")"
+    ALIGNED_SEQS_NR="$(cut -d'(' -f1 <<< "$AUX")"
+    
+    ALIGNED_BASES=`cat out.report | grep "AlignedBases " | head -n 1 | awk '{ print $2;}'`;  
+    AUX="$(cut -d')' -f1 <<< "$ALIGNED_BASES")"
+    ALIGNED_BASES_PERC="$(cut -d'(' -f2 <<< "$AUX")"
+    ALIGNED_BASES_PERC="$(cut -d'%' -f1 <<< "$ALIGNED_BASES_PERC")"
+    ALIGNED_BASES_NR="$(cut -d'(' -f1 <<< "$AUX")"
+    
+    UNALIGNED_BASES=`cat out.report | grep "UnalignedBases " | head -n 1 | awk '{ print $2;}'`;  
+    AUX="$(cut -d')' -f1 <<< "$UNALIGNED_BASES")"
+    UNALIGNED_BASES_PERC="$(cut -d'(' -f2 <<< "$AUX")"
+    UNALIGNED_BASES_PERC="$(cut -d'%' -f1 <<< "$UNALIGNED_BASES_PERC")"
+    UNALIGNED_BASES_NR="$(cut -d'(' -f1 <<< "$AUX")"
+    
+    AVG_LEN=`cat out.report | grep "AvgLength " | head -n 1 | awk '{ print $2;}'`;    
+    
+    #echo "Dataset	 File	Total seqs	Aligned seqs	Aligned seqs(%)	Aligned bases	Aligned bases(%)	Unaligned bases	Unaligned bases (%)	Avg length	Average identity	SNPs" > dnadiff_stats.tsv 
+    echo "$dataset	$file	$TOTAL_SEQS	$ALIGNED_SEQS_NR	$ALIGNED_SEQS_PERC	$ALIGNED_BASES_NR	$ALIGNED_BASES_PERC	$UNALIGNED_BASES_NR	$UNALIGNED_BASES_PERC	$AVG_LEN	$IDEN	$SNPS" >> dnadiff_stats.tsv 
+
     while [ "${ORDER_TOOLS[$count]}" != "$NAME_TOOL" ] && [ "$count" -lt 15 ] #add empty lines for the tools that couldn't output results
     do
       printf "TOOLS -> ${ORDER_TOOLS[$count]}		$NAME_TOOL\n\n" 
       echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
+      
+      #\textbf{Reconstruction tool} & \textbf{Total seqs} & \textbf{Aligned seqs} & \textbf{Aligned bases} & \textbf{Aligned bases (\%)} & \textbf{Unaligned bases} & \textbf{Unaligned bases (\%)} & \textbf{Avg length} & \textbf{SNPs} & \textbf{Average identity}
+      echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> dnadiff_stats.tex
+      
       count=$(($count + 1))
     done
     CPU="$(cut -d'%' -f1 <<< "$CPU_P")"
     echo "$NAME_TOOL & $TIME & $SNPS & $IDEN & $NCSD & $NRC & $MEM & $CPU & $NR_SPECIES & $SUM_LEN & $MIN_LEN & $MAX_LEN & $AVG_LEN \\\\\\hline" >> total_stats.tex
+    
+    echo "$NAME_TOOL & $TOTAL_SEQS & $ALIGNED_SEQS_NR & $ALIGNED_BASES_NR & $ALIGNED_BASES_PERC & $UNALIGNED_BASES_NR & $UNALIGNED_BASES_PERC & $AVG_LEN & $SNPS & $IDEN \\\\\\hline" >> dnadiff_stats.tex
+    
+    
     count=$(($count + 1))
     #printf "%s\t%s\t%s\n" "$ALBA" "$IDEN" "$SNPS";
     fi
@@ -374,6 +421,7 @@ for dataset in "${DATASETS[@]}" #analyse each virus
   while [ ${#ORDER_TOOLS[@]} -gt $count ] #add empty lines for the tools that couldn't output results
     do
       echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> total_stats.tex
+      echo "${ORDER_TOOLS[$count]} & -- & -- & -- & -- & -- & -- & -- & -- & -- \\\\\\hline" >> dnadiff_stats.tex
       count=$(($count + 1))
     done  
     
@@ -384,6 +432,15 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 
 
 " >> total_stats.tex  
+
+    echo "
+\end{tabular}
+\end{center}
+\end{table*}
+
+
+" >> dnadiff_stats.tex  
+
 done
 conda activate base
 #
