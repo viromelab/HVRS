@@ -196,7 +196,6 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 " >> total_stats.tex
 
 
-echo "Dataset	 File	Total seqs	Aligned seqs	Aligned seqs(%)	Aligned bases	Aligned bases(%)	Unaligned bases	Unaligned bases (%)	Avg length	Average identity	SNPs" > dnadiff_stats.tsv 
 
   echo "\begin{table*}[h!]
 \begin{center}
