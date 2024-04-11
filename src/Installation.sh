@@ -52,6 +52,7 @@ RUN_HAPLOFLOW=0;
 #RUN_ARAPANS=0;
 RUN_VIQUF_DOCKER=0;
 RUN_VIQUF=0; 
+RUN_IRMA=0; 
 #
 ################################################################################
 #
@@ -95,6 +96,7 @@ SHOW_MENU () {
   echo "                                                                    ";
   echo " --coronaspades                Install coronaSPAdes,                ";
   echo " --haploflow                   Install Haploflow,                   ";
+  echo " --irma                        Install IRMA,                        ";
   echo " --lazypipe                    Install LAZYPIPE,                    ";
   echo " --metaspades                  Install metaSPAdes,                  ";
   echo " --metaviralspades             Install metaviralSPAdes,             ";
@@ -171,6 +173,11 @@ while [[ $# -gt 0 ]]
       INSTALL_MINICONDA=0;
       shift
     ;;
+    --irma)
+      RUN_IRMA=1;
+      INSTALL_MINICONDA=0;
+      shift
+    ;;
     --lazypipe)
       RUN_LAZYPIPE=1;
       INSTALL_MINICONDA=0;
@@ -239,6 +246,7 @@ while [[ $# -gt 0 ]]
     --all)
       INSTALL_TOOLS=1;
       RUN_HAPLOFLOW=1;
+      RUN_IRMA=1;
       RUN_LAZYPIPE=1;
       RUN_PEHAPLO=1;
       RUN_QURE=1;
@@ -320,6 +328,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -c bioconda -y mummer4  
   printf "Installing GeCo3\n\n"
   conda install -c bioconda -y geco3 
+  printf "Installing seqkit\n\n"
+  conda install -c bioconda seqkit -y
   conda activate base
   #
   printf "Installing gnuplot\n\n"
@@ -537,6 +547,10 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   #./TRACESPipe.sh --build-viral 
   cd ../../  
   conda activate base
+  
+  sudo apt install bowtie2
+  sudo apt install bcftools
+
   
   
 fi
@@ -1171,6 +1185,27 @@ if [[ "$RUN_VIQUF_DOCKER" -eq "1" ]]
   
   
   cd ..
+  
+fi
+
+#IRMA
+if [[ "$RUN_IRMA" -eq "1" ]] 
+  then
+  printf "Installing IRMA\n\n"
+  
+  rm -rf flu-amd-202402.zip flu-amd
+  wget https://wonder.cdc.gov/amd/flu/irma/flu-amd-202402.zip
+  unzip flu-amd-202402.zip
+  rm flu-amd-202402.zip
+  sudo apt install r-base-core -y
+  cd flu-amd
+  sudo export PATH=$PATH:$(pwd)
+  cd ..
+
+  wget https://wonder.cdc.gov/amd/flu/irma/ORG.zip
+  unzip ORG.zip
+  rm ORG.zip
+  mv ORG flu-amd/IRMA_RES/modules
   
 fi
 

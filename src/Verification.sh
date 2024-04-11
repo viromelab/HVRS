@@ -21,6 +21,7 @@ RUN_PEHAPLO=0;
 RUN_VIRGENA=0; 
 RUN_SSAKE=0;
 RUN_HAPLOFLOW=0;
+RUN_IRMA=0;
 ################################################################################
 #
 SHOW_MENU () {
@@ -41,6 +42,7 @@ SHOW_MENU () {
   echo "                                                                      ";
   echo " --coronaspades                Checks installation of coronaSPAdes,   ";
   echo " --haploflow                   Checks installation of Haploflow,      ";
+  echo " --irma                        Checks installation of IRMA,           ";
   echo " --lazypipe                    Checks installation of LAZYPIPE,       ";
   echo " --metaspades                  Checks installation of metaSPAdes,     ";
   echo " --metaviralspades             Checks installation of metaviralSPAdes,";
@@ -88,6 +90,10 @@ while [[ $# -gt 0 ]]
     ;;
     --haploflow)
       RUN_HAPLOFLOW=1;
+      shift
+    ;;
+    --irma)
+      RUN_IRMA=1;
       shift
     ;;
     --lazypipe)
@@ -164,6 +170,7 @@ while [[ $# -gt 0 ]]
     -t|--tools)
       RUN_CORONASPADES=1;
       RUN_HAPLOFLOW=1;
+      RUN_IRMA=1;
       RUN_LAZYPIPE=1;
       RUN_METASPADES=1;
       RUN_METAVIRALSPADES=1;
@@ -267,6 +274,12 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]];
     eval "$(conda shell.bash hook)"
     conda activate haploflow
     PROGRAM_EXISTS "haploflow" haploflow Haploflow; 
+fi
+#
+if [[ "$RUN_IRMA" -eq "1" ]]; 
+  then
+    #printf "Starting tool verificaton...\n"
+    PROGRAM_EXISTS_V2 "IRMA" irma IRMA; 
 fi
 #
 if [[ "$RUN_LAZYPIPE" -eq "1" ]];

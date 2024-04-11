@@ -49,6 +49,7 @@ RUN_ENSEMBLEASSEMBLER=0;
 RUN_HAPLOFLOW=0; #w
 #RUN_TENSQR=0;
 RUN_VIQUF=0;
+RUN_IRMA=0;
 #
 RESULT=0
 #
@@ -197,6 +198,7 @@ SHOW_MENU () {
   echo " --coronaspades                Reconstruction using coronaSPAdes,   ";
   echo " --haploflow                   Reconstruction using Haploflow,      ";
   echo " --lazypipe                    Reconstruction using LAZYPIPE,       ";
+  echo " --irma                        Reconstruction using IRMA,           ";
   echo " --metaspades                  Reconstruction using metaSPAdes,     ";
   echo " --metaviralspades             Reconstruction using metaviralSPAdes,";
   echo " --pehaplo                     Reconstruction using PEHaplo,        ";
@@ -266,6 +268,11 @@ while [[ $# -gt 0 ]]
     --haploflow)
       check_installation haploflow;
       RUN_HAPLOFLOW=$RESULT;
+      shift
+    ;;
+    --irma)
+      check_installation irma;
+      RUN_IRMA=$RESULT;
       shift
     ;;
     --lazypipe)
@@ -338,6 +345,8 @@ while [[ $# -gt 0 ]]
       RUN_CORONASPADES=$RESULT;
       check_installation haploflow;
       RUN_HAPLOFLOW=$RESULT;
+      check_installation irma;
+      RUN_IRMA=$RESULT;
       check_installation lazypipe;
       RUN_LAZYPIPE=$RESULT;
       check_installation metaspades;
@@ -629,6 +638,81 @@ if [[ "$RUN_SHORAH" -eq "1" ]]
   printf "Reconstructing with ShoRAH\n\n"
   
   
+fi
+
+#IRMA
+if [[ "$RUN_IRMA" -eq "1" ]] 
+  then
+  printf "Reconstructing with IRMA\n\n"
+  
+  #create irma module 
+  cd flu-amd/IRMA_RES/modules
+
+  for virus in "${VIRUSES[@]}"
+    do
+    #printf "$(pwd)\n\n"
+    rm -rf $virus
+    cp -r ORG $virus
+    cd $virus/reference
+    cp ../../../../../$virus.fa  .
+    mv $virus.fa consensus.fasta
+    cd ../
+    ./init.sh
+    cd ..
+  done
+  cd ../../
+  
+  
+
+  #reconstruct
+  for dataset in "${DATASETS[@]}"
+    do
+  
+    for virus in "${VIRUSES[@]}"
+      do
+  
+      cp ../${dataset}_*.fq .
+      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o irma-${virus}-${dataset}-time.txt ./IRMA $virus ${dataset}_1.fq ${dataset}_2.fq $dataset
+      cd $dataset
+      mv *.fasta ..
+      cd ..
+      rm -rf $dataset
+    
+  
+    done
+  
+    cat *.fasta > irma-$dataset.fa
+    mv irma-$dataset.fa ../reconstructed/$dataset
+  
+    total_time=0
+    total_mem=0
+    total_cpu=0
+    count=0
+    for f in irma-*-$dataset-time.txt
+      do
+      echo "Processing $f" 
+      cat $f
+      TIME=`cat $f | grep "TIME" | awk '{ print $2;}'`;
+      MEM=`cat $f | grep "MEM" | awk '{ print $2;}'`;
+      CPU=`cat $f | grep "CPU_perc" | awk '{ print $2;}'`;
+      CPU="$(cut -d'%' -f1 <<< $CPU)"
+      total_time=`echo "$total_time+$TIME" | bc -l`
+      if [[ $MEM -gt $total_mem ]]
+      then
+        total_mem=$MEM
+      fi
+      total_cpu=`echo "$total_cpu+$CPU" | bc -l`
+      count=`echo "$count+1" | bc -l`
+    done
+    
+  printf "$total_cpu    -   $count     "
+  total_cpu=$(echo $total_cpu \/ $count |bc -l | xargs printf %.0f)
+  echo "TIME	$total_time
+MEM	$total_mem
+CPU_perc	$total_cpu%" > irma-${dataset}-time.txt
+  mv irma-${dataset}-time.txt ../reconstructed/$dataset
+  done
+  cd ../ 
 fi
 
 #savage - runs
@@ -939,6 +1023,8 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 5 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
     
     
+    
+    
     cd test_viral_analysis_${dataset}
     for virus in $(ls)
     do
@@ -984,19 +1070,20 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     rm tracespipe-*-time.txt
     cp ../../VDB.fa .
 
-    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --run-meta --run-all-v-alig --very-sensitive -t $NR_THREADS --cache 10
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --flush-logs --run-meta --threads $NR_THREADS --inter-sim-size 2 --run-all-v-alig --run-mito --remove-dup --run-de-novo --run-hybrid --min-similarity 5 --view-top 5 --very-sensitive 
+ 
     cp tracespipe-${dataset}-time.txt ../
     printf "$(pwd)\n\n"
     cd ..
     
-    for file in output_data/TRACES_viral_consensus/*.fa; do cat $file >> tracespipe-${dataset}.fa; done
+    cat output_data/TRACES_hybrid_R5_consensus/*.fa > tracespipe-${dataset}.fa
 
     #cat output_data/TRACES_viral_consensus/*.fa > ../tracespipe-${dataset}.fa     
   
     
     mv tracespipe-${dataset}.fa ../reconstructed/$dataset
     mv tracespipe-${dataset}-time.txt ../reconstructed/$dataset
-    
+  
     rm *-time.txt
     rm -rf output_data/*
    
@@ -1005,7 +1092,7 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     
     printf "$(pwd)\n\n"
    
-    done
+  done
   cd ..   
   conda activate base  
 fi
@@ -1823,7 +1910,6 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
     cat ${dataset}_*.fq > ${dataset}_paired.fq
     timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o haploflow-${dataset}-time.txt haploflow --read-file ${dataset}_paired.fq --out test_$dataset --log test_$dataset/log    
     mv haploflow-${dataset}-time.txt ../reconstructed/$dataset
-    #read a
     mv test_$dataset/contigs.fa test_$dataset/haploflow-${dataset}.fa
     cp test_$dataset/haploflow-${dataset}.fa ../reconstructed/$dataset
     

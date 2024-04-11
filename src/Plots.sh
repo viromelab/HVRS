@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 cp reconstructed/total_stats.tsv .
-declare -a TOOLS=("coronaSPAdes" "Haploflow" "LAZYPIPE" "metaSPAdes" "metaviralSPAdes" "PEHaplo" "QuRe" "QVG" "SPAdes" "SSAKE" "TRACESPipe" "TRACESPipeLite" "VirGenA" "ViSpA" "V-pipe")
+declare -a TOOLS=("coronaSPAdes" "Haploflow" "IRMA" "LAZYPIPE" "metaSPAdes" "metaviralSPAdes" "PEHaplo" "QuRe" "QVG" "SPAdes" "SSAKE" "TRACESPipe" "TRACESPipeLite" "VirGenA" "ViSpA" "V-pipe")
 #declare -a list
 #declare -p list
 #
@@ -92,7 +92,7 @@ gnuplot << EOF
     
     ymax = 100.5
     ymin = 90
-    offset = ( ymax - ymin ) / 15.0    
+    offset = ( ymax - ymin ) / 16.0   
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -125,7 +125,7 @@ gnuplot << EOF
     
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -158,7 +158,7 @@ gnuplot << EOF
     
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -191,7 +191,7 @@ gnuplot << EOF
     
     ymax = 4000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -219,18 +219,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cnt0.pdf"
+    set output "Min_scaffold_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -252,18 +252,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cnt0.pdf"
+    set output "Max_scaffold_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -285,18 +285,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cnt0.pdf"
+    set output "Avg_scaffold_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -323,7 +323,7 @@ gnuplot << EOF
     
     ymax = 4000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -351,18 +351,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cnt0.pdf"
+    set output "Min_scaffold_wout_n_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -384,18 +384,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cnt0.pdf"
+    set output "Max_scaffold_wout_n_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -417,18 +417,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cnt0.pdf"
+    set output "Avg_scaffold_wout_n_cnt0.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -455,7 +455,7 @@ gnuplot << EOF
     
     ymax = 0.022
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -488,7 +488,7 @@ gnuplot << EOF
     
     ymax = 0.022
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -528,7 +528,7 @@ gnuplot << EOF
     
     ymax = 100.5
     ymin = 90
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -561,7 +561,7 @@ gnuplot << EOF
     
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -593,7 +593,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -626,7 +626,7 @@ gnuplot << EOF
     
     ymax = 5000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -654,18 +654,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cnt3.pdf"
+    set output "Min_scaffold_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -687,18 +687,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cnt3.pdf"
+    set output "Max_scaffold_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -720,18 +720,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cnt3.pdf"
+    set output "Avg_scaffold_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -758,7 +758,7 @@ gnuplot << EOF
     
     ymax = 5000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -786,18 +786,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cnt3.pdf"
+    set output "Min_scaffold_wout_n_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -819,18 +819,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cnt3.pdf"
+    set output "Max_scaffold_wout_n_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -852,18 +852,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cnt3.pdf"
+    set output "Avg_scaffold_wout_n_cnt3.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "Coverage"
     set multiplot layout 1,1
     set rmargin 30
@@ -890,7 +890,7 @@ gnuplot << EOF
     
     ymax = 0.025
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -923,7 +923,7 @@ gnuplot << EOF
     
     ymax = 0.025
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
     set key outside right top
@@ -962,7 +962,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -997,7 +997,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1030,7 +1030,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1063,7 +1063,7 @@ gnuplot << EOF
     
     ymax = 3000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1091,18 +1091,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cvg2.pdf"
+    set output "Min_scaffold_cvg2.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1124,18 +1124,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cvg2.pdf"
+    set output "Max_scaffold_cvg2.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1157,18 +1157,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cvg2.pdf"
+    set output "Avg_scaffold_cvg2.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1195,7 +1195,7 @@ gnuplot << EOF
     
     ymax = 3000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1223,18 +1223,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cvg2.pdf"
+    set output "Min_scaffold_wout_n_cvg2.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1256,18 +1256,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cvg2.pdf"
+    set output "Max_scaffold_wout_n_cvg2.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1289,18 +1289,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cvg2.pdf"
+    set output "Avg_scaffold_wout_n_cvg2.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1327,7 +1327,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1360,7 +1360,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1400,7 +1400,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1433,7 +1433,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1466,7 +1466,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1499,7 +1499,7 @@ gnuplot << EOF
     
     ymax = 6000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1527,18 +1527,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cvg5.pdf"
+    set output "Min_scaffold_cvg5.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1560,18 +1560,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cvg5.pdf"
+    set output "Max_scaffold_cvg5.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1593,18 +1593,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cvg5.pdf"
+    set output "Avg_scaffold_cvg5.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1631,7 +1631,7 @@ gnuplot << EOF
     
     ymax = 6000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1659,18 +1659,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cvg5.pdf"
+    set output "Min_scaffold_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1692,18 +1692,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cvg5.pdf"
+    set output "Max_scaffold_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1725,18 +1725,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cvg5.pdf"
+    set output "Avg_scaffold_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1763,7 +1763,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1796,7 +1796,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1836,7 +1836,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1869,7 +1869,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1902,7 +1902,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1936,7 +1936,7 @@ gnuplot << EOF
     
     ymax = 5500000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -1964,18 +1964,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cvg10.pdf"
+    set output "Min_scaffold_cvg10.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -1997,18 +1997,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cvg10.pdf"
+    set output "Max_scaffold_cvg10.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2030,18 +2030,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cvg10.pdf"
+    set output "Avg_scaffold_cvg10.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2068,7 +2068,7 @@ gnuplot << EOF
     
     ymax = 5500000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2096,18 +2096,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cvg10.pdf"
+    set output "Min_scaffold_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2129,18 +2129,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cvg10.pdf"
+    set output "Max_scaffold_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
     ymax = 140000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2162,18 +2162,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cvg10.pdf"
+    set output "Avg_scaffold_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
     ymax = 60000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2200,7 +2200,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2233,7 +2233,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2272,7 +2272,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2305,7 +2305,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2337,7 +2337,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2370,7 +2370,7 @@ gnuplot << EOF
     
     ymax = 7000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2398,18 +2398,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cvg20.pdf"
+    set output "Min_scaffold_cvg20.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2431,18 +2431,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cvg20.pdf"
+    set output "Max_scaffold_cvg20.pdf"
     set datafile separator "\t"
     
     ymax = 1100000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2464,18 +2464,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cvg20.pdf"
+    set output "Avg_scaffold_cvg20.pdf"
     set datafile separator "\t"
     
     ymax = 250000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2502,7 +2502,7 @@ gnuplot << EOF
     
     ymax = 7000000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2530,18 +2530,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cvg20.pdf"
+    set output "Min_scaffold_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2563,18 +2563,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cvg20.pdf"
+    set output "Max_scaffold_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
     ymax = 1100000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2596,18 +2596,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cvg20.pdf"
+    set output "Avg_scaffold_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
     ymax = 250000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2634,7 +2634,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2667,7 +2667,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2707,7 +2707,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 100.5
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2740,7 +2740,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2773,7 +2773,7 @@ gnuplot << EOF
     set datafile separator "\t"
     ymax = 1.05
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2806,7 +2806,7 @@ gnuplot << EOF
     
     ymax = 7500000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2834,18 +2834,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_cvg40.pdf"
+    set output "Min_scaffold_cvg40.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length"
+    set ylabel "Minimum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2867,18 +2867,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_cvg40.pdf"
+    set output "Max_scaffold_cvg40.pdf"
     set datafile separator "\t"
     
     ymax = 2500000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length"
+    set ylabel "Maximum scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2900,18 +2900,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_cvg40.pdf"
+    set output "Avg_scaffold_cvg40.pdf"
     set datafile separator "\t"
     
     ymax = 520000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length"
+    set ylabel "Average scaffold length"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2938,7 +2938,7 @@ gnuplot << EOF
     
     ymax = 7500000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -2966,18 +2966,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Min_contig_wout_n_cvg40.pdf"
+    set output "Min_scaffold_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
     ymax = 6000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Minimum contig length (excluding N)"
+    set ylabel "Minimum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -2999,18 +2999,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Max_contig_wout_n_cvg40.pdf"
+    set output "Max_scaffold_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
     ymax = 2500000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Maximum contig length (excluding N)"
+    set ylabel "Maximum scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -3032,18 +3032,18 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "Avg_contig_wout_n_cvg40.pdf"
+    set output "Avg_scaffold_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
     ymax = 520000
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
     set xtics auto
     set ytics auto
-    set ylabel "Average contig length (excluding N)"
+    set ylabel "Average scaffold length (excluding N)"
     set xlabel "SNPs"
     set multiplot layout 1,1
     set rmargin 30
@@ -3070,7 +3070,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
@@ -3103,7 +3103,7 @@ gnuplot << EOF
     
     ymax = 0.16
     ymin = 0
-    offset = ( ymax - ymin )/15.0   
+    offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:0.16]
     set key outside right top
