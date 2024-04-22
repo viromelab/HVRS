@@ -36,10 +36,10 @@ list_datasets = ["DS1", "DS2", "DS3", "DS4", "DS5", "DS6", "DS7", "DS8", "DS9", 
                  "DS48",  "DS49",  "DS50",  "DS51",  "DS52",  "DS53",  "DS54",  "DS55",  "DS56",  "DS57",  "DS58",
                  "DS59",  "DS60",  "DS61",  "DS62", "DS63", "DS64", "DS65", "SRR23101281", "SRR23101235",
                  "SRR23101259", "SRR23101276", "SRR23101228", "SRR12175231", "SRR12175232", "SRR12175233"]
-tools_available = ["coronaspades","haploflow","lazypipe","metaspades","metaviralspades","pehaplo",
+tools_available = ["coronaspades","haploflow","irma","lazypipe","metaspades","metaviralspades","pehaplo",
                    "qure","qvg","spades","ssake","tracespipe","tracespipelite","virgena","vispa", "v-pipe"]
 
-correct_names = ["coronaSPAdes","Haploflow","LAZYPIPE","metaSPAdes","metaviralSPAdes","PEHaplo",
+correct_names = ["coronaSPAdes","Haploflow","IRMA","LAZYPIPE","metaSPAdes","metaviralSPAdes","PEHaplo",
                    "QuRe","QVG","SPAdes","SSAKE","TRACESPipe","TRACESPipeLite","VirGenA","ViSpA", "V-pipe"]
 
 decimal_cases = 3
@@ -138,15 +138,15 @@ def calculate_answer(key):
     ncd = statistics.mean(dict_ncd.get(key))
     #print(dict_time.get(key), dict_snp.get(key))
     snp = statistics.mean(dict_snp.get(key))
-    if ncd > 1:
+    '''if ncd > 1:
         print("changed ncd  -> ", key, ncd)
-        ncd = 1.000
+        ncd = 1.000'''
 
     nrc = statistics.mean(dict_nrc.get(key))
 
-    if nrc > 1:
+    '''if nrc > 1:
         print("changed nrc  -> ", key, nrc)
-        nrc = 1.000
+        nrc = 1.000'''
 
     mem = statistics.mean(dict_mem.get(key))
     cpu = statistics.mean(dict_cpu.get(key))

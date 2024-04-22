@@ -1,8 +1,8 @@
 
-tools_available = ["coronaspades","haploflow","lazypipe","metaspades","metaviralspades","pehaplo",
+tools_available = ["coronaspades","haploflow","irma","lazypipe","metaspades","metaviralspades","pehaplo",
                    "qure","qvg","spades","ssake","tracespipe","tracespipelite","virgena","vispa", "v"]
 
-correct_names = ["coronaSPAdes","Haploflow","LAZYPIPE","metaSPAdes","metaviralSPAdes","PEHaplo",
+correct_names = ["coronaSPAdes","Haploflow","IRMA","LAZYPIPE","metaSPAdes","metaviralSPAdes","PEHaplo",
                    "QuRe","QVG","SPAdes","SSAKE","TRACESPipe","TRACESPipeLite","VirGenA","ViSpA", "V-pipe"]
 
 dict_time = {}

@@ -22,7 +22,7 @@ gnuplot << EOF
     ymax = 100
     ymin = 75 
     set yrange [ymin:ymax]
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -46,7 +46,7 @@ gnuplot << EOF
     
     spacing_x = 30
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -70,7 +70,7 @@ gnuplot << EOF
     
     spacing_x = 30
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -94,7 +94,7 @@ gnuplot << EOF
     
     spacing_x = 30
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -118,7 +118,7 @@ gnuplot << EOF
     
     spacing_x = 30
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -142,7 +142,7 @@ gnuplot << EOF
     
     spacing_x = 30
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -166,7 +166,7 @@ gnuplot << EOF
     
     spacing_x = 30
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -191,7 +191,7 @@ gnuplot << EOF
     spacing_x = 30
     set autoscale y
     set logscale y 2
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -214,8 +214,8 @@ gnuplot << EOF
     set boxwidth 0.5
     
     spacing_x = 30
-    set yrange [0:65]
-    set xrange [-1:15]
+    set yrange [0:]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -233,6 +233,78 @@ EOF
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "weighted_time.pdf"
+    set datafile separator "\t"
+    set boxwidth 0.5
+
+    spacing_x = 30
+    set yrange [0:]
+    set xrange [-1:16]
+    set logscale y 2
+
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Weighted performance of the time using the NCSD"
+    set xlabel "Reconstruction Programs"
+    set multiplot layout 1,1
+    set rmargin 5
+    set key at screen 1, graph 1
+
+    plot "ncsd_time.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
+
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "weighted_CPU.pdf"
+    set datafile separator "\t"
+    set boxwidth 0.5
+
+    spacing_x = 30
+    set yrange [0:]
+    set xrange [-1:16]
+
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Weighted performance of the CPU using the NCSD"
+    set xlabel "Reconstruction Programs"
+    set multiplot layout 1,1
+    set rmargin 5
+    set key at screen 1, graph 1
+
+
+    plot "ncsd_cpu.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
+
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "weighted_RAM.pdf"
+    set datafile separator "\t"
+    set boxwidth 0.5
+
+    spacing_x = 30
+    set yrange [0:]
+    set xrange [-1:16]
+
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Weighted performance of the RAM using the NCSD"
+    set xlabel "Reconstruction Programs"
+    set multiplot layout 1,1
+    set rmargin 5
+    set key at screen 1, graph 1
+
+
+    plot "ncsd_ram.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
+
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
     set output "reconstructed_nr_bases.pdf"
     set datafile separator "\t"
     
@@ -242,7 +314,7 @@ gnuplot << EOF
     set boxwidth 0.25
     
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -272,7 +344,7 @@ gnuplot << EOF
     set boxwidth 0.25
     
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -302,7 +374,7 @@ gnuplot << EOF
     set boxwidth 0.25
     
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -332,7 +404,7 @@ gnuplot << EOF
     set boxwidth 0.25
     
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
@@ -362,7 +434,7 @@ gnuplot << EOF
     set boxwidth 0.25
     
     set autoscale y
-    set xrange [-1:15]
+    set xrange [-1:16]
    
     set ytics auto
     set xtics rotate by 45 right
