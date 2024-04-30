@@ -244,7 +244,7 @@ while [[ $# -gt 0 ]]
       shift
     ;;
     --all)
-      INSTALL_TOOLS=1;
+      #INSTALL_TOOLS=1;
       RUN_HAPLOFLOW=1;
       RUN_IRMA=1;
       RUN_LAZYPIPE=1;
@@ -296,6 +296,11 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt -y install git
   sudo apt install gawk -y
   conda update conda -y
+  conda config --add channels defaults
+  conda config --add channels conda-forge
+  conda config --add channels bioconda
+  conda config --add channels kennethshang
+  conda config --add channels anaconda
   conda install -c cobilab -y gto
   #conda install -c bioconda -y quast
   printf "Installing ART\n\n"
@@ -303,9 +308,9 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   conda install -c bioconda -y art
   ln -s $CONDA_PREFIX/lib/libgsl.so.27 $CONDA_PREFIX/lib/libgsl.so.25
   printf "Installing AlcoR\n\n"
-  conda install -n base conda-libmamba-solver -y
+  #conda install -n base conda-libmamba-solver -y
   conda install -c conda-forge libgcc-ng -y
-  conda install -y -c bioconda alcor --solver=libmamba
+  conda install -y -c bioconda alcor #--solver=libmamba
   printf "Installing G++\n\n"
   sudo apt-get -y install g++
   printf "Installing Samtools\n\n"
@@ -361,8 +366,8 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   eval "$(conda shell.bash hook)"
   conda create -y -n spades
   conda activate spades
-  conda install -c bioconda -y spades=3.15.5 python=3.8
-  conda install spades=3.15 -y
+  conda install -c bioconda -y spades=3.15.0 python=3.8 --solver=classic
+  #conda install spades=3.15 -y --solver=classic
   conda activate base
 fi
 
@@ -537,12 +542,27 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n tracespipe
   conda activate tracespipe
-  rm -rf tracespipe
-  git clone https://github.com/viromelab/tracespipe.git
+  #rm -rf tracespipe
+  #git clone https://github.com/viromelab/tracespipe.git
   cd tracespipe/src/
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install  
-  conda install -c bioconda -y entrez-direct
+  sudo apt install ncbi-entrez-direct -y
+  conda install trimmomatic -y
+  conda install -c cobilab magnet -y
+  conda install -c cobilab falcon -y
+  conda install -c cobilab gto -y
+  conda install -c seyedmorteza cryfa -y
+  conda install python=3.8.19 -y
+  conda install samtools=1.9 -y
+  
+  wget https://github.com/ablab/spades/releases/download/v3.15.5/SPAdes-3.15.5.tar.gz
+  tar -zvxf SPAdes-3.15.5.tar.gz
+  rm SPAdes-3.15.5.tar.gz
+  cd SPAdes-3.15.5
+  export PATH=$PATH:$(pwd)
+  cd ..
+  
   ./TRACESPipe.sh --get-all-aux 
   #./TRACESPipe.sh --build-viral 
   cd ../../  
@@ -944,7 +964,7 @@ if [[ "$RUN_TARVIR" -eq "1" ]] || [[ "$RUN_PEHAPLO" -eq "1" ]]
   conda config --add channels bioconda
   conda config --add channels kennethshang
   eval "$(conda shell.bash hook)"  
-  conda create -y -n bio2 python=2.7    
+  conda create -y -n bio2 python=2.7 --solver=classic   
   conda activate bio2                 
   pip install networkx==1.11 
   conda install -y bamtools==2.4.0 apsp sga samtools bowtie2 overlap_extension genometools-genometools numpy scipy
@@ -1415,7 +1435,7 @@ conda config --set channel_priority strict
 # NOTE conda-forge *HAS TO* be higher than bioconda
 
 VPIPEENV=
-if conda install --yes snakemake-minimal; then	# NOTE Mac OS X and some Linux dockers don't have git out of the box
+if conda install --yes 'snakemake-minimal<8'; then	# NOTE Mac OS X and some Linux dockers don't have git out of the box
 	: # success!
 else
 	oops 'I cannot install snakemake in base environment. Conflicts ?'
