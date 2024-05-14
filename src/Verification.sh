@@ -4,6 +4,8 @@ FILES="0";
 #
 declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS63"  "DS64"  "DS65");
 #
+declare -a REAL_DATASETS=("SRR12175231" "SRR12175232" "SRR12175233" "SRR23101235" "SRR23101281" "SRR23101259" "SRR23101276" "SRR23101228")
+#
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "HHV6B" "POLY7" "EBV" "CMV" "MT");
 #
 RUN_SPADES=0; 
@@ -57,7 +59,10 @@ SHOW_MENU () {
   echo " --vispa                       Checks installation of ViSpA,          ";
   echo " --vpipe                       Checks installation of V-pipe.         ";
   echo "                                                                      ";
-  echo " --all                         Checks all tools and datasets.          ";
+  echo " --other                       Checks installation of other tools used";
+  echo "                               in HVRS.                               ";
+  echo "                                                                      ";
+  echo " --all                         Checks all tools and datasets.         ";
   echo "                                                                      ";
   echo " Examples ----------------------------------------------------------- ";
   echo "                                                                      ";
@@ -148,6 +153,10 @@ while [[ $# -gt 0 ]]
       RUN_VPIPE=1;
       shift
     ;;
+    --other)
+      RUN_AUX_TOOLS=1;
+      shift
+    ;;
     --all)
       RUN_CORONASPADES=1;
       RUN_HAPLOFLOW=1;
@@ -164,6 +173,7 @@ while [[ $# -gt 0 ]]
       RUN_VIRGENA=1;
       RUN_VISPA=1;
       RUN_VPIPE=1;
+      RUN_AUX_TOOLS=1;
       FILES=1;
       shift;
     ;;
@@ -238,7 +248,6 @@ PROGRAM_EXISTS_V2 () {
 #
 if [[ "$RUN_SPADES" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "spades.py" spades SPAdes;
@@ -246,7 +255,6 @@ fi
 #
 if [[ "$RUN_CORONASPADES" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "coronaspades.py" coronaspades coronaSPAdes;
@@ -254,7 +262,6 @@ fi
 #
 if [[ "$RUN_METASPADES" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "metaspades.py" metaspades metaSPAdes;
@@ -262,7 +269,6 @@ fi
 #
 if [[ "$RUN_METAVIRALSPADES" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "metaviralspades.py" metaviralspades metaviralSPAdes;
@@ -270,7 +276,6 @@ fi
 #
 if [[ "$RUN_HAPLOFLOW" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate haploflow
     PROGRAM_EXISTS "haploflow" haploflow Haploflow; 
@@ -278,13 +283,12 @@ fi
 #
 if [[ "$RUN_IRMA" -eq "1" ]]; 
   then
-    #printf "Starting tool verificaton...\n"
+
     PROGRAM_EXISTS_V2 "IRMA" irma IRMA; 
 fi
 #
 if [[ "$RUN_LAZYPIPE" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate blast
     conda activate --stack lazypipe
@@ -293,7 +297,6 @@ fi
 #
 if [[ "$RUN_PEHAPLO" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate bio2
     PROGRAM_EXISTS_V2 "pehaplo.p*" pehaplo PEHaplo;
@@ -301,7 +304,6 @@ fi
 #    
 if [[ "$RUN_QURE" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate java-env
     PROGRAM_EXISTS_V2 "QuRe_v0.99971" qure QuRe; 
@@ -309,7 +311,6 @@ fi
 #
 if [[ "$RUN_QVG" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate qvg
     PROGRAM_EXISTS_V2 "QVG.sh" qvg QVG;
@@ -317,7 +318,6 @@ fi
 #    
 if [[ "$RUN_SSAKE" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate base
     PROGRAM_EXISTS_V2 "runSSAKE.sh" ssake SSAKE;
@@ -325,7 +325,6 @@ fi
 #
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate tracespipelite
     PROGRAM_EXISTS_V2 "TRACESPipeLite.sh" tracespipelite TRACESPipeLite;
@@ -333,7 +332,6 @@ fi
 #
 if [[ "$RUN_TRACESPIPE" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate tracespipe
     PROGRAM_EXISTS_V2 "TRACESPipe.sh" tracespipe TRACESPipe;
@@ -341,7 +339,6 @@ fi
 #
 if [[ "$RUN_VIRGENA" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate java-env   
     PROGRAM_EXISTS_V2 "VirGenA.jar" virgena VirGenA;
@@ -349,7 +346,6 @@ fi
 #
 if [[ "$RUN_VISPA" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate vispa
     PROGRAM_EXISTS_V2 "main_mosaik.bash" vispa ViSpA;
@@ -357,17 +353,30 @@ fi
 #
 if [[ "$RUN_VPIPE" -eq "1" ]];
   then
-    #printf "Starting tool verificaton...\n"
     eval "$(conda shell.bash hook)"
     conda activate base
     PROGRAM_EXISTS_V2 "vpipe" vpipe V-Pipe; 
 fi 
 #
 #
+if [[ "$RUN_AUX_TOOLS" -eq "1" ]];
+  then
+    eval "$(conda shell.bash hook)"
+    # Simulation tools
+    conda activate base
+    PROGRAM_EXISTS "gto" tools GTO;
+    PROGRAM_EXISTS "./sratoolkit.3.0.7-ubuntu64/bin/fastq-dump" tools sratoolkit-fastq-dump;
+    PROGRAM_EXISTS "./sratoolkit.3.0.7-ubuntu64/bin/prefetch" tools sratoolkit-prefetch;
+    PROGRAM_EXISTS "art_illumina" tools ART;
+    PROGRAM_EXISTS "AlcoR" tools AlcoR;
+    
+fi 
+#
+#
 #
 if [[ "$FILES" -eq "1" ]];
   then
-    printf "Starting file verificaton...\n"
+    printf "Starting dataset verificaton...\n"
     for dataset in "${DATASETS[@]}"
       do
       if [[ -f ${dataset}.fa ]]; then
@@ -384,6 +393,21 @@ if [[ "$FILES" -eq "1" ]];
         printf "\e[41m${dataset} with errors\e[49m\n"
       fi
     done 
+    
+    
+    for dataset in "${REAL_DATASETS[@]}"
+      do
+      if [[ -f ${dataset}_1.fq ]]; then
+        if [[ -f ${dataset}_2.fq ]]; then
+          printf "\e[42m${dataset} exists\e[49m\n"
+        else
+          printf "\e[41m${dataset} with errors\e[49m\n"
+        fi
+      else
+        printf "\e[41m${dataset} with errors\e[49m\n"
+      fi
+    done    
+    
     
     for virus in "${VIRUSES[@]}"
       do

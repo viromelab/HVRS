@@ -1464,7 +1464,10 @@ if [[ -z "${RELEASE}" ]]; then
 	message 'Using branch:' "${BRANCH}"
 
 	check_directory 'V-pipe' 'V-pipe installation directory'
-	git clone --depth 1 --branch "${BRANCH}" https://github.com/cbg-ethz/V-pipe.git || fail "I cannot install branch ${BRANCH}."
+	wget https://github.com/cbg-ethz/V-pipe/archive/refs/tags/v2.99.3.zip
+	unzip v2.99.3.zip
+	mv V-pipe-2.99.3 V-pipe
+	
 else
 	message 'Using release:' "${RELEASE}"
 	check_directory "V-pipe-${RELEASE}" 'V-pipe installation directory'

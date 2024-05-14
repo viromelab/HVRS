@@ -147,20 +147,36 @@ gnuplot << EOF
     set key outside right top
     set xtics ("13" 0, "63" 1, "64" 2, "65" 3)
     set ytics auto
-    set ylabel "Average Identity"
+    set ylabel "Identity"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:5:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
     }
 EOF
@@ -186,14 +202,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:6:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
     }
 EOF
@@ -218,14 +250,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:7:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -251,14 +299,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:16:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -284,14 +348,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:17:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -317,14 +397,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:18:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -350,14 +446,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:19:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -384,14 +496,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:20:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -417,14 +545,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:21:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -450,14 +594,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:22:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -483,14 +643,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:23:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -516,14 +692,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:24:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -549,14 +741,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:25:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -580,20 +788,36 @@ gnuplot << EOF
     set key outside right top
     set xtics ("5" 0, "13" 1, "57" 2, "58" 3)
     set ytics auto
-    set ylabel "Average Identity"
+    set ylabel "Identity"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:5:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
     }
 EOF
@@ -619,14 +843,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:6:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
     }
 EOF
@@ -652,14 +892,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:7:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -686,14 +942,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:16:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -719,14 +991,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:17:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -752,14 +1040,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:18:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -785,14 +1089,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:19:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -819,14 +1139,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:20:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -852,14 +1188,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:21:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -885,14 +1237,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:22:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -918,14 +1286,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:23:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -951,14 +1335,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:24:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -984,14 +1384,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 4.75, ymax
       plot file u 0:25:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1017,20 +1433,36 @@ gnuplot << EOF
     set key outside right top
     set xtics ("61" 0, "13" 1, "62" 2)
     set ytics auto
-    set ylabel "Average Identity"
+    set ylabel "Identity"
     set xlabel "Dataset"
     set multiplot layout 1,1
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:5:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
     }
 EOF
@@ -1056,14 +1488,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:6:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
     }
 EOF
@@ -1089,14 +1537,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:7:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1123,14 +1587,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:16:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1156,14 +1636,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:17:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1189,14 +1685,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:18:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1222,14 +1734,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:19:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1256,14 +1784,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:20:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1289,14 +1833,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:21:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1322,14 +1882,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:22:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1355,14 +1931,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:23:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1388,14 +1980,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:24:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1421,14 +2029,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 3.3, ymax
       plot file u 0:25:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1459,14 +2083,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:16:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1492,14 +2132,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:17:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1525,14 +2181,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:18:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1558,14 +2230,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:19:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1592,14 +2280,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:20:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1625,14 +2329,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:21:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1658,14 +2378,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:22:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
@@ -1691,14 +2427,30 @@ gnuplot << EOF
     set rmargin 30
     set key at screen 1, graph 1  
     
+    set style line 1 pt 1 lc rgb '#1d446a'
+    set style line 2 pt 2 lc rgb '#B9121B'
+    set style line 3 pt 3 lc rgb '#754d0f'
+    set style line 4 pt 4 lc rgb '#eb9000'
+    set style line 5 pt 5 lc rgb '#295b81'
+    set style line 6 pt 1 lc rgb '#54a6c3'
+    set style line 7 pt 2 lc rgb '#702A8C'
+    set style line 8 pt 6 lc rgb '#BF2669'
+    set style line 9 pt 7 lc rgb '#c7334d'
+    set style line 10 pt 12 lc rgb '#8ff6ff'
+    set style line 11 pt 13 lc rgb '#e5391a'
+    set style line 12 pt 9 lc rgb '#168039'
+    set style line 13 pt 8 lc rgb '#96CA2D'
+    set style line 14 pt 3 lc rgb '#000000'
+    set style line 15 pt 4 lc rgb '#895ea1'
+    set style line 16 pt 5 lc rgb '#c0407b'
+
     count = 1
+
     do for [ file in "${list_tools[@]}"]{  
       set key at 6.85, ymax
       plot file u 0:23:1 title file with linespoints linestyle count
       count = count + 1
-      if(count == 9){
-        count = count + 1
-      }
+      
       ymax = ymax - offset
       
     }
