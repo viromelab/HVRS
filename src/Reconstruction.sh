@@ -56,7 +56,9 @@ RESULT=0
 RUN_CLASSIFICATION="0";
 TOP="150";
 #
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+CURR_DIR=$(pwd)
+#
+declare -a DATASETS=("DS4" "DS6") # "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
 #declare -a DATASETS=("DS63")
@@ -78,8 +80,8 @@ declare -a VIRUSES_AVAILABLE=("B19V" "BuV" "CuV" "HBoV" "AAV" "BKPyV" "JCPyV" "K
                     "STLPyV" "HPyV12" "NJPyV" "LIPyV" "SV40" "TTV" "TTVmid"
                     "TTVmin" "HAV" "HBV" "HCV" "HDV" "HEV" "SENV" "HPV2"
                     "HPV6" "HPV11" "HPV16" "HPV18" "HPV31" "HPV39" "HPV45"
-                    "HPV51" "HPV56" "HPV58" "HPV59" "HPV68" "HPV77" "HSV-1"
-                    "HSV-2" "VZV" "EBV" "HCMV" "HHV6" "HHV7" "KSHV" "ReDoV"
+                    "HPV51" "HPV56" "HPV58" "HPV59" "HPV68" "HPV77" "HSV1"
+                    "HSV2" "VZV" "EBV" "HCMV" "HHV6" "HHV7" "KSHV" "ReDoV"
                     "VARV" "MPXV" "EV" "SARS2" "HERV" "MT");
 #
 #
@@ -116,46 +118,47 @@ CREATE_PAIRED_FALCON () {
   sed -n '1~4s/^@/>/p;2~4p' ${DATASETS[0]}_2.fq > tmp_new_2.fa
   cat tmp_new_*.fa > input.fasta
   perl -pe 's/[\r\n]+/;/g; s/>/\n>/g' input.fasta | sort -t"[" -k2,2V | sed 's/;/\n/g' | sed '/^$/d' > tmp.txt
-    rm tmp.txt
+  rm $CURR_DIR/tmp.txt
   mv input.fasta paired.fa
 }
 #
 generate_references () { 
-    printf "Classifying with FALCON-meta.\n\n"
-    OUTPUT_DIR="refs"
-    rm -rf $OUTPUT_DIR
-    conda activate falcon
+  printf "Classifying with FALCON-meta.\n\n"
+  OUTPUT_DIR="refs"
+  rm -rf $CURR_DIR/$OUTPUT_DIR
+  conda activate falcon
   
-    #lzma -d $DATABASE.lzma
-    lzma -d VDB.fa.lzma
+  #lzma -d $DATABASE.lzma
+  lzma -d VDB.fa.lzma
       
-    CREATE_PAIRED_FALCON;
+  CREATE_PAIRED_FALCON;
   
-    FALCON -v -n $NR_THREADS -t $TOP -F -m 6:1:1:0/0 -m 13:50:1:0/0 -m 19:500:1:5/10 -g 0.85 -c 10 -x top-metagenomics.csv paired.fa "VDB.fa"
+  FALCON -v -n $NR_THREADS -t $TOP -F -m 6:1:1:0/0 -m 13:50:1:0/0 -m 19:500:1:5/10 -g 0.85 -c 10 -x top-metagenomics.csv paired.fa "VDB.fa"
+  #
+  ## GET HIGHEST SIMILAR REFERENCE =============================================
+  #
+  rm -f $CURR_DIR/best-viral-metagenomics.txt
+  for VIRUS in "${VIRUSES_AVAILABLE[@]}"
+    do
+    printf "%s\t" "$VIRUS" >> best-viral-metagenomics.txt;
     #
-    ## GET HIGHEST SIMILAR REFERENCE =============================================
-    #
-    rm -f best-viral-metagenomics.txt
-    for VIRUS in "${VIRUSES_AVAILABLE[@]}"
-      do
-      printf "%s\t" "$VIRUS" >> best-viral-metagenomics.txt;
-      #
-      RESULT=`cat top-metagenomics.csv | grep -a -f IDS/ID-$VIRUS.ids \
-      | awk '{ if($3 > 0 && $2 > 200 && $2 < 9000000) print $3"\t"$4; }' \
-      | head -n 1 \
-      | awk '{ print $1"\t"$2;}' \
-      | sed "s/NC\_/NC-/" \
-      | tr '_' '\t' \
-      | awk '{ print $1"\t"$2;}'`;
-      if [ -z "$RESULT" ]
-        then
-        echo -e "-\t-" >> best-viral-metagenomics.txt
-        else
-        echo "$RESULT" | sed "s/NC-/NC\_/" >> best-viral-metagenomics.txt
-        fi
-      done
+    RESULT=`cat top-metagenomics.csv | grep -a -f IDS/ID-$VIRUS.ids \
+    | awk '{ if($3 > 0 && $2 > 200 && $2 < 9000000) print $3"\t"$4; }' \
+    | head -n 1 \
+    | awk '{ print $1"\t"$2;}' \
+    | sed "s/NC\_/NC-/" \
+    | tr '_' '\t' \
+    | awk '{ print $1"\t"$2;}'`;
   
-    rm -rf $OUTPUT_DIR
+    if [ -z "$RESULT" ]
+      then
+      echo -e "-\t-" >> best-viral-metagenomics.txt
+      else
+      echo "$RESULT" | sed "s/NC-/NC\_/" >> best-viral-metagenomics.txt
+      fi
+    done
+  
+    rm -rf $CURR_DIR/$OUTPUT_DIR
     mkdir $OUTPUT_DIR
     while IFS= read -r line
     do
@@ -173,11 +176,28 @@ generate_references () {
     mv top-metagenomics.csv $OUTPUT_DIR
     conda activate base
     cd refs 
-    rm *.csv  
-    rm *.txt
-    VIRUSES=($(ls -1 | sed -e 's/\.fa$//'))
-    printf "$VIRUSES \n\n"
-    printf "$(ls -1 | sed -e 's/\.fa$//')\n\n"
+    read a
+    rm $CURR_DIR/refs/*.csv  
+    rm $CURR_DIR/refs/*.txt
+    VIRUSES=($(ls -1 *.fa | sed -e 's/\.fa$//'))
+   
+    
+     
+    
+    printf "$(ls -1 *.fa| sed -e 's/\.fa$//')\n\n"
+    
+    
+    for virus in "${VIRUSES[@]}"
+      do
+      
+      printf "$virus \n"
+      
+    done 
+    
+    
+    
+    
+    read a
     cp * ..
     cd ..
 }
@@ -435,11 +455,11 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
     then
       printf "Main folder where the results will be stored exists. Do you wish to remove it and create a new folder? [Y/N]\n"
     
-      read char
+      read charrm 
     
       if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
         printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
-        rm -rf reconstructed
+        rm -rf $CURR_DIR/reconstructed
         mkdir reconstructed
         cd reconstructed
         for dataset in "${DATASETS[@]}"
@@ -456,7 +476,7 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
     
     else
       printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
-      rm -rf reconstructed
+      rm -rf $CURR_DIR/reconstructed
       mkdir reconstructed
       cd reconstructed
       for dataset in "${DATASETS[@]}"
@@ -468,8 +488,8 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
   
   else #assume_yes = 1
     printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
-    rm -rf reconstructed
-    mkdir reconstructed
+    #rm -rf $CURR_DIR/reconstructed
+    #mkdir reconstructed
     cd reconstructed
     for dataset in "${DATASETS[@]}"
     do
@@ -521,7 +541,7 @@ if [[ "$RUN_SPADES" -eq "1" ]]
     #mv spades_${dataset}/contigs.fasta spades_${dataset}/spades-${dataset}.fa
     cp spades_${dataset}/spades-${dataset}.fa ../reconstructed/$dataset
     cd ..
-    rm -rf spades_reconstruction
+    rm -rf $CURR_DIR/spades_reconstruction
   done
   conda activate base
 fi
@@ -545,7 +565,7 @@ if [[ "$RUN_METASPADES" -eq "1" ]]
     mv metaspades_${dataset}/scaffolds.fasta metaspades_${dataset}/metaspades-${dataset}.fa
     cp metaspades_${dataset}/metaspades-${dataset}.fa ../reconstructed/$dataset
     cd ..
-    rm -rf metaspades_reconstruction
+    rm -rf $CURR_DIR/metaspades_reconstruction
     
   done
   conda activate base
@@ -564,13 +584,13 @@ if [[ "$RUN_METAVIRALSPADES" -eq "1" ]]
     cd metaviralspades_reconstruction
     mkdir metaviralspades_${dataset}	
     cp ../${dataset}_*.fq metaviralspades_${dataset}
-    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataset}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
-  
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o metaviralspades-${dataset}-time.txt metaviralspades.py -t 1 -o metaviralspades_${dataset} -1 metaviralspades_${dataset}/${dataserm t}_1.fq -2 metaviralspades_${dataset}/${dataset}_2.fq -t $NR_THREADS -m $MAX_RAM 
+    
     mv metaviralspades-${dataset}-time.txt ../reconstructed/$dataset
     mv metaviralspades_${dataset}/scaffolds.fasta metaviralspades_${dataset}/metaviralspades-${dataset}.fa
     cp metaviralspades_${dataset}/metaviralspades-${dataset}.fa ../reconstructed/$dataset
     cd ..
-    rm -rf metaviralspades_reconstruction
+    rm -rf $CURR_DIR/metaviralspades_reconstruction
   done
   
   conda activate base
@@ -595,7 +615,7 @@ if [[ "$RUN_CORONASPADES" -eq "1" ]]
     cp coronaspades_${dataset}/coronaspades-${dataset}.fa ../reconstructed/$dataset
     cd ..
     
-    rm -rf coronaspades_reconstruction  
+    rm -rf $CURR_DIR/coronaspades_reconstruction  
   done
   conda activate base
 fi
@@ -607,13 +627,13 @@ if [[ "$RUN_VIADBG" -eq "1" ]]
   cd viaDBG/
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf $dataset
+    rm -rf $CURR_DIR/viaDBG/$dataset
     mkdir $dataset
     
-    rm -rf res_$dataset
+    rm -rf $CURR_DIR/viaDBG/res_$dataset
     mkdir res_$dataset
     
-    rm -rf uni_$dataset
+    rm -rf $CURR_DIR/viaDBG/uni_$dataset
     mkdir uni_$dataset
     
     cp ../${dataset}_*.fq $dataset
@@ -651,7 +671,7 @@ if [[ "$RUN_IRMA" -eq "1" ]]
   for virus in "${VIRUSES[@]}"
     do
     #printf "$(pwd)\n\n"
-    rm -rf $virus
+    rm -rf $CURR_DIR/flu-amd/IRMA_RES/modules/$virus
     cp -r ORG $virus
     cd $virus/reference
     cp ../../../../../$virus.fa  .
@@ -670,15 +690,18 @@ if [[ "$RUN_IRMA" -eq "1" ]]
   
     for virus in "${VIRUSES[@]}"
       do
+      
+      if [[ -d "$CURR_DIR/flu-amd/IRMA_RES/modules/$virus" ]]; then
   
-      cp ../${dataset}_*.fq .
-      /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o irma-${virus}-${dataset}-time.txt ./IRMA $virus ${dataset}_1.fq ${dataset}_2.fq $dataset
-      cd $dataset
-      mv *.fasta ..
-      cd ..
-      rm -rf $dataset
-    
-  
+        cp ../${dataset}_*.fq .
+      
+        /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o irma-${virus}-${dataset}-time.txt ./IRMA $virus ${dataset}_1.fq ${dataset}_2.fq $dataset
+      
+        cd $dataset
+        mv *.fasta ..
+        cd ..
+        rm -rf $CURR_DIR/flu-amd/$dataset
+      fi
     done
   
     cat *.fasta > irma-$dataset.fa
@@ -721,7 +744,7 @@ if [[ "$RUN_SAVAGE_NOREF" -eq "1" ]]
   printf "Reconstructing with SAVAGE without reference\n\n"
   eval "$(conda shell.bash hook)"
   conda activate savage
-  rm -rf savage
+  rm -rf $CURR_DIR/savage
   mkdir savage
   cd savage
   for dataset in "${DATASETS[@]}"
@@ -742,7 +765,7 @@ if [[ "$RUN_SAVAGE_REF" -eq "1" ]]
   printf "Reconstructing with SAVAGE with reference\n\n"
   eval "$(conda shell.bash hook)"
   conda activate savage
-  rm -rf savage
+  rm -rf $CURR_DIR/savage
   mkdir savage
   cd savage
   for dataset in "${DATASETS[@]}"
@@ -834,9 +857,10 @@ if [[ "$RUN_QURE" -eq "1" ]]
 MEM	$total_mem
 CPU_perc	$total_cpu%" > qure-${dataset}-time.txt
     mv qure-${dataset}-time.txt ../reconstructed/$dataset
-    rm -rf qure-*-time.txt
-    rm gen_*.fasta
-    rm *.fa
+    
+    rm -rf $CURR_DIR/QuRe_v0.99971/qure-*-time.txt
+    rm $CURR_DIR/QuRe_v0.99971/gen_*.fasta
+    rm $CURR_DIR/QuRe_v0.99971/*.fa
   done
   cd ..
   conda activate base
@@ -855,11 +879,11 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
   cp ../vg .
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf samples_virusvg
+    rm -rf $CURR_DIR/jbaaijens-virus-vg-69a05f3e74f2/samples_virusvg
     mkdir samples_virusvg
     cp ../${dataset}_*.fq .
     
-    rm -rf spades_${dataset}
+    rm -rf $CURR_DIR/jbaaijens-virus-vg-69a05f3e74f2/spades_${dataset}
     mkdir spades_${dataset} 
     
     #generate contigs with spades
@@ -871,8 +895,8 @@ if [[ "$RUN_VIRUSVG" -eq "1" ]]
     python scripts/optimize_strains.py -m 1 -c 2 node_abundance.txt contig_graph.final.gfa
     
     
-    rm -rf node_abundance.txt
-    rm -rf contig_graph.final.gfa
+    #rm -rf node_abundance.txt
+    #rm -rf contig_graph.final.gfa
     
     total_time=0
     total_mem=0
@@ -920,7 +944,7 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
   cp ../vg .
   for dataset in "${DATASETS[@]}"
     do
-    rm -rf samples_vgflow
+    rm -rf $CURR_DIR/jbaaijens-vg-flow-ac68093bbb23/samples_vgflow
     mkdir samples_vgflow
     cd samples_vgflow
     for virus in "${VIRUSES[@]}"
@@ -932,7 +956,7 @@ if [[ "$RUN_VGFLOW" -eq "1" ]]
     #savage --split 1 -p1 ${dataset}_1.fq -p2 ${dataset}_2.fq -m 10 -t $NR_THREADS --no_stage_b --no_stage_c
     #conda activate vg-flow-env
     
-    rm -rf spades_${dataset}
+    rm -rf $CURR_DIR/jbaaijens-vg-flow-ac68093bbb23/samples_vgflow/spades_${dataset}
     mkdir spades_${dataset} 
     
     #generate contigs with spades
@@ -1018,13 +1042,13 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   do	
     cp ../../${dataset}_*.fq .
     lzma -d VDB.mfa.lzma
-    rm *.gz
+    rm $CURR_DIR/TRACESPipeLite/src/*.gz
     gzip *.fq
+    
+    
     timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipelite-${dataset}-time.txt ./TRACESPipeLite.sh --similarity 5 --threads $NR_THREADS --reads1 ${dataset}_1.fq.gz --reads2 ${dataset}_2.fq.gz --database VDB.mfa --output test_viral_analysis_${dataset} --no-plots # --cache 10
-    
-    
-    
-    
+
+
     cd test_viral_analysis_${dataset}
     for virus in $(ls)
     do
@@ -1040,10 +1064,10 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
     cat *-consensus.fa > tracespipelite-$dataset.fa
     mv tracespipelite-${dataset}-time.txt ../../reconstructed/$dataset
     cp tracespipelite-$dataset.fa ../../reconstructed/$dataset
-    rm *-*.fa
-    rm -rf test_viral_analysis*
-    rm *.fq.gz
-    rm *-consensus.fa
+    rm $CURR_DIR/TRACESPipeLite/src/*-*.fa
+    rm -rf $CURR_DIR/TRACESPipeLite/src/test_viral_analysis*
+    rm $CURR_DIR/TRACESPipeLite/src/*.fq.gz
+
   done  
   cd ../../
   conda activate base
@@ -1062,33 +1086,29 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     do	
     cd input_data/
     cp ../../${dataset}_*.fq .
-    rm -rf *.fq.gz
+    rm -rf $CURR_DIR/tracespipe/input_data/*.fq.gz
     gzip *.fq
     cd ../meta_data/
     echo "x:${dataset}_1.fq.gz:${dataset}_2.fq.gz" > meta_info.txt
     cd ../src/
-    rm tracespipe-*-time.txt
+    #rm $CURR_DIR/tracespipe/src/tracespipe-*-time.txt
     cp ../../VDB.fa .
 
-    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --flush-logs --run-meta --threads $NR_THREADS --inter-sim-size 2 --run-all-v-alig --run-mito --remove-dup --run-de-novo --run-hybrid --min-similarity 5 --view-top 5 --very-sensitive 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --flush-logs --run-meta --threads $NR_THREADS --inter-sim-size 1 --run-all-v-alig --run-mito --remove-dup --run-de-novo --run-hybrid --min-similarity 5 --view-top 5 --very-sensitive 
  
     cp tracespipe-${dataset}-time.txt ../
     printf "$(pwd)\n\n"
     cd ..
     
     cat output_data/TRACES_hybrid_R5_consensus/*.fa > tracespipe-${dataset}.fa
-
-    #cat output_data/TRACES_viral_consensus/*.fa > ../tracespipe-${dataset}.fa     
-  
-    
+     
     mv tracespipe-${dataset}.fa ../reconstructed/$dataset
     mv tracespipe-${dataset}-time.txt ../reconstructed/$dataset
   
-    rm *-time.txt
-    rm -rf output_data/*
+    rm -rf $CURR_DIR/tracespipe/output_data/*
    
-    rm meta_data/meta_info.txt
-    rm input_data/*
+    rm $CURR_DIR/tracespipe/meta_data/meta_info.txt
+    rm $CURR_DIR/tracespipe/input_data/*
     
     printf "$(pwd)\n\n"
    
@@ -1113,18 +1133,18 @@ if [[ "$RUN_QVG" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda activate qvg
   cd QVG
-  rm -rf reconstruction_files
+  rm -rf $CURR_DIR/QVG/reconstruction_files
   mkdir reconstruction_files
-  rm -rf *.fa*
+  rm -rf $CURR_DIR/QVG/*.fa*
   for dataset in "${DATASETS[@]}"
     do	 
     for virus in "${VIRUSES[@]}"
       do
-      rm -rf ${dataset}_files
+      rm -rf $CURR_DIR/QVG/${dataset}_files
       mkdir ${dataset}_files
       echo "${dataset}" > ${dataset}_files/samples
       cd ${dataset}_files
-      rm -rf output
+      rm -rf $CURR_DIR/QVG/${dataset}_files/output
       mkdir output
       cp ../../${dataset}_*.fq .
       gzip -cvf ${dataset}_1.fq > ${dataset}_R1.fastq.gz
@@ -1167,8 +1187,8 @@ MEM	$total_mem
 CPU_perc	$total_cpu%" > qvg-${dataset}-time.txt
     mv qvg-${dataset}-time.txt ../reconstructed/$dataset
     
-    rm -rf ${dataset}_files
-    rm qvg-*-time.txt
+    rm -rf $CURR_DIR/QVG/${dataset}_files
+    rm $CURR_DIR/QVG/qvg-*-time.txt
   done
   conda activate base 
   cd ..
@@ -1201,7 +1221,7 @@ snv:
 lofreq:
     consensus: true" > $virus.yaml
     cd ../resources/
-    rm -rf $virus
+    rm -rf $CURR_DIR/V-pipe/resources/$virus
     mkdir $virus
     cp ../../$virus.fa $virus
     cd ../references/
@@ -1237,7 +1257,7 @@ output:
   echo "SRR10903401	20200102" > config/samples.tsv
 
       
-      rm -rf samples
+      rm -rf $CURR_DIR/V-pipe/samples
       mkdir samples
       cd samples
     
@@ -1263,8 +1283,12 @@ output:
       cd ..
     
       timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o v-pipe-$virus-${dataset}-time.txt ./vpipe  --cores $NR_THREADS --conda-frontend conda
+      
+      
       cp results/SRR10903401/20200102/references/ref_majority.fasta .
       mv ref_majority.fasta $virus.fasta
+      
+      
       
     done
     
@@ -1293,12 +1317,12 @@ output:
 MEM	$total_mem
 CPU_perc	$total_cpu%" > v-pipe-${dataset}-time.txt
   cp v-pipe-${dataset}-time.txt ../reconstructed/$dataset 
-  rm -rf v-pipe-*-time.txt
+  rm -rf $CURR_DIR/V-pipe/v-pipe-*-time.txt
   cat *.fasta > v-pipe-${dataset}.fa
-  rm -rf *.fasta
+  rm -rf $CURR_DIR/V-pipe/*.fasta
   mv v-pipe-${dataset}.fa ../reconstructed/$dataset 
-  rm v-pipe-*.fa
-  
+  #rm v-pipe-*.fa
+    
   done
       
   cd ../
@@ -1440,7 +1464,7 @@ if [[ "$RUN_VISPA" -eq "1" ]]
   create_paired_fa_files
   conda activate vispa  
   cd home
-  rm -rf test
+  rm -rf $CURR_DIR/home/test
   mkdir test
   cd test 
   for dataset in "${DATASETS[@]}"
@@ -1493,7 +1517,7 @@ CPU_perc	$total_cpu%" > vispa-${dataset}-time.txt
     mv vispa-${dataset}-time.txt ../../reconstructed/$dataset
     #rm * attention
     cd ..
-    rm test/*
+    rm $CURR_DIR/home/test/*
     cd test
   done
     cd ../../
@@ -1534,16 +1558,16 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     cp ../${dataset}_*.fq .
-    rm -rf results_$dataset
+    rm -rf $CURR_DIR/lazypipe/results_$dataset
     mkdir results_$dataset
     timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o lazypipe-${dataset}-time.txt perl lazypipe.pl -1 ${dataset}_1.fq -2 ${dataset}_2.fq --pipe all,rep -v -t $NR_THREADS   
     mv results/$dataset/contigs.fa results/$dataset/lazypipe-$dataset.fa
     cp results/$dataset/lazypipe-$dataset.fa ../reconstructed/${dataset}
     mv lazypipe-${dataset}-time.txt ../reconstructed/${dataset}
-    rm ${dataset}_*.fq
-    rm -rf results_${dataset}
+    rm $CURR_DIR/lazypipe/${dataset}_*.fq
+    rm -rf $CURR_DIR/lazypipe/results_${dataset}
     cd results
-    rm -rf ${dataset}
+    rm -rf $CURR_DIR/lazypipe/results/${dataset}
     cd ..
   done
   cd ..
@@ -1637,7 +1661,7 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
    
   for dataset in "${DATASETS[@]}"
     do	
-      rm -rf assembly
+      rm -rf $CURR_DIR/TAR-VIR/PEHaplo/assembly
       mkdir assembly  
       cd assembly     
       cp ../../../${dataset}_*.fq .
@@ -1647,10 +1671,10 @@ if [[ "$RUN_PEHAPLO" -eq "1" ]]
       cp pehaplo-${dataset}-time.txt ../../../reconstructed/$dataset
       mv Contigs.fa pehaplo-${dataset}.fa
       cp pehaplo-${dataset}.fa ../../../reconstructed/$dataset
-      rm -rf Contigs.fa
+      rm -rf $CURR_DIR/TAR-VIR/PEHaplo/assembly/Contigs.fa
       
       cd ..
-      rm -rf assembly
+      rm -rf $CURR_DIR/TAR-VIR/PEHaplo/assembly
   done
   cd ../../
   conda activate base  
@@ -1821,7 +1845,7 @@ if [[ "$RUN_SSAKE" -eq "1" ]]
     mv ${dataset}_assembly_scaffolds.fa ssake-${dataset}.fa
     mv ssake-${dataset}.fa ../../reconstructed/${dataset}
     mv ssake-${dataset}-time.txt ../../reconstructed/$dataset
-    rm ${dataset}*
+    rm $CURR_DIR/ssake/tools/${dataset}*
   done
   cd ../../
 fi
@@ -1903,7 +1927,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
   for dataset in "${DATASETS[@]}"
     do
     printf "Reconstructing $dataset\n"
-    rm -rf haploflow_data
+    rm -rf $CURR_DIR/haploflow_data
     mkdir haploflow_data
     cd haploflow_data
     cp ../${dataset}_*.fq .
@@ -1914,7 +1938,7 @@ if [[ "$RUN_HAPLOFLOW" -eq "1" ]]
     cp test_$dataset/haploflow-${dataset}.fa ../reconstructed/$dataset
     
     cd ..
-    rm -rf haploflow_data
+    rm -rf $CURR_DIR/haploflow_data
   done 
   conda activate base 
 fi
@@ -1994,17 +2018,15 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
     
     for virus in "${VIRUSES[@]}"
     do
-      rm -rf ${dataset}_*.fq
+      rm -rf $CURR_DIR/release_v1.4/${dataset}_*.fq
       #rm -rf ${virus}.fa
-      rm -rf *.gz
+      rm -rf $CURR_DIR/release_v1.4/*.gz
       
       cp ../${dataset}_*.fq .
       cp ../${virus}.fa .
     
       gzip *.fq
-      
-      #rm -rf $dataset-$virus 
-      #mkdir $dataset-$virus
+
     
       echo "<config>
     <Data>
@@ -2086,12 +2108,11 @@ if [[ "$RUN_VIRGENA" -eq "1" ]]
     
     timeout --signal=SIGINT ${VIRGENA_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o virgena-$virus-${dataset}-time.txt java -jar VirGenA.jar assemble -c $dataset-conf.xml # config_test_linux.xml
     #java -jar VirGenA.jar map -c config.xml -r ../B19.fa -p1 ../DS1_1.fq -p2 ../DS1_2.fq
-    #rm $virus*
-    
+
     done
     cd res
     cat *_complete_genome_assembly.fasta > virgena-$dataset.fa
-    rm -rf *_complete_genome_assembly.fasta
+    rm -rf $CURR_DIR/release_v1.4/res/*_complete_genome_assembly.fasta
     
     
     total_time=0
@@ -2121,14 +2142,14 @@ CPU_perc	$total_cpu%" > ../virgena-${dataset}-time.txt
         
     mv ../virgena-${dataset}-time.txt ../../reconstructed/$dataset
     mv virgena-$dataset.fa ../../reconstructed/$dataset 
-    #rm -rf *
+
     cd ..
-    rm virgena-*-$dataset-time.txt
-    rm $dataset*
-    rm *.fa
-    cd res
-    rm -rf *
-    cd ..
+    rm $CURR_DIR/release_v1.4/virgena-*-$dataset-time.txt
+    rm $CURR_DIR/release_v1.4/$dataset*
+    rm $CURR_DIR/release_v1.4/*.fa
+ 
+    rm -rf $CURR_DIR/release_v1.4/res/*
+    
     
     
   done

@@ -568,11 +568,9 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   cd ../../  
   conda activate base
   
-  sudo apt install bowtie2
-  sudo apt install bcftools
+  sudo apt install bowtie2 -y
+  sudo apt install bcftools -y
 
-  
-  
 fi
 
 #ASPIRE - Can't locate App/Cmd/Setup.pm, tried installing one of the missing dependencies (Sub::Exporter), was not sucessfull, tried installing one of the missing dependencies for it (Test::LeakTrace) and it failed installation.
