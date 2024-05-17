@@ -1426,7 +1426,7 @@ gnuplot << EOF
     set datafile separator "\t"
     
     ymax = 100.5
-    ymin = 0
+    ymin = 90
     offset = ( ymax - ymin ) / 16.0   
     set yrange [ymin:ymax]
     set xrange [-0.2:2.2]

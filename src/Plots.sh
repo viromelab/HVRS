@@ -737,7 +737,7 @@ gnuplot << EOF
     set datafile separator "\t"
     
     ymax = 100.5
-    ymin = 90
+    ymin = 60
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
     set xrange [0:42]
@@ -869,7 +869,7 @@ gnuplot << EOF
     do for [ file in "${list_cnt3[@]}"]{  
       set key at 61, ymax
       plot file u 13:7 title file with linespoints linestyle count
-            
+      count = count + 1  
       ymax = ymax - offset
       
     }

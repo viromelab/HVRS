@@ -244,6 +244,9 @@ for dataset in "${DATASETS[@]}" #analyse each virus
       #mv tmp $dataset/$file
       cat $dataset/$file | tr [:lower:] [:upper:] > tmp.txt
       mv tmp.txt $dataset/$file
+      
+      #remove spaces
+      sed -i "s/ //g" $dataset/$file
 
       dnadiff $dataset/$file ../$dataset-clean.fa; #run dnadiff
       #dnadiff $dataset/$file ../$dataset.fa; #run dnadiff

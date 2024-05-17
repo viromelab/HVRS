@@ -176,28 +176,12 @@ generate_references () {
     mv top-metagenomics.csv $OUTPUT_DIR
     conda activate base
     cd refs 
-    read a
     rm $CURR_DIR/refs/*.csv  
     rm $CURR_DIR/refs/*.txt
     VIRUSES=($(ls -1 *.fa | sed -e 's/\.fa$//'))
-   
-    
-     
     
     printf "$(ls -1 *.fa| sed -e 's/\.fa$//')\n\n"
     
-    
-    for virus in "${VIRUSES[@]}"
-      do
-      
-      printf "$virus \n"
-      
-    done 
-    
-    
-    
-    
-    read a
     cp * ..
     cd ..
 }
@@ -455,7 +439,7 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
     then
       printf "Main folder where the results will be stored exists. Do you wish to remove it and create a new folder? [Y/N]\n"
     
-      read charrm 
+      read char
     
       if [ "$char" = "Y" ] || [ "$char" = "y" ]; then
         printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
