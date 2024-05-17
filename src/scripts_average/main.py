@@ -259,16 +259,21 @@ def import_files_in_dir(path):
 
         for line in file:
 
-            if is_first_line == False:
-                add_vals_dict(line)
-            else:
-                is_first_line = False
-                if fst_file == True:
-                    f_tsv=open(file_tsv, "a")
-                    f_tsv.write(line.split("\n")[0] + "\tNr SNPs / All bases\tNr SNPs / All non N bases\n")
-                    f_tsv.close()
+            if line.split("\t")[19] == "0":
+                print("Line skipped; no bases -> " + line)
 
-                    fst_file = False
+            else:
+                if is_first_line == False:
+
+                    add_vals_dict(line)
+                else:
+                    is_first_line = False
+                    if fst_file == True:
+                        f_tsv=open(file_tsv, "a")
+                        f_tsv.write(line.split("\n")[0] + "\tNr SNPs / All bases\tNr SNPs / All non N bases\n")
+                        f_tsv.close()
+
+                        fst_file = False
 
         file.close()
 

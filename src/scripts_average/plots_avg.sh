@@ -214,7 +214,7 @@ gnuplot << EOF
     set boxwidth 0.5
     
     spacing_x = 30
-    set yrange [0:]
+    set yrange [0:65]
     set xrange [-1:16]
    
     set ytics auto
@@ -227,78 +227,6 @@ gnuplot << EOF
 
 
     plot "reconstructed.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
-
-EOF
-#
-gnuplot << EOF
-    reset
-    set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "weighted_time.pdf"
-    set datafile separator "\t"
-    set boxwidth 0.5
-
-    spacing_x = 30
-    set yrange [0:]
-    set xrange [-1:16]
-    set logscale y 2
-
-    set ytics auto
-    set xtics rotate by 45 right
-    set ylabel "Weighted performance of the time using the NCSD"
-    set xlabel "Reconstruction Programs"
-    set multiplot layout 1,1
-    set rmargin 5
-    set key at screen 1, graph 1
-
-    plot "ncsd_time.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
-
-EOF
-#
-gnuplot << EOF
-    reset
-    set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "weighted_CPU.pdf"
-    set datafile separator "\t"
-    set boxwidth 0.5
-
-    spacing_x = 30
-    set yrange [0:]
-    set xrange [-1:16]
-
-    set ytics auto
-    set xtics rotate by 45 right
-    set ylabel "Weighted performance of the CPU using the NCSD"
-    set xlabel "Reconstruction Programs"
-    set multiplot layout 1,1
-    set rmargin 5
-    set key at screen 1, graph 1
-
-
-    plot "ncsd_cpu.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
-
-EOF
-#
-gnuplot << EOF
-    reset
-    set terminal pdfcairo enhanced color font 'Verdade,9'
-    set output "weighted_RAM.pdf"
-    set datafile separator "\t"
-    set boxwidth 0.5
-
-    spacing_x = 30
-    set yrange [0:]
-    set xrange [-1:16]
-
-    set ytics auto
-    set xtics rotate by 45 right
-    set ylabel "Weighted performance of the RAM using the NCSD"
-    set xlabel "Reconstruction Programs"
-    set multiplot layout 1,1
-    set rmargin 5
-    set key at screen 1, graph 1
-
-
-    plot "ncsd_ram.tsv" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
 
 EOF
 #
@@ -446,6 +374,96 @@ gnuplot << EOF
 
 
     plot 'snps_nr_bases_w_n.tsv' using (column(0)-0.125):2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle, \
+    'snps_nr_bases_wout_n.tsv' using (column(0)+0.125):2 with boxes lc rgb "#d3804a" fill solid 0.5 notitle \
+    
+    
+
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "weigthed_time.pdf"
+    set datafile separator "\t"
+    
+    set style data histogram
+    set style histogram cluster
+    
+    set boxwidth 0.25
+    
+    set autoscale y
+    set xrange [-1:16]
+   
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Ratio of the number of SNPs in relation to\nthe number of bases reconstructed"
+    set xlabel "Reconstruction Programs"
+
+    set rmargin 5
+    
+
+
+    plot 'ncsd_time.tsv' using (column(0)-0.125):2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle, \
+    'snps_nr_bases_wout_n.tsv' using (column(0)+0.125):2 with boxes lc rgb "#d3804a" fill solid 0.5 notitle \
+    
+    
+
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "weigthed_CPU.pdf"
+    set datafile separator "\t"
+    
+    set style data histogram
+    set style histogram cluster
+    
+    set boxwidth 0.25
+    
+    set autoscale y
+    set xrange [-1:16]
+   
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Ratio of the number of SNPs in relation to\nthe number of bases reconstructed"
+    set xlabel "Reconstruction Programs"
+
+    set rmargin 5
+    
+
+
+    plot 'ncsd_cpu.tsv' using (column(0)-0.125):2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle, \
+    'snps_nr_bases_wout_n.tsv' using (column(0)+0.125):2 with boxes lc rgb "#d3804a" fill solid 0.5 notitle \
+    
+    
+
+EOF
+#
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "weigthed_RAM.pdf"
+    set datafile separator "\t"
+    
+    set style data histogram
+    set style histogram cluster
+    
+    set boxwidth 0.25
+    
+    set autoscale y
+    set xrange [-1:16]
+   
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Ratio of the number of SNPs in relation to\nthe number of bases reconstructed"
+    set xlabel "Reconstruction Programs"
+
+    set rmargin 5
+    
+
+
+    plot 'ncsd_ram.tsv' using (column(0)-0.125):2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle, \
     'snps_nr_bases_wout_n.tsv' using (column(0)+0.125):2 with boxes lc rgb "#d3804a" fill solid 0.5 notitle \
     
     
