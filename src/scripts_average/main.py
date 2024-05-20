@@ -48,7 +48,10 @@ def add_to_dict(key, val, sel_dict):
 
     if key in sel_dict:
         # append the new number to the existing array at this slot
-        sel_dict[key].append(float(val.replace(",", "." )))
+        try:
+            sel_dict[key].append(float(val.replace(",", "." )))
+        except:
+            pass
     else:
         # create a new array in this slot
         try:

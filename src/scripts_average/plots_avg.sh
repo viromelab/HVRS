@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#declare -a TOOLS=("coronaSPAdes" "Haploflow" "LAZYPIPE" "metaSPAdes" "metaviralSPAdes" "PEHaplo" "QuRe" "QVG" "SPAdes" "SSAKE" "TRACESPipe" "TRACESPipeLite" "VirGenA" "ViSpA" "V-pipe")
+declare -a TOOLS=("coronaSPAdes" "Haploflow" "IRMA" "LAZYPIPE" "metaSPAdes" "metaviralSPAdes" "PEHaplo" "QuRe" "QVG" "SPAdes" "SSAKE" "TRACESPipe" "TRACESPipeLite" "V-pipe" "VirGenA" "ViSpA" )
 #declare -a list
 #declare -p list
 #
@@ -471,3 +471,84 @@ gnuplot << EOF
 EOF
 #
 mv *.pdf Graphs
+#
+
+printf "$(pwd)\n\n"
+
+
+
+declare -a DATASETS=("SRR23101281" "SRR23101235" "SRR23101259" "SRR23101276" "SRR23101228" "SRR12175231")
+
+for ds in "${DATASETS[@]}" 
+  do
+  
+  rm -rf $ds
+  mkdir $ds
+  cd $ds
+  
+  
+ printf "" > $ds
+  
+ for tool in "${TOOLS[@]}" 
+    do 
+    
+    i=$(echo "$tool" | tr '[:upper:]' '[:lower:]' )
+    content=$(cat ../total_avg_stats.tsv | grep -w "${i}-${ds}*")  
+    
+    #printf "$content\n\n"     
+    
+    if [ -z "$content" ]
+      then      
+      printf "$tool\t0\n" >> $ds     
+    else
+      val=$(echo "$content" | cut -d'	' -f10)
+
+      printf "$tool\t$val\n" >> $ds
+      content=""
+    fi    
+  done
+  
+  cd ..
+   
+done
+
+
+
+for ds in "${DATASETS[@]}" 
+  do
+  
+  cd $ds
+
+gnuplot << EOF
+    reset
+    set terminal pdfcairo enhanced color font 'Verdade,9'
+    set output "scaffolds-$ds.pdf"
+    set datafile separator "\t"
+    set boxwidth 0.5
+  
+    spacing_x = 30
+    set autoscale y
+    
+    set xrange [-1:15]
+    
+    set ytics auto
+    set xtics rotate by 45 right
+    set ylabel "Number of scaffolds - $ds"
+    set xlabel "Reconstruction Programs"
+    set multiplot layout 1,1
+    set rmargin 5
+    set key at screen 1, graph 1 
+
+
+    plot "$ds" using 0:2:xtic(1) with boxes lc rgb "#067188" fill solid 0.5 notitle
+EOF
+
+  cp *.pdf ../Graphs
+  
+  cd ..
+done
+#
+cd ..
+#
+
+
