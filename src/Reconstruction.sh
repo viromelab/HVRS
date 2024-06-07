@@ -58,7 +58,7 @@ TOP="150";
 #
 CURR_DIR=$(pwd)
 #
-declare -a DATASETS=("DS4" "DS6") # "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62");
 declare -a VIRUSES=("B19" "HPV" "VZV" "MCPyV" "MT");
 #
 #declare -a DATASETS=("DS63")
@@ -1078,7 +1078,8 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
     #rm $CURR_DIR/tracespipe/src/tracespipe-*-time.txt
     cp ../../VDB.fa .
 
-    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --flush-logs --run-meta --threads $NR_THREADS --inter-sim-size 1 --run-all-v-alig --run-mito --remove-dup --run-de-novo --run-hybrid --min-similarity 5 --view-top 5 --very-sensitive 
+    timeout --signal=SIGINT ${OVERALL_TIMEOUT}m /bin/time -f "TIME\t%e\nMEM\t%M\nCPU_perc\t%P" -o tracespipe-${dataset}-time.txt ./TRACESPipe.sh --flush-logs --run-meta --threads $NR_THREADS --inter-sim-size 1 --run-all-v-alig --run-mito --remove-dup --run-de-novo --run-hybrid --min-similarity 5 --view-top 5 --very-sensitive  
+    
  
     cp tracespipe-${dataset}-time.txt ../
     printf "$(pwd)\n\n"

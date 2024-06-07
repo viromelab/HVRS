@@ -631,7 +631,7 @@ gnuplot << EOF
     set output "ratio_snps_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 0.022
+    ymax = 0.015
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -680,7 +680,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cnt0.pdf"
     set datafile separator "\t"
     
-    ymax = 0.022
+    ymax = 0.015
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -1412,7 +1412,7 @@ gnuplot << EOF
 
     do for [ file in "${list_cvg2[@]}"]{  
       set key at 0.23, ymax
-      plot file u 14:5 title file with linespoints linetype count 
+      plot file u 14:5 title file with linespoints linestyle count
       count = count + 1
       
      
@@ -2562,7 +2562,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.14
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -2611,7 +2611,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg5.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.14
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -2913,7 +2913,7 @@ gnuplot << EOF
     set output "Max_scaffold_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 140000
+    ymax = 200000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3109,7 +3109,7 @@ gnuplot << EOF
     set output "Max_scaffold_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 140000
+    ymax = 200000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3207,7 +3207,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.10
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3256,7 +3256,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg10.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.10
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3555,7 +3555,7 @@ gnuplot << EOF
     set output "Max_scaffold_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 1100000
+    ymax = 1500000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3604,7 +3604,7 @@ gnuplot << EOF
     set output "Avg_scaffold_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 250000
+    ymax = 325000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3751,7 +3751,7 @@ gnuplot << EOF
     set output "Max_scaffold_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 1100000
+    ymax = 1500000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3800,7 +3800,7 @@ gnuplot << EOF
     set output "Avg_scaffold_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 250000
+    ymax = 325000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3849,7 +3849,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.06
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -3898,7 +3898,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg20.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.06
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -4199,7 +4199,7 @@ gnuplot << EOF
     set output "Max_scaffold_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 2500000
+    ymax = 1000000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -4248,7 +4248,7 @@ gnuplot << EOF
     set output "Avg_scaffold_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 520000
+    ymax = 200000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -4395,7 +4395,7 @@ gnuplot << EOF
     set output "Max_scaffold_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 2500000
+    ymax = 1000000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -4444,7 +4444,7 @@ gnuplot << EOF
     set output "Avg_scaffold_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 520000
+    ymax = 200000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -4493,7 +4493,7 @@ gnuplot << EOF
     set output "ratio_snps_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.06
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -4542,7 +4542,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_cvg40.pdf"
     set datafile separator "\t"
     
-    ymax = 0.16
+    ymax = 0.06
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]

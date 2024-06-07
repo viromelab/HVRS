@@ -678,7 +678,7 @@ gnuplot << EOF
     set output "ratio_snps_vir.pdf"
     set datafile separator "\t"
     
-    ymax = 0.01
+    ymax = 0.004
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -727,7 +727,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_vir.pdf"
     set datafile separator "\t"
     
-    ymax = 0.01
+    ymax = 0.004
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -2315,7 +2315,7 @@ gnuplot << EOF
     set output "Min_scaffold_wout_n_real_ds.pdf"
     set datafile separator "\t"
     
-    ymax = 162000
+    ymax = 40000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]

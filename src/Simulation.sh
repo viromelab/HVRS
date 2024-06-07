@@ -2,11 +2,11 @@
 #
 declare -a DATASETS_SRA=("SRR12175231" "SRR12175232" "SRR12175233" "SRR23101235" "SRR23101281" "SRR23101259" "SRR23101276" "SRR23101228")
 #
-lzma -k -f -d VDB.fa.lzma
+rm -f DS*
+rm -f SRR*
+rm -f *.fa
 #
-rm -f DS*_*.fq
-rm -f DS*_.sam
-rm -f DS*.bam
+lzma -k -f -d VDB.fa.lzma
 #
 gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
 gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
@@ -17,8 +17,7 @@ gto_fasta_extract_read_by_pattern -p "NC_000898.1" < VDB.fa > HHV6B.fa
 gto_fasta_extract_read_by_pattern -p "NC_014407.1" < VDB.fa > POLY7.fa
 gto_fasta_extract_read_by_pattern -p "NC_009334.1" < VDB.fa > EBV.fa
 gto_fasta_extract_read_by_pattern -p "KP745701.1" < VDB.fa > CMV.fa
-#
-Get real sequences
+#Get real sequences
 for dataset in "${DATASETS_SRA[@]}"
   do
   ./sratoolkit.3.0.7-ubuntu64/bin/prefetch $dataset
