@@ -83,10 +83,28 @@ def name_converter(key):
 def avg_dicts(dict_to_avg, name_file): #averages the dictionaries
     file = open(name_file, "w")
     dict_sel = dict(sorted(dict_to_avg.items()))
+    
+    aux_list = tools_available.copy()
 
     for key in dict_sel:
+
+        if aux_list[0] != key:
+
+            for i in aux_list:
+
+                if i not in dict_sel.keys():
+                    file.write(name_converter(i) + "\t0\n")
+                    aux_list.remove(i)
+                else:
+                    break
+
+
+
         average_value = dict_sel[key][0] / dict_sel[key][1]
         file.write(name_converter(key) + "\t" + str(round(average_value, cases)) + "\n")
+        aux_list.remove(key)
+
+
 
     file.close()
 
@@ -94,8 +112,26 @@ def calculate_nr_genomes_reconstructed (dictionary, name_file): #writes to file 
     file = open(name_file, "w")
     dict_sel = dict(sorted(dictionary.items()))
 
+    aux_list = tools_available.copy()
     for key in dict_sel:
+
+        if aux_list[0] != key:
+
+            for i in aux_list:
+
+                if i not in dict_sel.keys():
+                    file.write(name_converter(i) + "\t0\n")
+                    aux_list.remove(i)
+                else:
+                    break
+
+
+
+        average_value = dict_sel[key][0] / dict_sel[key][1]
         file.write(name_converter(key) + "\t" + str(dict_sel[key][1]) + "\n")
+        aux_list.remove(key)
+
+
 
     file.close()
 
