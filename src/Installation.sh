@@ -244,7 +244,7 @@ while [[ $# -gt 0 ]]
       shift
     ;;
     --all)
-      #INSTALL_TOOLS=1;
+      INSTALL_TOOLS=1;
       RUN_HAPLOFLOW=1;
       RUN_IRMA=1;
       RUN_LAZYPIPE=1;
@@ -296,6 +296,7 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   sudo apt -y install git
   sudo apt install gawk -y
   conda update conda -y
+  conda install --solver=classic conda-forge::conda-libmamba-solver conda-forge::libmamba conda-forge::libmambapy conda-forge::libarchive -y
   conda config --add channels defaults
   conda config --add channels conda-forge
   conda config --add channels bioconda
@@ -420,7 +421,7 @@ if [[ "$RUN_QURE" -eq "1" ]]
   eval "$(conda shell.bash hook)"
   conda create -n java-env -y
   conda activate java-env
-  conda install -c bioconda -y picard
+  conda install picard=3.1.0 -y
   conda activate base
   rm -rf QuRe_v0.99971
   wget -O qure "https://sourceforge.net/projects/qure/files/latest/download"
@@ -542,8 +543,8 @@ if [[ "$RUN_TRACESPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   conda create -y -n tracespipe
   conda activate tracespipe
-  #rm -rf tracespipe
-  #git clone https://github.com/viromelab/tracespipe.git
+  rm -rf tracespipe
+  git clone https://github.com/viromelab/tracespipe.git
   cd tracespipe/src/
   chmod +x TRACES*.sh
   ./TRACESPipe.sh --install  
@@ -611,6 +612,8 @@ if [[ "$RUN_QVG" -eq "1" ]]
   git clone https://github.com/laczkol/QVG.git
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
+  conda install freebayes=1.3.5 -y
+  coda install vcflib=1.0.3 -y
   conda activate base
   sudo apt-get -y install libncurses6
   cd ..
