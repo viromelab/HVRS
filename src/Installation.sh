@@ -613,7 +613,7 @@ if [[ "$RUN_QVG" -eq "1" ]]
   cd ./QVG/
   conda create -y --name qvg-env --file qvg-env.yaml 
   conda install freebayes=1.3.5 -y
-  coda install vcflib=1.0.3 -y
+  conda install vcflib=1.0.3 -y
   conda activate base
   sudo apt-get -y install libncurses6
   cd ..
