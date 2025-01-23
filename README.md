@@ -1,5 +1,5 @@
 # HVRS
-Human Viral Reconstruction Survey
+Human Viral Reconstruction Survey - Comparative evaluation of computational methods for reconstruction of human viral genomes
 
 ### REPLICATION ###
 
