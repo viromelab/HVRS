@@ -5,7 +5,7 @@ Human Viral Reconstruction Survey
 
 Run the whole experiment in a Linux system with:
 <pre>
-git clone https://github.com/mirakaya/HVRS.git
+git clone https://github.com/viromelab/HVRS.git
 cd HVRS/src/
 bash Installation.sh
 bash Simulation.sh
@@ -21,7 +21,7 @@ On using this software/method please cite:
 
 ### ISSUES ###
 
-For any issue let us know at [issues link](https://github.com/mirakaya/HVRS/issues).
+For any issue let us know at [issues link](https://github.com/viromelab/HVRS/issues).
 
 ### LICENSE ###
 
