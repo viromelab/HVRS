@@ -24,6 +24,10 @@ RUN_VIRGENA=0;
 RUN_SSAKE=0;
 RUN_HAPLOFLOW=0;
 RUN_IRMA=0;
+#
+CAREFUL=0;
+FAILED=0;
+#
 ################################################################################
 #
 SHOW_MENU () {
@@ -63,6 +67,9 @@ SHOW_MENU () {
   echo "                               in HVRS.                               ";
   echo "                                                                      ";
   echo " --all                         Checks all tools and datasets.         ";
+  echo "                                                                      ";
+  echo " -c, --careful                 Checks if the reconstruction programs  ";
+  echo "                               execute correctly.                     ";
   echo "                                                                      ";
   echo " Examples ----------------------------------------------------------- ";
   echo "                                                                      ";
@@ -160,6 +167,7 @@ while [[ $# -gt 0 ]]
     --all)
       RUN_CORONASPADES=1;
       RUN_HAPLOFLOW=1;
+      RUN_IRMA=1;
       RUN_LAZYPIPE=1;
       RUN_METASPADES=1;
       RUN_METAVIRALSPADES=1;
@@ -198,6 +206,10 @@ while [[ $# -gt 0 ]]
     ;;
     -d|--datasets|--dataset)
       FILES=1;
+      shift;
+    ;;
+    -c|--careful)
+      CAREFUL=1;
       shift;
     ;;
     -*) # unknown option with small
@@ -243,119 +255,324 @@ PROGRAM_EXISTS_V2 () {
     echo -e "\e[42mSUCCESS!\e[49m";
     fi
   }
+  
+VERIFY_DATASET () {
+
+  dataset=$1
+
+  if [[ -f ${dataset}_1.fq ]]; then
+    if [[ -f ${dataset}_2.fq ]]; then
+      printf "\e[42m${dataset} exists\e[49m\n"
+    else
+      printf "\e[41m${dataset} with errors\e[49m\n"
+      FAILED=1
+    fi
+    
+  else
+    printf "\e[41m${dataset} with errors\e[49m\n"
+    FAILED=1
+  fi
+}
+
+VERIFY_EXECUTION (){
+
+  TOOL=$1
+  
+  printf "Checking $TOOL ... ";
+  
+
+  ./Reconstruction.sh --$TOOL -r DStest -t 1 -m 10 -y &> a.txt
+  rm a.txt
+  
+  
+  #printf "CHECK NOW!!\n\n"
+  #read a
+  
+    
+  cd reconstructed/DStest
+  
+  if [[ ! -s "$3-DStest.fa" ]]; then 
+    
+    echo -e "\e[41mERROR\e[49m: $2 is not installed." >&2;
+    echo -e "\e[42mTIP\e[49m: Try to reinstall $2 using ./Installation.sh --$1" >&2;
+  else
+    echo -e "\e[42mSUCCESS!\e[49m";
+  fi
+  
+  cd ../../
+  rm -rf reconstructed
+   
+}
 #
 ################################################################################
 #
+if [[ "$CAREFUL" -eq "1" ]];
+  then
+  
+  lzma -k -f -d VDB.fa.lzma
+  
+  gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
+  #gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
+  #gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
+  #gto_fasta_extract_read_by_pattern -p "KX827417.1" < VDB.fa | sed 's|/||g' > MCPyV.fa
+  
+  gto_fasta_mutate -s 1 -e 0.01 < B19.fa > B19-1.fa
+  #gto_fasta_mutate -s 1 -e 0.01 < VZV.fa > VZV-1.fa
+  #gto_fasta_mutate -s 1 -e 0.01 < MCPyV.fa > MCPyV-1.fa
+  #gto_fasta_mutate -s 1 -e 0.01 < HPV.fa > HPV-1.fa
+  
+  cat B19-1.fa > DStest.fa
+  art_illumina -rs 4  -i DStest.fa -p -sam -l 150 -f 15 -m 200 -s 10 -o DStest_ &> a.txt
+  rm a.txt
+  
+  VERIFY_DATASET "DStest"
+  
+  if [[ "$FAILED" -eq "1" ]];
+    then
+    exit 1
+  fi
+  
+fi
+
+
+
 if [[ "$RUN_SPADES" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "spades.py" spades SPAdes;
+    
+  else
+    VERIFY_EXECUTION spades SPAdes spades;
+  fi
+
 fi
 #
 if [[ "$RUN_CORONASPADES" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "coronaspades.py" coronaspades coronaSPAdes;
+    
+  else
+    VERIFY_EXECUTION coronaspades coronaSPAdes coronaspades;
+  fi
 fi
 #
 if [[ "$RUN_METASPADES" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "metaspades.py" metaspades metaSPAdes;
+    
+  else
+    VERIFY_EXECUTION metaspades metaSPAdes metaspades;
+  fi
 fi
 #
 if [[ "$RUN_METAVIRALSPADES" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate spades
     PROGRAM_EXISTS "metaviralspades.py" metaviralspades metaviralSPAdes;
+    
+  else
+    VERIFY_EXECUTION metaviralspades metaviralSPAdes metaviralspades;
+  fi
 fi
 #
 if [[ "$RUN_HAPLOFLOW" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate haploflow
     PROGRAM_EXISTS "haploflow" haploflow Haploflow; 
+    
+  else
+    VERIFY_EXECUTION haploflow Haploflow haploflow;
+  fi
 fi
 #
 if [[ "$RUN_IRMA" -eq "1" ]]; 
   then
-
+  
+    if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     PROGRAM_EXISTS_V2 "IRMA" irma IRMA; 
+    
+  else
+    VERIFY_EXECUTION irma IRMA irma;
+  fi
 fi
 #
 if [[ "$RUN_LAZYPIPE" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate blast
     conda activate --stack lazypipe
     PROGRAM_EXISTS_V2 "lazypipe.pl" lazypipe LAZYPIPE2;
+    
+  else
+    VERIFY_EXECUTION lazypipe LAZYPIPE2 lazypipe;
+  fi
 fi
 #
 if [[ "$RUN_PEHAPLO" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate bio2
     PROGRAM_EXISTS_V2 "pehaplo.p*" pehaplo PEHaplo;
+    
+  else
+    VERIFY_EXECUTION pehaplo PEHaplo pehaplo;
+  fi
 fi
 #    
 if [[ "$RUN_QURE" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate java-env
     PROGRAM_EXISTS_V2 "QuRe_v0.99971" qure QuRe; 
+    
+  else
+    VERIFY_EXECUTION qure QuRe qure; 
+  fi
 fi    
 #
 if [[ "$RUN_QVG" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate qvg
-    PROGRAM_EXISTS_V2 "QVG.sh" qvg QVG;
+    PROGRAM_EXISTS_V2 "QVG.sh" qvg QVG qvg;
+    
+  else
+    VERIFY_EXECUTION qvg QVG qvg;
+  fi
 fi    
 #    
 if [[ "$RUN_SSAKE" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate base
-    PROGRAM_EXISTS_V2 "runSSAKE.sh" ssake SSAKE;
+    PROGRAM_EXISTS_V2 "runSSAKE.sh" ssake SSAKE ssake;
+    
+  else
+    VERIFY_EXECUTION ssake SSAKE ssake;
+  fi
 fi    
 #
 if [[ "$RUN_TRACESPIPELITE" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate tracespipelite
     PROGRAM_EXISTS_V2 "TRACESPipeLite.sh" tracespipelite TRACESPipeLite;
+    
+  else
+    VERIFY_EXECUTION tracespipelite TRACESPipeLite tracespipelite;
+  fi
 fi    
 #
 if [[ "$RUN_TRACESPIPE" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate tracespipe
     PROGRAM_EXISTS_V2 "TRACESPipe.sh" tracespipe TRACESPipe;
+    
+  else
+    VERIFY_EXECUTION tracespipe TRACESPipe tracespipe;
+  fi
 fi    
 #
 if [[ "$RUN_VIRGENA" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate java-env   
     PROGRAM_EXISTS_V2 "VirGenA.jar" virgena VirGenA;
+    
+  else
+    VERIFY_EXECUTION virgena VirGenA virgena;
+  fi
 fi 
 #
 if [[ "$RUN_VISPA" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate vispa
     PROGRAM_EXISTS_V2 "main_mosaik.bash" vispa ViSpA;
+    
+  else
+    VERIFY_EXECUTION vispa ViSpA vispa;
+  fi
 fi  
 #
 if [[ "$RUN_VPIPE" -eq "1" ]];
   then
+  
+  if [[ "$CAREFUL" -eq "0" ]];
+    then
+    
     eval "$(conda shell.bash hook)"
     conda activate base
     PROGRAM_EXISTS_V2 "vpipe" vpipe V-Pipe; 
+    
+  else
+    VERIFY_EXECUTION vpipe V-Pipe v-pipe; 
+  fi
 fi 
 #
 #
@@ -397,15 +614,7 @@ if [[ "$FILES" -eq "1" ]];
     
     for dataset in "${REAL_DATASETS[@]}"
       do
-      if [[ -f ${dataset}_1.fq ]]; then
-        if [[ -f ${dataset}_2.fq ]]; then
-          printf "\e[42m${dataset} exists\e[49m\n"
-        else
-          printf "\e[41m${dataset} with errors\e[49m\n"
-        fi
-      else
-        printf "\e[41m${dataset} with errors\e[49m\n"
-      fi
+      VERIFY_DATASET $dataset
     done    
     
     

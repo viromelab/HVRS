@@ -1517,5 +1517,5 @@ status 'Installation of V-pipe completed'
   #cd ..
 fi
 
-./Verification.sh --tools
+./Verification.sh --tools -c
 

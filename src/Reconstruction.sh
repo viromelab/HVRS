@@ -53,6 +53,7 @@ RUN_IRMA=0;
 #
 RESULT=0
 #
+REQUIRES_CLASSIFICATION="0";
 RUN_CLASSIFICATION="0";
 TOP="150";
 #
@@ -277,6 +278,7 @@ while [[ $# -gt 0 ]]
     --irma)
       check_installation irma;
       RUN_IRMA=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --lazypipe)
@@ -302,11 +304,13 @@ while [[ $# -gt 0 ]]
     --qure)
       check_installation qure;
       RUN_QURE=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --qvg)
       check_installation qvg;
       RUN_QVG=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --spades)      
@@ -332,16 +336,19 @@ while [[ $# -gt 0 ]]
     --virgena)
       check_installation virgena;
       RUN_VIRGENA=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --vispa)
       check_installation vispa;
       RUN_VISPA=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --vpipe)
       check_installation vpipe;
       RUN_VPIPE=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --all)
@@ -377,6 +384,7 @@ while [[ $# -gt 0 ]]
       RUN_VISPA=$RESULT;
       check_installation vpipe;
       RUN_VPIPE=$RESULT;
+      REQUIRES_CLASSIFICATION="1";
       shift
     ;;
     --virgena-timeout)
@@ -405,7 +413,9 @@ while [[ $# -gt 0 ]]
     ;;
     -r|--input|--reads)
       declare -a DATASETS=("$2");
-      RUN_CLASSIFICATION="1";
+      if [[ "$REQUIRES_CLASSIFICATION" -eq "1" ]];then
+        RUN_CLASSIFICATION="1";
+      fi
       shift 2;
     ;;
     -*) # unknown option with small
@@ -472,8 +482,8 @@ if [[ "$CREATE_RECONSTRUCTION_FOLDERS" -eq "1" ]]
   
   else #assume_yes = 1
     printf "Creating the folders where the results will be stored - $(pwd)/reconstructed/\n\n"
-    #rm -rf $CURR_DIR/reconstructed
-    #mkdir reconstructed
+    rm -rf $CURR_DIR/reconstructed
+    mkdir reconstructed
     cd reconstructed
     for dataset in "${DATASETS[@]}"
     do
