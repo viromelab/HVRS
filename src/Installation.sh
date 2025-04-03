@@ -354,6 +354,8 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   #SRA tools
   wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.7/sratoolkit.3.0.7-ubuntu64.tar.gz
   tar -xf sratoolkit.3.0.7-ubuntu64.tar.gz
+  #QVG
+  sudo apt-get install libtabixpp0
 fi
 #
 #
@@ -367,8 +369,9 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   eval "$(conda shell.bash hook)"
   conda create -y -n spades
   conda activate spades
-  conda install -c bioconda -y spades=3.15.0 python=3.8 --solver=classic
+  conda install -c bioconda -y spades=3.13.0 python=3.8 --solver=classic
   #conda install spades=3.15 -y --solver=classic
+  conda install spades=3.13.0 --force-reinstall -y
   conda activate base
 fi
 
@@ -693,7 +696,7 @@ fi
 if [[ "$RUN_VISPA" -eq "1" ]] 
   then
   printf "Installing ViSpA\n\n"
-  wget https://alan.cs.gsu.edu/NGS/sites/default/files/vispa02.zip
+  wget https://alan.cs.gsu.edu/NGS/sites/default/files/vispa02.zip --no-check-certificate
   rm -rf home
   unzip vispa02.zip 
   rm -rf vispa02.zip
@@ -1215,7 +1218,7 @@ if [[ "$RUN_IRMA" -eq "1" ]]
   printf "Installing IRMA\n\n"
   
   rm -rf flu-amd-202402.zip flu-amd
-  wget https://wonder.cdc.gov/amd/flu/irma/flu-amd-202402.zip
+  wget https://github.com/CDCgov/irma/releases/download/v1.1.4/flu-amd-202402.zip
   unzip flu-amd-202402.zip
   rm flu-amd-202402.zip
   sudo apt install r-base-core -y
@@ -1223,7 +1226,7 @@ if [[ "$RUN_IRMA" -eq "1" ]]
   sudo export PATH=$PATH:$(pwd)
   cd ..
 
-  wget https://wonder.cdc.gov/amd/flu/irma/ORG.zip
+  wget https://web.archive.org/web/20241205213306/https://wonder.cdc.gov/amd/flu/irma/ORG.zip
   unzip ORG.zip
   rm ORG.zip
   mv ORG flu-amd/IRMA_RES/modules

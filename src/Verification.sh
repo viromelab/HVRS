@@ -279,27 +279,25 @@ VERIFY_EXECUTION (){
   TOOL=$1
   
   printf "Checking $TOOL ... ";
-  
-
   ./Reconstruction.sh --$TOOL -r DStest -t 1 -m 10 -y &> a.txt
   rm a.txt
   
+  if [[ ! -s "reconstructed/DStest/$3-DStest.fa" ]]; then 
   
-  #printf "CHECK NOW!!\n\n"
-  #read a
-  
+    ./Reconstruction.sh --$TOOL -r DStest2 -t 2 -m 28 -y &> a.txt
+    rm a.txt
     
-  cd reconstructed/DStest
-  
-  if [[ ! -s "$3-DStest.fa" ]]; then 
+    if [[ ! -s "reconstructed/DStest2/$3-DStest2.fa" ]]; then 
+      echo -e "\e[41mERROR\e[49m: $2 is not installed." >&2;
+      echo -e "\e[42mTIP\e[49m: Try to reinstall $2 using ./Installation.sh --$1" >&2;
+    else
+      echo -e "\e[42mSUCCESS!\e[49m";
+    fi
     
-    echo -e "\e[41mERROR\e[49m: $2 is not installed." >&2;
-    echo -e "\e[42mTIP\e[49m: Try to reinstall $2 using ./Installation.sh --$1" >&2;
   else
     echo -e "\e[42mSUCCESS!\e[49m";
   fi
   
-  cd ../../
   rm -rf reconstructed
    
 }
@@ -312,17 +310,19 @@ if [[ "$CAREFUL" -eq "1" ]];
   lzma -k -f -d VDB.fa.lzma
   
   gto_fasta_extract_read_by_pattern -p "AY386330.1" < VDB.fa > B19.fa
-  #gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
-  #gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
-  #gto_fasta_extract_read_by_pattern -p "KX827417.1" < VDB.fa | sed 's|/||g' > MCPyV.fa
+  gto_fasta_extract_read_by_pattern -p "DQ479959.1" < VDB.fa > VZV.fa
+  gto_fasta_extract_read_by_pattern -p "KU298932.1" < VDB.fa > HPV.fa
+  gto_fasta_extract_read_by_pattern -p "KX827417.1" < VDB.fa | sed 's|/||g' > MCPyV.fa
   
   gto_fasta_mutate -s 1 -e 0.01 < B19.fa > B19-1.fa
-  #gto_fasta_mutate -s 1 -e 0.01 < VZV.fa > VZV-1.fa
-  #gto_fasta_mutate -s 1 -e 0.01 < MCPyV.fa > MCPyV-1.fa
-  #gto_fasta_mutate -s 1 -e 0.01 < HPV.fa > HPV-1.fa
+  gto_fasta_mutate -s 1 -e 0.01 < VZV.fa > VZV-1.fa
+  gto_fasta_mutate -s 1 -e 0.01 < MCPyV.fa > MCPyV-1.fa
+  gto_fasta_mutate -s 1 -e 0.01 < HPV.fa > HPV-1.fa
   
   cat B19-1.fa > DStest.fa
+  cat B19-1.fa VZV-1.fa MCPyV-1.fa HPV-1.fa > DStest2.fa
   art_illumina -rs 4  -i DStest.fa -p -sam -l 150 -f 15 -m 200 -s 10 -o DStest_ &> a.txt
+  art_illumina -rs 7  -i DStest2.fa -p -sam -l 150 -f 30 -m 200 -s 10 -o DStest2_ &> a.txt
   rm a.txt
   
   VERIFY_DATASET "DStest"
