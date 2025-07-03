@@ -444,5 +444,12 @@ for dataset in "${DATASETS[@]}" #analyse each virus
 " >> dnadiff_stats.tex  
 
 done
+mkdir ../scripts_average/results
+cp total_stats.tsv ../scripts_average/results
+cd ../scripts_average
+python3 main.py
+mv total_avg_stats.tsv total_stats.tsv
+mv total_stats.tsv ../reconstructed
+cd ..
 conda activate base
 #
