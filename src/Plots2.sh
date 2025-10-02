@@ -1573,7 +1573,7 @@ gnuplot << EOF
     set output "Recon_bases_length.pdf"
     set datafile separator "\t"
     
-    ymax = 500000
+    ymax = 800000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -1770,7 +1770,7 @@ gnuplot << EOF
     set output "Recon_bases_wout_n_length.pdf"
     set datafile separator "\t"
     
-    ymax = 500000
+    ymax = 800000
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -1966,7 +1966,7 @@ gnuplot << EOF
     set output "ratio_snps_length.pdf"
     set datafile separator "\t"
     
-    ymax = 0.01
+    ymax = 0.007
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]
@@ -2015,7 +2015,7 @@ gnuplot << EOF
     set output "ratio_snps_wout_n_length.pdf"
     set datafile separator "\t"
     
-    ymax = 0.01
+    ymax = 0.007
     ymin = 0
     offset = ( ymax - ymin )/16.0  
     set yrange [ymin:ymax]

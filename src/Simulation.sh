@@ -217,7 +217,7 @@ cat B19-2.fa HPV-2.fa VZV-2.fa MCPyV-2.fa > DS59-clean.fa
 cat B19-3.fa HPV-3.fa VZV-3.fa MCPyV-3.fa tmp2.fa MT.fa > DS60.fa
 cat B19-3.fa HPV-3.fa VZV-3.fa MCPyV-3.fa > DS60-clean.fa
 #
-cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp2.fa MT.fa > DS61.fa
+cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa tmp1.fa MT.fa > DS61.fa
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa > DS61-clean.fa
 cp DS61.fa DS62.fa
 cp DS61-clean.fa DS62-clean.fa
