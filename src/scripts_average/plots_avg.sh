@@ -276,7 +276,7 @@ gnuplot << EOF
    
     set ytics auto
     set xtics rotate by 45 right
-    set ylabel "Minimum length per contig reconstructed"
+    set ylabel "Minimum length per scaffold reconstructed"
     set xlabel "Reconstruction Programs"
 
     set rmargin 5
@@ -306,7 +306,7 @@ gnuplot << EOF
    
     set ytics auto
     set xtics rotate by 45 right
-    set ylabel "Maximum length per contig reconstructed"
+    set ylabel "Maximum length per scaffold reconstructed"
     set xlabel "Reconstruction Programs"
 
     set rmargin 5
@@ -336,7 +336,7 @@ gnuplot << EOF
    
     set ytics auto
     set xtics rotate by 45 right
-    set ylabel "Average length per contig reconstructed"
+    set ylabel "Average length per scaffold reconstructed"
     set xlabel "Reconstruction Programs"
 
     set rmargin 5
