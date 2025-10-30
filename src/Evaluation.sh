@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS63" "DS64" "DS65" "SRR23101281" "SRR23101235" "SRR23101259" "SRR23101276" "SRR23101228" "SRR12175231" "SRR12175232" "SRR12175233")
+declare -a DATASETS=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57"  "DS58"  "DS59"  "DS60"  "DS61"  "DS62" "DS63" "DS64" "DS65" "DS66" "DS67" "DS68" "DS69" "DS70" "DS71" "DS72" "DS73" "SRR23101281" "SRR23101235" "SRR23101259" "SRR23101276" "SRR23101228" "SRR12175231" "SRR12175232" "SRR12175233")
 #declare -a DATASETS=("DS63" "DS64" "DS65")
 #
 declare -a ANALYSIS=("tracespipelite" "spades" "metaspades" "metaviralspades" "coronaspades" "ssake" "tracespipe" "lazypipe" "pehaplo" "haploflow");
@@ -12,16 +12,16 @@ declare -a NO_CLASSIFICATION=("irma" "spades" "metaspades" "metaviralspades" "co
 declare -a ORDER_TOOLS=("coronaspades" "haploflow" "irma" "lazypipe" "metaspades" "metaviralspades" "pehaplo" "qure" "qvg" "spades" "ssake" "tracespipe" "tracespipelite" "v" "virgena" "vispa")
 #
 declare -a COVERAGE_2=("DS1" "DS9" "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24")
-declare -a COVERAGE_5=("DS2" "DS10" "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32")
+declare -a COVERAGE_5=("DS2" "DS10" "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32" "DS66" "DS67" "DS68" "DS69" )
 declare -a COVERAGE_10=("DS3" "DS11" "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40")
 declare -a COVERAGE_15=("DS4" "DS12")
-declare -a COVERAGE_20=("DS5" "DS13" "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48" "DS57"  "DS58" "DS61"  "DS62")
+declare -a COVERAGE_20=("DS5" "DS13" "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48" "DS57"  "DS58" "DS61"  "DS62" "DS63" "DS64" "DS65")
 declare -a COVERAGE_25=("DS6" "DS14")
 declare -a COVERAGE_30=("DS7" "DS15" "DS59")
-declare -a COVERAGE_40=("DS8" "DS16" "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56" "DS60")
+declare -a COVERAGE_40=("DS8" "DS16" "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56" "DS60" "DS70" "DS71" "DS72" "DS73")
 #
-declare -a SNP_1=("DS1"  "DS2"  "DS3"  "DS4"  "DS5"  "DS6"  "DS7"  "DS8"  "DS9"  "DS10"  "DS11"  "DS12"  "DS13"  "DS14"  "DS15"  "DS16" "DS57" "DS58" "DS61" "DS62")
-declare -a SNP_0=("DS17"  "DS25"  "DS33"  "DS41" "DS49")
+declare -a SNP_1=("DS1"  "DS2"  "DS3"  "DS4"  "DS5"  "DS6"  "DS7"  "DS8"  "DS9"  "DS10"  "DS11"  "DS12"  "DS13"  "DS14"  "DS15"  "DS16" "DS57" "DS58" "DS61" "DS62" "DS63" "DS64" "DS65")
+declare -a SNP_0=("DS17"  "DS25"  "DS33"  "DS41" "DS49" "DS66" "DS67" "DS68" "DS69" "DS70" "DS71" "DS72" "DS73")
 declare -a SNP_3=("DS18"  "DS26"  "DS34"  "DS42"  "DS50" "DS59")
 declare -a SNP_5=("DS19"  "DS27"  "DS35"  "DS43"  "DS51" "DS60")
 declare -a SNP_7=("DS20"  "DS28"  "DS36"  "DS44"  "DS52" )
@@ -31,7 +31,7 @@ declare -a SNP_13=("DS23"  "DS31"  "DS39"  "DS47"  "DS55")
 declare -a SNP_15=("DS24"  "DS32"  "DS40"  "DS48"  "DS56")
 #
 declare -a CNT_0=("DS1" "DS2" "DS3" "DS4" "DS5" "DS6" "DS7" "DS8" "DS58")
-declare -a CNT_3=("DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57" "DS59" "DS61"  "DS62")
+declare -a CNT_3=("DS9" "DS10" "DS11" "DS12" "DS13"  "DS14"  "DS15"  "DS16"  "DS17"  "DS18"  "DS19"  "DS20"  "DS21"  "DS22"  "DS23"  "DS24"  "DS25"  "DS26"  "DS27"  "DS28"  "DS29"  "DS30"  "DS31"  "DS32"  "DS33"  "DS34"  "DS35"  "DS36"  "DS37"  "DS38"  "DS39"  "DS40"  "DS41"  "DS42"  "DS43"  "DS44"  "DS45"  "DS46"  "DS47"  "DS48"  "DS49"  "DS50"  "DS51"  "DS52"  "DS53"  "DS54"  "DS55"  "DS56"  "DS57" "DS59" "DS61"  "DS62" "DS63" "DS64" "DS65" "DS66" "DS67" "DS68" "DS69" "DS70" "DS71" "DS72" "DS73" )
 declare -a CNT_6=("DS60")
 #
 count=0

@@ -356,6 +356,11 @@ if [[ "$INSTALL_TOOLS" -eq "1" ]]
   tar -xf sratoolkit.3.0.7-ubuntu64.tar.gz
   #QVG
   sudo apt-get install libtabixpp0
+  #Install wgsim
+  git clone https://github.com/lh3/wgsim
+  cd wgsim
+  gcc -g -O2 -Wall -o wgsim wgsim.c -lz -lm
+  cd ..
 fi
 #
 #

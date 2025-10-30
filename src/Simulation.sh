@@ -229,6 +229,22 @@ cat B19-1.fa HPV-1.fa VZV-1.fa POLY7-1.fa EBV-1.fa > DS64-clean.fa
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV-1.fa tmp1.fa MT.fa > DS65.fa
 cat B19-1.fa HPV-1.fa VZV-1.fa MCPyV-1.fa CMV-1.fa > DS65-clean.fa
 #
+cat B19-9.fa HPV-9.fa VZV-9.fa MCPyV-9.fa tmp1.fa MT.fa > DS66.fa
+cat B19-9.fa HPV-9.fa VZV-9.fa MCPyV-9.fa > DS66-clean.fa
+cp DS66.fa DS67.fa
+cp DS66-clean.fa DS67-clean.fa
+cp DS66.fa DS68.fa
+cp DS66-clean.fa DS68-clean.fa
+cp DS66.fa DS69.fa
+cp DS66-clean.fa DS69-clean.fa
+cp DS66.fa DS70.fa
+cp DS66-clean.fa DS70-clean.fa
+cp DS66.fa DS71.fa
+cp DS66-clean.fa DS71-clean.fa
+cp DS66.fa DS72.fa
+cp DS66-clean.fa DS72-clean.fa
+cp DS66.fa DS73.fa
+cp DS66-clean.fa DS73-clean.fa
 #
 # SIMULATE FASTQ READS:
 #
@@ -308,6 +324,16 @@ art_illumina -rs 62  -i DS62.fa -p -sam -l 250 -f 20 -m 400 -s 10 -o DS62_
 art_illumina -rs 63  -i DS63.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS63_
 art_illumina -rs 64  -i DS64.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS64_
 art_illumina -rs 65  -i DS65.fa -p -sam -l 150 -f 20 -m 200 -s 10 -o DS65_
+#
+./wgsim/wgsim -e 0.0 -1 150 -2 150 -N 3507 DS66.fa DS66_1.fq DS66_2.fq
+./wgsim/wgsim -e 0.01 -1 150 -2 150 -N 3507 DS67.fa DS67_1.fq DS67_2.fq
+./wgsim/wgsim -e 0.025 -1 150 -2 150 -N 3507 DS68.fa DS68_1.fq DS68_2.fq
+./wgsim/wgsim -e 0.05 -1 150 -2 150 -N 3507 DS69.fa DS69_1.fq DS69_2.fq
+#
+./wgsim/wgsim -e 0.0 -1 150 -2 150 -N 28057 DS70.fa DS70_1.fq DS70_2.fq
+./wgsim/wgsim -e 0.01 -1 150 -2 150 -N 28057 DS71.fa DS71_1.fq DS71_2.fq
+./wgsim/wgsim -e 0.025 -1 150 -2 150 -N 28057 DS72.fa DS72_1.fq DS72_2.fq
+./wgsim/wgsim -e 0.05 -1 150 -2 150 -N 28057 DS73.fa DS73_1.fq DS73_2.fq
 #
 rm *.aln *.sam
 #
