@@ -34,7 +34,7 @@ list_datasets = ["DS1", "DS2", "DS3", "DS4", "DS5", "DS6", "DS7", "DS8", "DS9", 
                  "DS26", "DS27", "DS28",  "DS29",  "DS30",  "DS31",  "DS32",  "DS33",  "DS34",  "DS35",  "DS36",
                  "DS37",  "DS38",  "DS39",  "DS40", "DS41",  "DS42",  "DS43",  "DS44",  "DS45",  "DS46",  "DS47",
                  "DS48",  "DS49",  "DS50",  "DS51",  "DS52",  "DS53",  "DS54",  "DS55",  "DS56",  "DS57",  "DS58",
-                 "DS59",  "DS60",  "DS61",  "DS62", "DS63", "DS64", "DS65", "SRR23101281", "SRR23101235",
+                 "DS59",  "DS60",  "DS61",  "DS62", "DS63", "DS64", "DS65", "DS66", "DS67", "DS68", "DS69", "DS70", "DS71", "DS72", "DS73", "SRR23101281", "SRR23101235",
                  "SRR23101259", "SRR23101276", "SRR23101228", "SRR12175231", "SRR12175232", "SRR12175233"]
 tools_available = ["coronaspades","haploflow","irma","lazypipe","metaspades","metaviralspades","pehaplo",
                    "qure","qvg","spades","ssake","tracespipe","tracespipelite","virgena","vispa", "v-pipe"]
