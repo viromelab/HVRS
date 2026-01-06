@@ -160,7 +160,7 @@ This will print the following options:
 
 On using this software/method please cite:
 
-* pending
+* Maria JP Sousa, Mari Toppinen, Lari Pyöriä, Klaus Hedman, Antti Sajantila, Maria F Perdomo, Diogo Pratas. An evaluation of computational methods for reconstruction of human viral DNA genomes. GigaScience, 2025. https://doi.org/10.1093/gigascience/giaf159
 
 ### ISSUES ###
 
