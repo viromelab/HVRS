@@ -376,7 +376,8 @@ if [[ "$RUN_SPADES" -eq "1" ]] || [[ "$RUN_METAVIRALSPADES" -eq "1" ]] || [[ "$R
   conda activate spades
   conda install -c bioconda -y spades=3.13.0 python=3.8 --solver=classic
   #conda install spades=3.15 -y --solver=classic
-  conda install spades=3.13.0 --force-reinstall -y
+  #conda install spades=3.13.0 --force-reinstall -y
+  conda install spades=4.2.0 -y
   conda activate base
 fi
 
@@ -541,6 +542,7 @@ if [[ "$RUN_TRACESPIPELITE" -eq "1" ]]
   chmod +x *.sh
   ./TRACESPipeLite.sh --install
   cd ../../  
+  conda install python=3.10 bowtie2 samtools -y
   conda activate base
 fi
 
@@ -606,26 +608,43 @@ fi
 
 
 #QVG 
-if [[ "$RUN_QVG" -eq "1" ]] 
-  then
+if [[ "$RUN_QVG" -eq "1" ]]; then
   printf "Installing QVG\n\n"
-  eval "$(conda shell.bash hook)"  
-  conda create -y -n qvg
-  conda activate qvg  
-  conda install samtools=1.17 -y
-  conda install -c bioconda -y bwa sambamba freebayes bcftools vcflib vcftools bedtools bioawk fastp
-  conda install -c conda-forge -y ncurses
-  conda install -c r -y r
+
+  # Initialize conda
+  eval "$(conda shell.bash hook)"
+
+  conda config --set channel_priority strict
+
+  conda create -y -n qvg python=3.9
+  conda activate qvg
+
+  conda install -y \
+    -c conda-forge \
+    -c bioconda \
+    samtools=1.17 \
+    bwa \
+    sambamba \
+    freebayes \
+    bcftools \
+    vcflib \
+    vcftools \
+    bedtools \
+    bioawk \
+    fastp \
+    ncurses \
+    r-base
+
+  # Clone QVG
   rm -rf QVG/
   git clone https://github.com/laczkol/QVG.git
-  cd ./QVG/
-  conda create -y --name qvg-env --file qvg-env.yaml 
-  conda install freebayes=1.3.5 -y
-  conda install vcflib=1.0.3 -y
+  cd QVG/
+
+  conda env create -n qvg-env -f qvg-env.yaml
   conda activate base
-  sudo apt-get -y install libncurses6
   cd ..
 fi
+
 
 #Strainline - seg. fault; reads.las not present
 if [[ "$RUN_STRAINLINE" -eq "1" ]]
@@ -740,7 +759,7 @@ if [[ "$RUN_LAZYPIPE" -eq "1" ]]
   eval "$(conda shell.bash hook)"  
   rm -rf lazypipe 
   rm 277fafc.tar.gz 
-  wget https://bitbucket.com/plyusnin/lazypipe/get/277fafc.tar.gz
+  curl -L -o 277fafc.tar.gz https://bitbucket.org/plyusnin/lazypipe/get/277fafc.tar.gz
   tar -xf 277fafc.tar.gz 
   mv plyusnin-lazypipe-277fafc63631/ lazypipe
   cd lazypipe
@@ -1451,7 +1470,7 @@ else
 
 	VPIPEENV=V-pipe
 	# HACK Alternate to consider if we have have version conflicts
-	conda create --yes -n ${VPIPEENV} -c conda-forge -c bioconda snakemake-minimal
+	conda create --yes -n ${VPIPEENV} -c conda-forge -c bioconda snakemake-minimal=7.11.0 tabulate=0.8.10
 	conda activate ${VPIPEENV}
 fi
 

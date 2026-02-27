@@ -1195,6 +1195,7 @@ if [[ "$RUN_VPIPE" -eq "1" ]]
   then
   printf "Reconstructing with V-pipe\n\n"
   eval "$(conda shell.bash hook)"
+  conda activate V-pipe
 
   cd V-pipe/
   mkdir references
